@@ -16,8 +16,8 @@
             @foreach($buy_nft as $nft)
             <div class="col col-lg-3 col-md-4 col-6">
                 <div class="card">
-                    <img class="card-img-top" src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}"
-                        alt="{{ $nft->ntf_name }}" style="height: 300px; object-fit: cover;">
+                    <img class="card-img-top" src="{{ asset($nft->ntf_image) }}" alt="{{ $nft->ntf_name }}"
+                        style="height: 300px; object-fit: cover;">
                     <div class="card-header">
                         <h5 class="card-title mb-0">{{ $nft->ntf_name }}</h5>
                     </div>
