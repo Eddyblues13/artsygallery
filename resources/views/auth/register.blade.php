@@ -52,6 +52,12 @@
                                 novalidate>
                                 @csrf
 
+
+                                <!-- Honeypot field -->
+                                <input type="text" name="honeypot" style="display:none;">
+                                <!-- Timestamp field -->
+                                <input type="hidden" name="timestamp" value="{{ now()->timestamp }}">
+
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Full Name</label>
                                     <input type="text" class="form-control" id="fullname" name="name"
