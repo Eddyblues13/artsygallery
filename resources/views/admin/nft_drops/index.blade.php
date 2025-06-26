@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <div class="card-footer">
+                <div class="card-footer"> 
                     <form action="{{ route('admin.nft-drops.destroy', $my_nft->id) }}" method="POST"
                         onsubmit="return confirm('Are you sure you want to delete this NFT Drop?');">
                         @csrf

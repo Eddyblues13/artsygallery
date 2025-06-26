@@ -16,23 +16,18 @@ class NftDropController extends Controller
      */
     public function index()
     {
-        // Fetch NFT Drops with user information (name and email) using leftJoin
-        $buy_nft = NftDrop::leftJoin('users', 'nft_drops.user_id', '=', 'users.id')
-            ->select('nft_drops.*', 'users.name', 'users.email')
-            ->orderBy('nft_drops.created_at', 'desc')
+        $buy_nft = NftDrop::with('user:id,name,email')
+            ->orderByDesc('created_at')
             ->paginate(12);
 
-        // Return the admin NFT Drops view with the data
         return view('admin.nft_drops.index', compact('buy_nft'));
     }
-
 
     /**
      * Show the form for creating a new NFT Drop.
      */
     public function create()
     {
-        // Fetch all users where usertype is 0
         $users = User::where('user_type', 0)->get();
         return view('admin.nft_drops.create', compact('users'));
     }
@@ -40,10 +35,6 @@ class NftDropController extends Controller
     /**
      * Store a newly created NFT Drop in storage.
      */
-
-
-
-
     public function store(Request $request)
     {
         $request->validate([
@@ -51,15 +42,13 @@ class NftDropController extends Controller
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg,avif,webp|max:2048',
             'eth_value' => 'required|numeric',
             'change' => 'required|numeric',
-            'user_id' => 'required|numeric',
+            'user_id' => 'required|exists:users,id',
             'duration' => 'required|integer',
             'is_positive' => 'required|boolean',
         ]);
 
-        // Upload to Cloudinary
         $uploadResult = $this->uploadToCloudinary($request->file('image_url'), 'nft_drops');
 
-        // Create NFT Drop
         NftDrop::create([
             'name' => $request->name,
             'image_url' => $uploadResult['secure_url'],
@@ -77,40 +66,16 @@ class NftDropController extends Controller
     /**
      * Show the form for editing the specified NFT Drop.
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $data['nftDrop'] = NftDrop::findOrFail($id);
-        // Fetch all users where usertype is 0
-        $data['users'] = User::where('user_type', 0)->get();
-
-        $query = $request->input('query');
-
-        // Fetch users by name or email matching the query
-        $users = User::where('name', 'LIKE', "%$query%")
-            ->orWhere('email', 'LIKE', "%$query%")
-            ->get();
-
-        return view('admin.nft_drops.edit', $data, ['users' => $users]);
-    }
-
-
-
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
-        $users = User::where('name', 'LIKE', "%$query%")
-            ->orWhere('email', 'LIKE', "%$query%")
-            ->get(['id', 'name', 'email']);
-
-        return response()->json($users);
+        $nftDrop = NftDrop::findOrFail($id);
+        $users = User::where('user_type', 0)->get();
+        return view('admin.nft_drops.edit', compact('nftDrop', 'users'));
     }
 
     /**
      * Update the specified NFT Drop in storage.
      */
-
-
-
     public function update(Request $request, $id)
     {
         $nftDrop = NftDrop::findOrFail($id);
@@ -120,7 +85,7 @@ class NftDropController extends Controller
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,avif,webp|max:2048',
             'eth_value' => 'required|numeric|min:0',
             'change' => 'required|numeric|min:0',
-            'user_id' => 'required',
+            'user_id' => 'required|exists:users,id',
             'duration' => 'required|integer',
             'is_positive' => 'required|boolean',
         ]);
@@ -134,14 +99,9 @@ class NftDropController extends Controller
             'is_positive' => $validated['is_positive'],
         ];
 
-        // Handle new image upload
         if ($request->hasFile('image_url')) {
-            // Delete old image from Cloudinary
             $this->deleteFromCloudinary($nftDrop->cloudinary_public_id);
-
-            // Upload new image
             $uploadResult = $this->uploadToCloudinary($request->file('image_url'), 'nft_drops');
-
             $updateData['image_url'] = $uploadResult['secure_url'];
             $updateData['cloudinary_public_id'] = $uploadResult['public_id'];
         }
@@ -149,6 +109,37 @@ class NftDropController extends Controller
         $nftDrop->update($updateData);
 
         return redirect()->route('admin.nft-drops.index')->with('success', 'NFT Drop updated successfully.');
+    }
+
+    /**
+     * Remove the specified NFT Drop from storage.
+     */
+    public function destroy($id)
+    {
+        $nftDrop = NftDrop::findOrFail($id);
+
+        // Delete image from Cloudinary
+        if ($nftDrop->cloudinary_public_id) {
+            $this->deleteFromCloudinary($nftDrop->cloudinary_public_id);
+        }
+
+        $nftDrop->delete();
+
+        return redirect()->route('admin.nft-drops.index')
+            ->with('success', 'NFT Drop deleted successfully');
+    }
+
+    /**
+     * Search users for AJAX requests.
+     */
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $users = User::where('name', 'LIKE', "%$query%")
+            ->orWhere('email', 'LIKE', "%$query%")
+            ->get(['id', 'name', 'email']);
+
+        return response()->json($users);
     }
 
     // Helper method for Cloudinary uploads
