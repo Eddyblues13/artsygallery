@@ -28,8 +28,8 @@ class AdminController extends Controller
     {
         return view('admin.ethereum');
     }
-    
-        public function updateWhatsAppApi()
+
+    public function updateWhatsAppApi()
     {
         return view('admin.whatsapp');
     }
@@ -51,9 +51,9 @@ class AdminController extends Controller
         $update->save();
         return back()->with('status', 'Wallet Details Updated Successfully');
     }
-    
-    
-        public function updateWhatsapp(Request $request)
+
+
+    public function updateWhatsapp(Request $request)
     {
 
 
@@ -102,55 +102,55 @@ class AdminController extends Controller
         return view('admin.nft');
     }
 
-// public function adminApproveNft(Request $request)
-// {
-//     // Query the NFTs without pagination
-//     $query = User::join('nfts', 'users.id', '=', 'nfts.user_id')
-//         // ->orderBy('nfts.id', 'asc')
-//         ->orderBy('nfts.created_at', 'desc')
-//         ->select('users.email', 'users.name as user_name', 'nfts.*');
+    // public function adminApproveNft(Request $request)
+    // {
+    //     // Query the NFTs without pagination
+    //     $query = User::join('nfts', 'users.id', '=', 'nfts.user_id')
+    //         // ->orderBy('nfts.id', 'asc')
+    //         ->orderBy('nfts.created_at', 'desc')
+    //         ->select('users.email', 'users.name as user_name', 'nfts.*');
 
-//     // Apply search filters if provided
-//     if ($request->has('search')) {
-//         $search = $request->input('search');
-//         $query->where(function($q) use ($search) {
-//             $q->where('nfts.name', 'like', '%' . $search . '%')
-//               ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
-//               ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
-//         });
-//     }
+    //     // Apply search filters if provided
+    //     if ($request->has('search')) {
+    //         $search = $request->input('search');
+    //         $query->where(function($q) use ($search) {
+    //             $q->where('nfts.name', 'like', '%' . $search . '%')
+    //               ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
+    //               ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
+    //         });
+    //     }
 
-//     $users_nfts = $query->get(); // Retrieve all records without pagination
+    //     $users_nfts = $query->get(); // Retrieve all records without pagination
 
-//     return view('admin.approve_nft', compact('users_nfts'));
-// }
+    //     return view('admin.approve_nft', compact('users_nfts'));
+    // }
 
 
-public function adminApproveNft(Request $request)
-{
-    // Query the NFTs with pagination in descending order of creation date
-    $query = User::join('nfts', 'users.id', '=', 'nfts.user_id')
-        ->orderBy('nfts.created_at', 'desc')
-        ->select('users.email', 'users.name as user_name', 'nfts.*');
+    public function adminApproveNft(Request $request)
+    {
+        // Query the NFTs with pagination in descending order of creation date
+        $query = User::join('nfts', 'users.id', '=', 'nfts.user_id')
+            ->orderBy('nfts.created_at', 'desc')
+            ->select('users.email', 'users.name as user_name', 'nfts.*');
 
-    // Apply search filters if provided
-    if ($request->has('search')) {
-        $search = $request->input('search');
-        $query->where(function($q) use ($search) {
-            $q->where('nfts.name', 'like', '%' . $search . '%')
-              ->orWhere('nfts.ntf_owner', 'like', '%' . $search . '%')
-              ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
-              ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
-        });
+        // Apply search filters if provided
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nfts.name', 'like', '%' . $search . '%')
+                    ->orWhere('nfts.ntf_owner', 'like', '%' . $search . '%')
+                    ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
+                    ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
+            });
+        }
+
+        $users_nfts = $query->paginate(10); // Adjust the number as needed
+
+        return view('admin.approve_nft', compact('users_nfts'));
     }
 
-    $users_nfts = $query->paginate(10); // Adjust the number as needed
 
-    return view('admin.approve_nft', compact('users_nfts'));
-}
-
-
- public function searchNft(Request $request)
+    public function searchNft(Request $request)
     {
         // Query the NFTs with search functionality
         $query = User::join('nfts', 'users.id', '=', 'nfts.user_id')
@@ -160,11 +160,11 @@ public function adminApproveNft(Request $request)
         // Apply search filters if provided
         if ($request->has('search')) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nfts.ntf_name', 'like', '%' . $search . '%')
-                  ->orWhere('nfts.ntf_owner', 'like', '%' . $search . '%')
-                  ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
-                  ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
+                    ->orWhere('nfts.ntf_owner', 'like', '%' . $search . '%')
+                    ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
+                    ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
             });
         }
 
@@ -178,7 +178,7 @@ public function adminApproveNft(Request $request)
 
     public function nftMarket()
     {
-        $data['buy_nft'] =Nft::where('status', '1')->orderBy('updated_at', 'desc')->paginate(12);
+        $data['buy_nft'] = Nft::where('status', '1')->orderBy('updated_at', 'desc')->paginate(12);
         $nft = $data['buy_nft'];
         $eth = $this->procesData($nft);
         return view('admin.nftmarkets', ['buy_nft' => $eth]);
@@ -261,115 +261,115 @@ public function adminApproveNft(Request $request)
 
 
 
-public function userProfile($id)
-{
-    // 1. Retrieve the user profile using DB::table and execute the query with `first()`
-    $userProfile = DB::table('users')->where('id', $id)->first();
+    public function userProfile($id)
+    {
+        // 1. Retrieve the user profile using DB::table and execute the query with `first()`
+        $userProfile = DB::table('users')->where('id', $id)->first();
 
-    if (!$userProfile) {
-        return redirect()->back()->with('error', 'User not found.');
-    }
-
-    // 2. Retrieve user transactions
-    $user_deposit = Transaction::where('user_id', $id)
-                                ->where('transaction_type', 'Deposit')
-                                ->orderBy('id', 'asc')
-                                ->get();
-
-    $user_withdrawal = Transaction::where('user_id', $id)
-                                   ->where('transaction_type', 'Withdrawal')
-                                   ->orderBy('id', 'asc')
-                                   ->get();
-
-    $user_profit = Transaction::where('user_id', $id)
-                              ->where('transaction_type', 'Profit')
-                              ->orderBy('id', 'asc')
-                              ->get();
-
-    // 3. Get file path and extension from userProfile
-    // Ensure the file exists and the path is valid
-    $filePath = $userProfile->id_card ? asset($userProfile->id_card) : null;
-    $extension = $filePath ? strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) : null;
-
-
-    // 4. Fetch Ethereum price from CoinGecko API
-    $client = new Client();
-    try {
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-            'timeout' => 10, // Optional: Set a timeout
-        ]);
-
-        $data_price = json_decode($response->getBody(), true);
-        $price = $data_price['ethereum']['usd'] ?? 0;
-
-        if ($price == 0) {
-            throw new \Exception('Ethereum price not found.');
+        if (!$userProfile) {
+            return redirect()->back()->with('error', 'User not found.');
         }
-    } catch (\Exception $e) {
-        // Handle API errors gracefully
-        return redirect()->back()->with('error', 'Failed to fetch Ethereum price.');
+
+        // 2. Retrieve user transactions
+        $user_deposit = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'Deposit')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $user_withdrawal = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'Withdrawal')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $user_profit = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'Profit')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // 3. Get file path and extension from userProfile
+        // Ensure the file exists and the path is valid
+        $filePath = $userProfile->id_card ? asset($userProfile->id_card) : null;
+        $extension = $filePath ? strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) : null;
+
+
+        // 4. Fetch Ethereum price from CoinGecko API
+        $client = new Client();
+        try {
+            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
+                'query' => [
+                    'ids' => 'ethereum',
+                    'vs_currencies' => 'usd',
+                ],
+                'timeout' => 10, // Optional: Set a timeout
+            ]);
+
+            $data_price = json_decode($response->getBody(), true);
+            $price = $data_price['ethereum']['usd'] ?? 0;
+
+            if ($price == 0) {
+                throw new \Exception('Ethereum price not found.');
+            }
+        } catch (\Exception $e) {
+            // Handle API errors gracefully
+            return redirect()->back()->with('error', 'Failed to fetch Ethereum price.');
+        }
+
+        // 5. Calculate transaction sums
+        $deposit = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'Deposit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $deposit_eth = $deposit / $price;
+
+        $withdrawal = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'Withdrawal')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $withdrawal_eth = $withdrawal / $price;
+
+        $add_profit = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'Profit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $debit_profit = Transaction::where('user_id', $id)
+            ->where('transaction_type', 'DebitProfit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $profit = $add_profit - $debit_profit;
+        $profit_eth = $profit / $price;
+
+        $balance = $deposit + $profit - $withdrawal;
+        $balance_eth = $balance / $price;
+
+        // 6. Prepare data array
+        $data = [
+            'deposit' => $deposit,
+            'deposit_eth' => $deposit_eth,
+            'withdrawal' => $withdrawal,
+            'withdrawal_eth' => $withdrawal_eth,
+            'add_profit' => $add_profit,
+            'debit_profit' => $debit_profit,
+            'profit' => $profit,
+            'profit_eth' => $profit_eth,
+            'balance' => $balance,
+            'balance_eth' => $balance_eth,
+            'extension' => $extension,
+
+        ];
+
+        // 7. Pass data to the view
+        return view('admin.user', array_merge($data, [
+            'userProfile' => $userProfile,
+            'user_deposit' => $user_deposit,
+            'user_withdrawal' => $user_withdrawal,
+            'filePath' => $filePath,
+            'user_profit' => $user_profit,
+        ]));
     }
-
-    // 5. Calculate transaction sums
-    $deposit = Transaction::where('user_id', $id)
-                         ->where('transaction_type', 'Deposit')
-                         ->where('status', '1')
-                         ->sum('transaction_amount');
-
-    $deposit_eth = $deposit / $price;
-
-    $withdrawal = Transaction::where('user_id', $id)
-                             ->where('transaction_type', 'Withdrawal')
-                             ->where('status', '1')
-                             ->sum('transaction_amount');
-
-    $withdrawal_eth = $withdrawal / $price;
-
-    $add_profit = Transaction::where('user_id', $id)
-                             ->where('transaction_type', 'Profit')
-                             ->where('status', '1')
-                             ->sum('transaction_amount');
-
-    $debit_profit = Transaction::where('user_id', $id)
-                               ->where('transaction_type', 'DebitProfit')
-                               ->where('status', '1')
-                               ->sum('transaction_amount');
-
-    $profit = $add_profit - $debit_profit;
-    $profit_eth = $profit / $price;
-
-    $balance = $deposit + $profit - $withdrawal;
-    $balance_eth = $balance / $price;
-
-    // 6. Prepare data array
-    $data = [
-        'deposit' => $deposit,
-        'deposit_eth' => $deposit_eth,
-        'withdrawal' => $withdrawal,
-        'withdrawal_eth' => $withdrawal_eth,
-        'add_profit' => $add_profit,
-        'debit_profit' => $debit_profit,
-        'profit' => $profit,
-        'profit_eth' => $profit_eth,
-        'balance' => $balance,
-        'balance_eth' => $balance_eth,
-        'extension' => $extension,
-        
-    ];
-
-    // 7. Pass data to the view
-    return view('admin.user', array_merge($data, [
-        'userProfile' => $userProfile,
-        'user_deposit' => $user_deposit,
-        'user_withdrawal' => $user_withdrawal,
-        'filePath' => $filePath,
-        'user_profit' => $user_profit,
-    ]));
-}
 
 
     public function adminSaveNft(Request $request)
@@ -492,15 +492,15 @@ public function userProfile($id)
 
 
         Mail::to($email)->send(new nftApprovedEmail($user));
-        
-          if($update)  return response()->json([
+
+        if ($update)  return response()->json([
             'success' => true,
             'message' => 'NFT has been approved successfully.',
         ]);
         // return back()->with('message', 'Nft Has Been Approved Successfully, An email has been sent to the owner');
     }
-    
-    
+
+
 
     public function ApproveId(Request $request, $id)
     {
@@ -513,13 +513,13 @@ public function userProfile($id)
         $update = DB::table('users')->where('id', $id)->update($user);
         $full_name =  $request->name;
         $email = $request->email;
-        
-        
+
+
         $user = [
-   
+
             'status' => 'Approved',
             'full_name' => $request->name
-         
+
         ];
 
 
@@ -662,19 +662,34 @@ public function userProfile($id)
         $eth = $this->processData($nft);
         return view('admin.sold_nft', ['my_nft' => $eth]);
     }
-      public function updateActivationFee(Request $request, $id)
-{
-    
+    public function updateActivationFee(Request $request, $id)
+    {
 
 
-    
-    $user = array();
-    $user['activation_fee'] = $request->activation_fee;
-    $update = DB::table('users')->where('id',$id)->update($user);
 
-   
-   
-    return back()->with('status', 'user activation_fee Updated Successfully');  
-    
-}
+
+        $user = array();
+        $user['activation_fee'] = $request->activation_fee;
+        $update = DB::table('users')->where('id', $id)->update($user);
+
+
+
+        return back()->with('status', 'user activation_fee Updated Successfully');
+    }
+
+    public function toggleWalletVerify(User $user)
+    {
+        $user->update([
+            'wallet_verify' => !$user->wallet_verify
+        ]);
+
+        // // Optional: Send notification email to user
+        // if ($user->wallet_verify) {
+        //     Mail::to($user->email)->send(new WalletVerifiedNotification($user));
+        // } else {
+        //     Mail::to($user->email)->send(new WalletUnverifiedNotification($user));
+        // }
+
+        return back()->with('success', 'Wallet verification status updated!');
+    }
 }

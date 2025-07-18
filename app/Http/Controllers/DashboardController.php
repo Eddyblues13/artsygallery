@@ -731,11 +731,11 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             } catch (\Exception $e) {
                 Log::error('Cloudinary upload failed: ' . $e->getMessage());
 
-                // fallback to local storage
-                $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->move('user/uploads/nfts', $filename);
-                $nftImageUrl = 'user/uploads/nfts/' . $filename;
+                // // fallback to local storage
+                // $file = $request->file('image');
+                // $filename = time() . '.' . $file->getClientOriginalExtension();
+                // $file->move('user/uploads/nfts', $filename);
+                // $nftImageUrl = 'user/uploads/nfts/' . $filename;
             }
 
             $nft->ntf_image = $nftImageUrl;

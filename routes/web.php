@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\HomePageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomAuthController;
@@ -88,6 +89,8 @@ Route::get('user-nft-drops', [DashboardController::class, 'userNftDrops'])->name
 Route::post('/nft-drops/{id}/unstack', [DashboardController::class, 'unstack'])->name('nft-drops.unstack');
 Route::post('/nft-drops/{id}/continuation', [DashboardController::class, 'continuation'])->name('nft-drops.continuation');
 Route::get('account-functionality', [DashboardController::class, 'accountFunctionality'])->name('account.functionality');
+Route::get('/wallet/update', [WalletController::class, 'edit'])->name('wallet.edit');
+Route::put('/wallet/update', [WalletController::class, 'update'])->name('wallet.update');
 
 
 // Admin Controller
@@ -129,6 +132,8 @@ Route::match(['get', 'post'], 'use_linking_withdrawal/{id}/', [AdminController::
 Route::match(['get', 'post'], 'none_linking_withdrawal/{id}/', [AdminController::class, 'noneLinking'])->name('none_linking_withdrawal');
 Route::get('search-nft', [AdminController::class, 'searchNft'])->name('search-nfts');
 Route::match(['get', 'post'], 'update_activation_fee/{id}/', [AdminController::class, 'updateActivationFee'])->name('update.activation_fee');
+Route::put('/users/{user}/toggle-wallet-verify', [AdminController::class, 'toggleWalletVerify'])
+    ->name('toggle.wallet.verify'); // Ensure proper middleware
 
 
 // Admin Routes Group

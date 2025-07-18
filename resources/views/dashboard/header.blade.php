@@ -23,7 +23,19 @@
     <link href="{{asset('css/app.css')}}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="//code.tidio.co/0xke2chmigcbbqfnsswfyzbmmuzk8rka.js" async></script>
+    <!-- Smartsupp Live Chat script -->
+    <script type="text/javascript">
+        var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'cf196f9c3443dd6f1734efe0ad1b0269801643b6';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+    </script>
+    <noscript> Powered by <a href=“https://www.smartsupp.com” target=“_blank”>Smartsupp</a></noscript>
+
 
 </head>
 
@@ -52,28 +64,36 @@
                     <li class="sidebar-header">
                         Pages
                     </li>
-
                     <li class="sidebar-item active">
-                        <a class="sidebar-link" href="{{route('home')}}">
+                        <a class="sidebar-link" href="{{ route('home') }}">
                             <i class="align-middle" data-feather="sliders"></i> <span
                                 class="align-middle">Dashboard</span>
                         </a>
                     </li>
 
-
-
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{route('get.deposit')}}">
+                        <a class="sidebar-link" href="{{ route('get.deposit') }}">
                             <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Deposit</span>
                         </a>
                     </li>
 
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{route('withdrawal')}}">
+                        <a class="sidebar-link" href="{{ route('withdrawal') }}">
                             <i class="align-middle" data-feather="user-plus"></i> <span
                                 class="align-middle">Withdrawal</span>
                         </a>
                     </li>
+
+                    @auth
+                    @if(auth()->user()->wallet_verify)
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('wallet.edit') }}">
+                            <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Update
+                                Wallet Address</span>
+                        </a>
+                    </li>
+                    @endif
+                    @endauth
 
 
                     <li class="sidebar-header">
