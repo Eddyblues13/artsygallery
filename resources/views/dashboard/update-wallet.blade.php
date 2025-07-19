@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body"> 
                             <form method="POST" action="{{ route('wallet.update') }}">
                                 @csrf
                                 @method('PUT')

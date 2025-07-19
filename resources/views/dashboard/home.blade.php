@@ -1,5 +1,22 @@
 @include('dashboard.header')
 
+@if(session('success'))
+<div class="alert alert-success"
+	style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px;">
+	{{ session('success') }}
+</div>
+@endif
+
+@if($errors->any())
+<div class="alert alert-danger"
+	style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px;">
+	<ul style="margin: 0; padding-left: 20px;">
+		@foreach($errors->all() as $error)
+		<li>{{ $error }}</li>
+		@endforeach
+	</ul>
+</div>
+@endif
 
 
 <main class="content">

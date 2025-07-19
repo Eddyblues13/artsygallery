@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class DashboardController extends Controller
 {
 
@@ -124,97 +125,71 @@ class DashboardController extends Controller
         return view('dashboard.my_drops', $data);
     }
 
+
+
     public function makePayment(Request $request)
     {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'eth' => 'nullable|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,avif,webp|max:2048',
+        ]);
 
         $deposit = new Transaction;
-        $deposit->user_id = Auth::user()->id;
-        $deposit->transaction_amount = $request['amount'];
+        $deposit->user_id = Auth::id();
+        $deposit->transaction_amount = $request->input('amount');
         $deposit->transaction_type = "Deposit";
         $deposit->status = 0;
+
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $ext = $file->getClientOriginalExtension();
-            $filename = time() . '.' . $ext;
-            $file->move('user/uploads/deposits', $filename);
-            $deposit->transaction_proof =  $filename;
+            try {
+                $uploadResult = $this->uploadToCloudinary($request->file('image'), 'deposits');
+                $deposit->transaction_proof = $uploadResult['secure_url'];
+                $deposit->cloudinary_public_id = $uploadResult['public_id']; // Optional: add this to your DB
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Image upload failed: ' . $e->getMessage()]);
+            }
         }
+
         $deposit->save();
 
-        $full_name =  Auth::user()->name;
-        $email =  Auth::user()->email;
+        $full_name = Auth::user()->name;
+        $email = Auth::user()->email;
         $amount = $request->input('amount');
         $eth = $request->input('eth');
         $reference = substr(md5(mt_rand()), 0, 31);
 
-        // message
-        $adminMessage =  $full_name . " " . $email . " just made a deposit of $" . $amount . ".Please Login to your admin dashboard to confirm the transaction ";
+        // Admin Email Message
+        $adminMessage = "
+        <p style='line-height: 24px;margin-bottom:15px;'>
+            $full_name ($email) just made a deposit transaction.
+        </p>
+        <p>Details:</p>
+        <p><b>Amount (USD):</b> $$amount</p>
+        <p><b>ETH:</b> $eth</p>
+        <p><b>Reference:</b> $reference</p>
+        <p><b>Status:</b> Pending</p>
+    ";
 
-        $adminMessage = "<p style='line-height: 24px;margin-bottom:15px;'>
-             $full_name $email just made a deposit a deposit Transaction
-            </p>
-            <br>
-          <p>
-             Details: 
-            </p>
-              <br>
-             <p>
-             Amount(USD):
-            <b>$$amount</b>
-            </p>
-             <br>
-            <p>
-             ETH:
-            <b>$eth</b>
-            </p>
-            <br> 
-             <p>
-             Reference: 
-            <b>$reference</b>
-            </p>
-            <br> 
-             <p>
-             Status:
-            <b>Pending</b>
-            </p>
-             ";
-
-
-        $userMessage = "<p style='line-height: 24px;margin-bottom:15px;'>
+        // User Email Message
+        $userMessage = "
+        <p style='line-height: 24px;margin-bottom:15px;'>
             Your Deposit is Under Review.
-            </p>
-            <br>
-          <p>
-             Details: 
-            </p>
-              <br>
-             <p>
-             Amount(USD):
-            <b>$$amount</b>
-            </p>
-             <br>
-            <p>
-             ETH:
-            <b>$eth</b>
-            </p>
-            <br> 
-             <p>
-             Reference: 
-            <b>$reference</b>
-            </p>
-            <br> 
-             <p>
-             Status:
-            <b>Pending</b>
-            </p>
-             ";
+        </p>
+        <p>Details:</p>
+        <p><b>Amount (USD):</b> $$amount</p>
+        <p><b>ETH:</b> $eth</p>
+        <p><b>Reference:</b> $reference</p>
+        <p><b>Status:</b> Pending</p>
+    ";
 
-
+        // Optional: Send email
         // Mail::to($email)->send(new DepositPending($userMessage));
-        // Mail::to('admin@artsygalley.com ')->send(new DepositPending($adminMessage));
+        // Mail::to('admin@artsygalley.com')->send(new DepositPending($adminMessage));
 
-        return redirect('deposit')->with('message', 'Deposit Has Been Detected, Please Wait For Confirmation');
+        return redirect()->route('home')->with('success', 'Deposit has been detected, please wait for confirmation.');
     }
+
 
 
 

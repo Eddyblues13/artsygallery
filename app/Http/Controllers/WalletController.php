@@ -24,7 +24,6 @@ class WalletController extends Controller
         $validated = $request->validate([
             'wallet_type' => 'required|string|in:binance,trust_wallet,metamask,coinbase,other',
             'wallet_address' => 'required|string',
-
         ]);
 
         // Update user's wallet information
@@ -36,7 +35,7 @@ class WalletController extends Controller
         // Send email notification
         Mail::to($user->email)->send(new WalletUpdateNotification($user));
 
-        return redirect()->route('wallet.edit')
+        return redirect()->route('home') // Change 'home' to your actual homepage route name
             ->with('success', 'Wallet information updated successfully!');
     }
 }
