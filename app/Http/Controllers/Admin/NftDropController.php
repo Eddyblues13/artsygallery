@@ -106,7 +106,7 @@ class NftDropController extends Controller
             $updateData['cloudinary_public_id'] = $uploadResult['public_id'];
         }
 
-        $nftDrop->update($updateData);
+        $nftDrop->update($updateData); 
 
         return redirect()->route('admin.nft-drops.index')->with('success', 'NFT Drop updated successfully.');
     }
