@@ -135,64 +135,40 @@ class DashboardController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,avif,webp|max:2048',
         ]);
 
-        $deposit = new Transaction;
-        $deposit->user_id = Auth::id();
-        $deposit->transaction_amount = $request->input('amount');
-        $deposit->transaction_type = "Deposit";
-        $deposit->status = 0;
+        $uploadResult = $this->uploadToCloudinary($request->file('image'), 'deposits');
 
-        if ($request->hasFile('image')) {
-            try {
-                $uploadResult = $this->uploadToCloudinary($request->file('image'), 'deposits');
-                $deposit->transaction_proof = $uploadResult['secure_url'];
-                $deposit->cloudinary_public_id = $uploadResult['public_id']; // Optional: add this to your DB
-            } catch (\Exception $e) {
-                return back()->withErrors(['image' => 'Image upload failed: ' . $e->getMessage()]);
-            }
-        }
+        $deposit = Transaction::create([
+            'user_id' => Auth::id(),
+            'transaction_amount' => $request->amount,
+            'transaction_type' => "Deposit",
+            'status' => 0,
+            'transaction_proof' => $uploadResult['secure_url'],
+        ]);
 
-        $deposit->save();
-
-        $full_name = Auth::user()->name;
-        $email = Auth::user()->email;
-        $amount = $request->input('amount');
-        $eth = $request->input('eth');
-        $reference = substr(md5(mt_rand()), 0, 31);
-
-        // Admin Email Message
-        $adminMessage = "
-        <p style='line-height: 24px;margin-bottom:15px;'>
-            $full_name ($email) just made a deposit transaction.
-        </p>
-        <p>Details:</p>
-        <p><b>Amount (USD):</b> $$amount</p>
-        <p><b>ETH:</b> $eth</p>
-        <p><b>Reference:</b> $reference</p>
-        <p><b>Status:</b> Pending</p>
-    ";
-
-        // User Email Message
-        $userMessage = "
-        <p style='line-height: 24px;margin-bottom:15px;'>
-            Your Deposit is Under Review.
-        </p>
-        <p>Details:</p>
-        <p><b>Amount (USD):</b> $$amount</p>
-        <p><b>ETH:</b> $eth</p>
-        <p><b>Reference:</b> $reference</p>
-        <p><b>Status:</b> Pending</p>
-    ";
-
-        // Optional: Send email
-        // Mail::to($email)->send(new DepositPending($userMessage));
-        // Mail::to('admin@artsygalley.com')->send(new DepositPending($adminMessage));
-
+        // Rest of your email and redirect logic...
         return redirect()->route('home')->with('success', 'Deposit has been detected, please wait for confirmation.');
     }
 
+    private function uploadToCloudinary($file, $folder)
+    {
+        try {
+            $cloudinary = new \Cloudinary\Api\Upload\UploadApi();
 
+            $response = $cloudinary->upload($file->getRealPath(), [
+                'folder' => $folder,
+                'public_id' => 'deposit_' . time(),
+                'overwrite' => true,
+                'resource_type' => 'auto'
+            ]);
 
-
+            return [
+                'secure_url' => $response['secure_url'],
+                'public_id' => $response['public_id']
+            ];
+        } catch (\Exception $e) {
+            throw new \Exception("Cloudinary upload failed: " . $e->getMessage());
+        }
+    }
 
 
     public function makeWithdrawal(Request $request)

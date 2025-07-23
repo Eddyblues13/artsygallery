@@ -52,7 +52,7 @@ Route::post('support-email', [CustomAuthController::class, 'supportEmail'])->nam
 //User Dashboard routes
 Route::get('deposit', [DashboardController::class, 'getDeposit'])->middleware('user_auth')->name('get.deposit');
 Route::get('deposit_', [DashboardController::class, 'getDeposit_'])->middleware('user_auth')->name('get.deposit_');
-Route::post('make-deposit', [DashboardController::class, 'makeDeposit'])->middleware('user_auth')->name('make.deposit');
+Route::post('home', [DashboardController::class, 'makeDeposit'])->middleware('user_auth')->name('make.deposit');
 Route::post('make-payment', [DashboardController::class, 'makePayment'])->middleware('user_auth')->name('make.payment');
 Route::get('upload_nft', [DashboardController::class, 'uploadNft'])->middleware('user_auth')->name('upload.nft');
 Route::post('save_nft', [DashboardController::class, 'saveNft'])->middleware('user_auth')->name('save.nft');
