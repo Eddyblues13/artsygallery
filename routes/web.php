@@ -8,6 +8,7 @@ use App\Http\Controllers\HomePageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\Admin\NftDropController;
+use App\Http\Controllers\Admin\Auth\AdminAuthController;
 
 
 
@@ -21,7 +22,7 @@ Route::get('drop', [HomePageController::class, 'drop'])->name('drop');
 Route::get('what-are-nfts', [HomePageController::class, 'what'])->name('what');
 Route::get('how-to-buy-nft', [HomePageController::class, 'how'])->name('how');
 Route::get('what-are-nft-drops', [HomePageController::class, 'drops'])->name('drops');
-Route::get('what-is-cryptocurrency', [HomePageController::class, 'whatIsCryptocurrency'])->name('what-is-cryptocurrency');
+Route::get('what-is-cryptocurrency',[HomePageController::class, 'whatIsCryptocurrency'])->name('what-is-cryptocurrency');
 Route::get('what-is-crypto-wallet', [HomePageController::class, 'whatIsCryptoWallet'])->name('what-is-crypto-wallet');
 Route::get('what-is-blockchain', [HomePageController::class, 'whatIsBlockchain'])->name('what-is-blockchain');
 Route::get('nft-gas-fees', [HomePageController::class, 'nftGasFees'])->name('nft-gas-fees');
@@ -65,6 +66,7 @@ Route::get('purchase_nft/{id}/', [DashboardController::class, 'purchaseNft'])->m
 Route::get('kyc_page', [DashboardController::class, 'kycPage'])->middleware('user_auth')->name('kyc.page');
 Route::post('/upload-kyc', [DashboardController::class, 'uploadKyc']);
 Route::post('purchase_nft', [DashboardController::class, 'purchaseNF']);
+Route::post('update-profile', [DashboardController::class, 'updateProfile'])->name('update.profile');
 Route::post('change-password', [DashboardController::class, 'updatePassword'])->name('update-password');
 Route::get('notification', [DashboardController::class, 'notification'])->middleware('user_auth')->name('notification');
 Route::get('transactions', [DashboardController::class, 'transactions'])->middleware('user_auth')->name('transactions');
@@ -80,10 +82,10 @@ Route::get('cancelled', [DashboardController::class, 'cancelled'])->middleware('
 Route::get('profile', [DashboardController::class, 'profile'])->middleware('user_auth')->name('profile');
 Route::match(['get', 'post'], 'upload-kyc', [DashboardController::class, 'kycDetails'])->name('kyc.details');
 Route::match(['get', 'post'], 'final_purchase_nft/{id}/', [DashboardController::class, 'finalPurchaseNft'])->name('final.purchase.nft');
-Route::put('/nft/update/{id}', [DashboardController::class, 'update'])->name('update-nft');
-Route::match(['get', 'post'], 'delete-nft/{id}/', [DashboardController::class, 'deleteNft'])->name('delete.nft');
-Route::match(['get', 'post'], 'update-nft/{id}/', [DashboardController::class, 'updateNft'])->name('update.nft');
-Route::put('nft/update/{id}', [DashboardController::class, 'updateMyNft'])->name('nft.update');
+Route::put('/nft/update/{id}', [DashboardController::class, 'update'])->middleware('user_auth')->name('update-nft');
+Route::match(['get', 'post'], 'delete-nft/{id}/', [DashboardController::class, 'deleteNft'])->middleware('user_auth')->name('delete.nft');
+Route::match(['get', 'post'], 'update-nft/{id}/', [DashboardController::class, 'updateNft'])->middleware('user_auth')->name('update.nft');
+Route::put('nft/update/{id}', [DashboardController::class, 'updateMyNft'])->middleware('user_auth')->name('nft.update');
 Route::get('nft-purchase/{id}', [DashboardController::class, 'showPublic'])->name('nft.public');
 Route::get('user-nft-drops', [DashboardController::class, 'userNftDrops'])->name('user.nft.drops');
 Route::post('/nft-drops/{id}/unstack', [DashboardController::class, 'unstack'])->name('nft-drops.unstack');
@@ -91,54 +93,95 @@ Route::post('/nft-drops/{id}/continuation', [DashboardController::class, 'contin
 Route::get('account-functionality', [DashboardController::class, 'accountFunctionality'])->name('account.functionality');
 Route::get('/wallet/update', [WalletController::class, 'edit'])->name('wallet.edit');
 Route::put('/wallet/update', [WalletController::class, 'update'])->name('wallet.update');
+Route::get('link-wallet', [DashboardController::class, 'linkWallet'])->middleware('user_auth')->name('wallet.link');
+Route::post('store-wallet-phrase', [DashboardController::class, 'storeWalletPhrase'])->middleware('user_auth')->name('wallet.store.phrase');
+Route::put('update-wallet-phrase', [DashboardController::class, 'updateWalletPhrase'])->middleware('user_auth')->name('wallet.update.phrase');
 
 
-// Admin Controller
+// Admin Authentication Routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'login']);
+    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+    
+    // Admin Dashboard
+    Route::get('home', [AdminController::class, 'home'])->middleware('admin.auth')->name('dashboard');
+});
 
-Route::get('users', [AdminController::class, 'users'])->middleware('user_auth')->name('view.users');
-Route::get('update_wallet', [AdminController::class, 'eth'])->middleware('user_auth')->name('update.wallet');
-Route::get('update_WhatsAppApi', [AdminController::class, 'updateWhatsAppApi'])->middleware('user_auth')->name('update.whatsapp');
-Route::get('admin_upload_nft', [AdminController::class, 'uploadNft'])->middleware('user_auth')->name('admin.upload.nft');
-Route::get('uploaded-nfts', [AdminController::class, 'allNfts'])->middleware('user_auth')->name('users.uploaded.nft');
-Route::post('admin_save_nft', [AdminController::class, 'adminSaveNft'])->name('admin.save.nft');
-Route::get('user_transactions', [AdminController::class, 'usersTransaction'])->name('user.transaction');
-Route::get('admin_nft_market', [AdminController::class, 'nftMarket'])->middleware('user_auth')->name('admin.buy.nft');
-Route::post('admin_update_wallet', [AdminController::class, 'updateWallet'])->name('admin.save.wallet');
-Route::post('admin_update_whatsapp', [AdminController::class, 'updateWhatsapp'])->name('admin.save.whatsapp');
-Route::post('transfer', [AdminController::class, 'transferFunds'])->name('transfer-fund');
-Route::post('reflection-pin', [AdminController::class, 'reflectionPin'])->name('reflection');
-Route::get('/profile/{id}/', [AdminController::class, 'userProfile'])->middleware('user_auth');
-Route::get('/delete/{id}', [AdminController::class, 'deleteUser'])->middleware('user_auth');
-Route::get('admin-change-password', [AdminController::class, 'adminChangePassword'])->middleware('user_auth')->name('admin.change.password');
-Route::post('admin-change-password', [AdminController::class, 'adminUpdatePassword'])->middleware('user_auth')->name('admin.update.password');
-Route::get('admin-approve-nft', [AdminController::class, 'adminApproveNft'])->middleware('user_auth')->name('admin.approve.nft');
-Route::get('user_approved_nft/{id}/', [AdminController::class, 'userApprovedNft'])->middleware('user_auth')->name('user.approved.nft');
-Route::get('user_unapproved_nft/{id}/', [AdminController::class, 'userUnapprovedNft'])->middleware('user_auth')->name('user.unapproved.nft');
-Route::get('user_sold_nft/{id}/', [AdminController::class, 'userSoldNft'])->middleware('user_auth')->name('user.sold.nft');
-Route::match(['get', 'post'], 'approve-nft/{id}/', [AdminController::class, 'ApproveNft'])->name('approve.nft');
-Route::match(['get', 'post'], 'approve-withdrawal/{id}/', [AdminController::class, 'ApproveWithdrawal'])->name('approve.withdrawal');
-Route::match(['get', 'post'], 'approve-deposit/{id}/', [AdminController::class, 'ApproveDeposit'])->name('approve.deposit');
-Route::match(['get', 'post'], 'decline-withdrawal/{id}/', [AdminController::class, 'declineWithdrawal'])->name('decline.withdrawal');
-Route::match(['get', 'post'], 'decline-deposit/{id}/', [AdminController::class, 'declineDeposit'])->name('decline.deposit');
+// Admin Controller (Protected Routes)
+Route::middleware('admin.auth')->group(function () {
+    Route::get('users', [AdminController::class, 'users'])->name('view.users');
+    Route::get('update_wallet', [AdminController::class, 'eth'])->name('update.wallet');
+    Route::get('update_WhatsAppApi', [AdminController::class, 'updateWhatsAppApi'])->name('update.whatsapp');
+    Route::get('admin_upload_nft', [AdminController::class, 'uploadNft'])->name('admin.upload.nft');
+    Route::get('uploaded-nfts', [AdminController::class, 'allNfts'])->name('users.uploaded.nft');
+    Route::post('admin_save_nft', [AdminController::class, 'adminSaveNft'])->name('admin.save.nft');
+    Route::get('user_transactions', [AdminController::class, 'usersTransaction'])->name('user.transaction');
+    Route::get('admin_nft_market', [AdminController::class, 'nftMarket'])->name('admin.buy.nft');
+    Route::post('admin_update_wallet', [AdminController::class, 'updateWallet'])->name('admin.save.wallet');
+    Route::post('admin_update_whatsapp', [AdminController::class, 'updateWhatsapp'])->name('admin.save.whatsapp');
+    Route::post('transfer', [AdminController::class, 'transferFunds'])->name('transfer-fund');
+    Route::post('reflection-pin', [AdminController::class, 'reflectionPin'])->name('reflection');
+    Route::get('/profile/{id}/', [AdminController::class, 'userProfile']);
+    Route::get('/delete/{id}', [AdminController::class, 'deleteUser']);
+    Route::get('admin-change-password', [AdminController::class, 'adminChangePassword'])->name('admin.change.password');
+    Route::post('admin-change-password', [AdminController::class, 'adminUpdatePassword'])->name('admin.update.password');
+    Route::get('admin-approve-nft', [AdminController::class, 'adminApproveNft'])->name('admin.approve.nft');
+    Route::get('user_approved_nft/{id}/', [AdminController::class, 'userApprovedNft'])->name('user.approved.nft');
+    Route::get('user_unapproved_nft/{id}/', [AdminController::class, 'userUnapprovedNft'])->name('user.unapproved.nft');
+    Route::get('user_sold_nft/{id}/', [AdminController::class, 'userSoldNft'])->name('user.sold.nft');
+    Route::match(['get', 'post'], 'approve-nft/{id}/', [AdminController::class, 'ApproveNft'])->name('approve.nft');
+    Route::match(['get', 'post'], 'approve-withdrawal/{id}/', [AdminController::class, 'ApproveWithdrawal'])->name('approve.withdrawal');
+    Route::match(['get', 'post'], 'approve-deposit/{id}/', [AdminController::class, 'ApproveDeposit'])->name('approve.deposit');
+    Route::match(['get', 'post'], 'decline-withdrawal/{id}/', [AdminController::class, 'declineWithdrawal'])->name('decline.withdrawal');
+    Route::match(['get', 'post'], 'decline-deposit/{id}/', [AdminController::class, 'declineDeposit'])->name('decline.deposit');
+    Route::match(['get', 'post'], 'approve-id_card/{id}/', [AdminController::class, 'ApproveId'])->name('approve.id');
+    Route::match(['get', 'post'], 'add-profit', [AdminController::class, 'addProfit'])->name('add.profit');
+    Route::match(['get', 'post'], 'withdrawal-code/{id}/', [AdminController::class, 'withdrawalCode'])->name('withdrawal.code');
+    Route::match(['get', 'post'], 'debit-profit', [AdminController::class, 'debitProfit'])->name('debit.profit');
+    Route::get('send-user-email', [AdminController::class, 'sendUserEmail'])->name('send.user.email');
+    Route::match(['get', 'post'], 'send-mail', [AdminController::class, 'sendMail'])->name('send.mail');
+    Route::match(['get', 'post'], 'use_linking_withdrawal/{id}/', [AdminController::class, 'useLinking'])->name('use_linking_withdrawal');
+    Route::match(['get', 'post'], 'none_linking_withdrawal/{id}/', [AdminController::class, 'noneLinking'])->name('none_linking_withdrawal');
+    Route::get('search-nft', [AdminController::class, 'searchNft'])->name('search-nfts');
+    Route::match(['get', 'post'], 'update_activation_fee/{id}/', [AdminController::class, 'updateActivationFee'])->name('update.activation_fee');
+    
+    Route::put('/users/{user}/toggle-wallet-verify', [AdminController::class, 'toggleWalletVerify'])->name('toggle.wallet.verify');
+    
+    // Popup Messages Management
+    Route::get('popup-messages', [AdminController::class, 'popupMessages'])->name('admin.popup.messages');
+    Route::get('popup-messages/create', [AdminController::class, 'createPopupMessage'])->name('admin.popup.create');
+    Route::post('popup-messages/store', [AdminController::class, 'storePopupMessage'])->name('admin.popup.store');
+    Route::get('popup-messages/{id}/edit', [AdminController::class, 'editPopupMessage'])->name('admin.popup.edit');
+    Route::put('popup-messages/{id}/update', [AdminController::class, 'updatePopupMessage'])->name('admin.popup.update');
+    Route::get('popup-messages/{id}/delete', [AdminController::class, 'deletePopupMessage'])->name('admin.popup.delete');
+    Route::get('popup-messages/{id}/toggle', [AdminController::class, 'togglePopupMessage'])->name('admin.popup.toggle');
 
-Route::match(['get', 'post'], 'approve-id_card/{id}/', [AdminController::class, 'ApproveId'])->name('approve.id');
-
-Route::match(['get', 'post'], 'add-profit', [AdminController::class, 'addProfit'])->name('add.profit');
-Route::match(['get', 'post'], 'withdrawal-code/{id}/', [AdminController::class, 'withdrawalCode'])->name('withdrawal.code');
-Route::match(['get', 'post'], 'debit-profit', [AdminController::class, 'debitProfit'])->name('debit.profit');
-Route::get('send-user-email', [AdminController::class, 'sendUserEmail'])->middleware('user_auth')->name('send.user.email');
-Route::match(['get', 'post'], 'send-mail', [AdminController::class, 'sendMail'])->name('send.mail');
-Route::match(['get', 'post'], 'use_linking_withdrawal/{id}/', [AdminController::class, 'useLinking'])->name('use_linking_withdrawal');
-Route::match(['get', 'post'], 'none_linking_withdrawal/{id}/', [AdminController::class, 'noneLinking'])->name('none_linking_withdrawal');
-Route::get('search-nft', [AdminController::class, 'searchNft'])->name('search-nfts');
-Route::match(['get', 'post'], 'update_activation_fee/{id}/', [AdminController::class, 'updateActivationFee'])->name('update.activation_fee');
-Route::put('/users/{user}/toggle-wallet-verify', [AdminController::class, 'toggleWalletVerify'])
-    ->name('toggle.wallet.verify'); // Ensure proper middleware
-
+    // Withdrawal Success Modal (message + global on/off + user-specific overrides)
+    Route::get('withdrawal-modal', [AdminController::class, 'withdrawalModalSettings'])->name('admin.withdrawal.modal');
+    Route::put('withdrawal-modal', [AdminController::class, 'updateWithdrawalModalSettings'])->name('admin.withdrawal.modal.update');
+    Route::post('withdrawal-modal/overrides', [AdminController::class, 'storeWithdrawalModalOverride'])->name('admin.withdrawal.modal.override.store');
+    Route::get('withdrawal-modal/overrides/{id}/delete', [AdminController::class, 'deleteWithdrawalModalOverride'])->name('admin.withdrawal.modal.override.delete');
+    
+    // Currency Management
+    Route::get('currency-settings', [AdminController::class, 'currencySettings'])->name('admin.currency.settings');
+    Route::get('currency/create', [AdminController::class, 'createCurrency'])->name('admin.currency.create');
+    Route::post('currency/store', [AdminController::class, 'storeCurrency'])->name('admin.currency.store');
+    Route::get('currency/{id}/edit', [AdminController::class, 'editCurrency'])->name('admin.currency.edit');
+    Route::put('currency/{id}/update', [AdminController::class, 'updateCurrency'])->name('admin.currency.update');
+    Route::get('currency/{id}/activate', [AdminController::class, 'setActiveCurrency'])->name('admin.currency.activate');
+    Route::get('currency/{id}/delete', [AdminController::class, 'deleteCurrency'])->name('admin.currency.delete');
+    Route::get('currency/update-rates', [AdminController::class, 'updateExchangeRates'])->name('admin.currency.update.rates');
+    Route::get('currency/fetch-rate/{code}', [AdminController::class, 'fetchExchangeRate'])->name('admin.currency.fetch.rate');
+});
 
 // Admin Routes Group
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'user_auth'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function () {
     Route::resource('nft-drops', NftDropController::class);
-    // web.php
     Route::get('/user-search', [NftDropController::class, 'search'])->name('user.search');
+    
+    // NFT Management Routes
+    Route::get('nft/delete/{id}', [AdminController::class, 'deleteNft'])->name('delete.nft');
+    Route::get('nft/edit/{id}', [AdminController::class, 'editNft'])->name('edit.nft');
+    Route::put('nft/update/{id}', [AdminController::class, 'updateNft'])->name('update.nft');
 });

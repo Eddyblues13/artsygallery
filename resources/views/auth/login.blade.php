@@ -16,7 +16,6 @@
     <link href="auth/css/icons.min.css" rel="stylesheet" type="text/css" />
     <!-- App Css-->
     <link href="auth/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
-    <script src="//code.tidio.co/0xke2chmigcbbqfnsswfyzbmmuzk8rka.js" async></script>
 </head>
 
 <body>

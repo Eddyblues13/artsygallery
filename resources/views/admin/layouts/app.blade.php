@@ -10,8 +10,8 @@
 </head>
 
 <body>
-    @include('admin.header')
-    @include('admin.navbar')
+    @include('admin.dashboard_header')
+    
 
     <!-- Content Wrapper -->
     <div class="content-wrapper-scroll">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    @include('admin.footer')
+    @include('dashboard.footer')
 
     <script src="{{ asset('admin/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Add other JS files as needed -->

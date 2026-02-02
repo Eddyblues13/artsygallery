@@ -43,17 +43,7 @@
                             @endif
                         </div>
                     </div>
-                                @if (session('error'))
-                    <div class="alert box-bdr-red alert-dismissible fade show text-red" role="alert">
-                        <b>Error!</b>{{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    @elseif (session('status'))
-                    <div class="btn btn-primary" role="alert">
-                        <b>Success!</b> {{ session('status') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    @endif
+                                @include('dashboard.alert')
                     <div class="card">
                         <div class="card-body">
                             <div class="container-fluid p-0">

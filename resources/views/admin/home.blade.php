@@ -1,110 +1,281 @@
+@include('admin.dashboard_header')
+
+@if(session('success'))
+<div class="alert alert-success"
+	style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px;">
+	{{ session('success') }}
+</div>
+@endif
+
+@if($errors->any())
+<div class="alert alert-danger"
+	style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px;">
+	<ul style="margin: 0; padding-left: 20px;">
+		@foreach($errors->all() as $error)
+		<li>{{ $error }}</li>
+		@endforeach
+	</ul>
+</div>
+@endif
 
 
-@include('admin.header')
-@include('admin.navbar')
-				<!-- Content wrapper scroll start -->
-				<div class="content-wrapper-scroll">
-				            @if (session('error'))
-                              <div class="alert box-bdr-red alert-dismissible fade show text-red" role="alert">
-															<b>Error!</b>{{ session('error') }}
-											<button type="button" class="btn-close" data-bs-dismiss="alert"
-																aria-label="Close"></button>
-									</div>
-                                    @elseif (session('status'))
-									<div class="alert box-bdr-green alert-dismissible fade show text-green" role="alert">
-															<b>Success!</b> {{ session('status') }}
-							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-									</div>
-                                  @endif
+<main class="content">
+	<div class="container-fluid p-0">
 
-					<!-- Main header starts -->
-					<div class="main-header d-flex align-items-center justify-content-between position-relative">
-						<div class="d-flex align-items-center justify-content-center">
-							<div class="page-icon">
-								<i class="bi bi-house"></i>
-							</div>
-							<div class="page-title d-none d-md-block">
-								<h5>Welcome back, {{Auth::user()->name}}</h5>
+		<h1 class="h3 mb-3"><strong>Welcome</strong> {{Auth::guard('admin')->user()->name}}</h1>
+		<div class="col-12 col-md-12 col-xxl-6 d-flex order-3 order-xxl-2">
+			<div class="card flex-fill w-50">
+				<!-- Background image -->
+				<div class="bg-image" style="
+    background-image: url('https://img.freepik.com/free-vector/digital-nft-non-fungible-token-background_1017-41191.jpg?t=st=1719148257~exp=1719151857~hmac=0bf6528b00dd8cbb2561e7d1dda624493774dd2fd63cfa35700c867985bb1ac4&w=826');
+    height: 30vh;
+  ">
+					<div class="mask" style="background-color: rgba(0, 0, 0, 0.6);">
+						<div class="d-flex justify-content-center align-items-center h-100">
+							<h1 class="text-white mb-0 mx-3 my-3">Admin Dashboard</h1>
+						</div>
+						<div class="card-body text-center">
+							<div class="mb-3">
+								<a href="{{route('view.users')}}" class="btn btn-primary btn-lg">Manage Users</a>
+								<a href="{{route('admin.approve.nft')}}" class="btn btn-secondary btn-lg">Approve Artworks</a>
 							</div>
 						</div>
-						<!-- Live updates start -->
-						
-						<!-- Live updates end -->
+
 					</div>
-					<!-- Main header ends -->
+				</div>
+				<!-- Background image -->
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xl-6 col-xxl-5 d-flex">
+				<div class="w-100">
+					<div class="row">
+						<div class="col-sm-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Total Balance</h5>
+										</div>
 
-					<!-- Content wrapper start -->
-					<div class="content-wrapper">
+										<div class="col-auto">
+											<div class="stat text-primary">
+												<i class="align-middle" data-feather="dollar-sign"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_balance, 2) }}</b></h3>
+									<div class="mb-0">
+										<span class="text-danger">{{number_format($total_balance_eth, 2)}} ETH</span>
 
-						<!-- Row start -->
-						
-											<div class="col-sm-12 col-12">
-												<h4>Users</h4>
-							
-								
-										<div class="card">
-					<div class="card-header">
-						<div class="card-title">Transaction History</div>
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Total Profit</h5>
+										</div>
+
+										<div class="col-auto">
+											<div class="stat text-primary">
+												<i class="align-middle" data-feather="dollar-sign"></i>
+											</div>
+										</div>
+									</div>
+
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_profit, 2) }}</b></h3>
+									<div class="mb-0">
+										<span class="text-success">{{ number_format($total_profit_eth, 2) }} ETH</span>
+
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Total Deposits</h5>
+										</div>
+
+										<div class="col-auto">
+											<div class="stat text-primary">
+												<i class="align-middle" data-feather="dollar-sign"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_deposits, 2) }}</b></h3>
+
+									<div class="mb-0">
+										<span class="text-success">{{ number_format($total_deposits_eth, 2) }} ETH</span>
+
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Total Withdrawals</h5>
+										</div>
+
+										<div class="col-auto">
+											<div class="stat text-primary">
+												<i class="align-middle" data-feather="dollar-sign"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_withdrawals, 2) }}</b></h3>
+
+									<div class="mb-0">
+										<span class="text-danger">{{ number_format($total_withdrawals_eth, 2) }} ETH</span>
+
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table id="highlightRowColumn" class="table custom-table">
-								<thead>
-									<tr>
-									   <th>S/N</th>
-										<th>Full Name</th>
-										<th>Email</th> 
-										<th>View User</th>
-										<th>Delete User</th>
-
-
-
-									</tr>
-								</thead>
-								<tbody>
-                                 @foreach($result as $users)
-													<tr>
-												      <th>{{$users->id}}</t>
-														<th>{{$users->name}}</t>
-														<th>{{$users->email}}</t>
-														<td><a href="{{url('profile/'.$users->id)}}"><span class="badge shade-blue">View User</span></a></td>
-														<td><a href="{{url('delete/'.$users->id)}}" onclick="confirm('Are you sure you want to delete this user?')"><span class="badge shade-red">Delete User</span></a></td>
-
-														
-													</tr>
-													@endforeach
-
-								</tbody>
-							</table>
+					<!-- Additional Admin Stats -->
+					<div class="row mt-3">
+						<div class="col-sm-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Total Users</h5>
+										</div>
+										<div class="col-auto">
+											<div class="stat text-primary">
+												<i class="align-middle" data-feather="users"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{$total_users}}</b></h3>
+									<div class="mb-0">
+										<span class="text-success">{{$active_users}} Active</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Total Artworks</h5>
+										</div>
+										<div class="col-auto">
+											<div class="stat text-primary">
+												<i class="align-middle" data-feather="image"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{$total_artworks}}</b></h3>
+									<div class="mb-0">
+										<span class="text-success">{{$approved_artworks}} Approved</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Pending Actions -->
+					<div class="row mt-3">
+						<div class="col-sm-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Pending Deposits</h5>
+										</div>
+										<div class="col-auto">
+											<div class="stat text-warning">
+												<i class="align-middle" data-feather="clock"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{$pending_deposits}}</b></h3>
+									<div class="mb-0">
+										<a href="{{route('user.transaction')}}" class="text-warning">Review Now</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col mt-0">
+											<h5 class="card-title">Pending Withdrawals</h5>
+										</div>
+										<div class="col-auto">
+											<div class="stat text-warning">
+												<i class="align-middle" data-feather="clock"></i>
+											</div>
+										</div>
+									</div>
+									<h3 class="mt-1 mb-3"><b>{{$pending_withdrawals}}</b></h3>
+									<div class="mb-0">
+										<a href="{{route('user.transaction')}}" class="text-warning">Review Now</a>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="col-xl-6 col-xxl-7">
+				<div class="card flex-fill w-100">
+
+					<div class="card-body py-3">
+						<div class="chart chart-sm">
+							<div class="pt-1 col-12">
+								<h3>Platform Trading Chart</h3>
+								<div class="tradingview-widget-container" style="margin:30px 0px 10px 0px;">
+									<div id="tradingview_ethereum"></div>
+									<div class="tradingview-widget-copyright">
+										<a href="#" rel="noopener" target="_blank">
+											<span class="blue-text"></span>
+											<span class="blue-text">Platform trading chart</span>
+										</a>
+									</div>
+									<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+									<script type="text/javascript">
+										new TradingView.widget({
+											"width": "100%",
+											"height": "550",
+											"symbol": "COINBASE:ETHUSD",
+											"interval": "1",
+											"timezone": "Etc/UTC",
+											"theme": 'light',
+											"style": "9",
+											"locale": "en",
+											"toolbar_bg": "#f1f3f6",
+											"enable_publishing": false,
+											"hide_side_toolbar": false,
+											"allow_symbol_change": true,
+											"calendar": false,
+											"studies": [
+												"BB@tv-basicstudies"
+											],
+											"container_id": "tradingview_ethereum"
+										});
+									</script>
+								</div>
 							</div>
+
 						</div>
-						<!-- Row end -->
-
 					</div>
-					<!-- Content wrapper end -->
-
 				</div>
-				<!-- Content wrapper scroll end -->
-				    <script>
-        function confirmAction() {
-            // Display a confirmation dialog
-            var userResponse = window.confirm("Are you sure you want to delete this user?");
+			</div>
+		</div>
 
-            // If the user clicks "OK," perform the action
-            if (userResponse) {
-                alert("Performing the action...");
-                // Add your additional code here
-            } else {
-                alert("Action canceled.");
-                // Add your additional code here if the action is canceled
-            }
 
-            // Return false to prevent the default link behavior (navigation)
-            return false;
-        }
-    
-    </script>
-@include('admin.footer')
+
+	</div>
+</main>
+
+@include('dashboard.footer')

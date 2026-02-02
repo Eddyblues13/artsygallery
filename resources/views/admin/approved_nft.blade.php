@@ -1,5 +1,5 @@
-@include('admin.header')
-@include('admin.navbar')
+@include('admin.dashboard_header')
+
 <div class="main-content">
 
 	<div class="page-content">
@@ -95,4 +95,4 @@
 </div>
 <!-- Content wrapper scroll end -->
 
-@include('admin.footer')
+@include('dashboard.footer')

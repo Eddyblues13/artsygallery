@@ -24,8 +24,7 @@
 					</div>
 					<div class="card-body">
 						<p class="card-text">{{ $nft->ntf_description }}</p>
-						<p class="card-text"><strong>Price in USD:</strong> ${{number_format($nft->nft_price, 2, '.',
-							',')}}</p>
+						<p class="card-text"><strong>Price:</strong> {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</p>
 						<p class="card-text"><strong>Price in ETH:</strong> {{ number_format($nft->nft_eth_price,
 							2)}} ETH</p>
 						<p class="card-text"><strong>Creator:</strong> {{ $nft->ntf_owner }}</p>

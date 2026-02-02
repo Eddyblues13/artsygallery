@@ -32,7 +32,7 @@ class sendUserEmail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Artsygalley TEAM',
+            subject: $this->data['subject'] ?? 'Artsygalley TEAM',
         );
     }
 

@@ -15,6 +15,16 @@ class Transaction extends Model
         'user_id',
         'transaction_id',
         'transaction_type',
+        'withdrawal_method',
+        'payment_account_name',
+        'payment_account_number',
+        'payment_account_type',
+        'bank_name',
+        'bank_routing_number',
+        'paypal_email',
+        'crypto_type',
+        'crypto_wallet_address',
+        'additional_notes',
         'transaction_amount',
         'transaction_proof',
         'status',
@@ -24,6 +34,8 @@ class Transaction extends Model
     protected $casts = [
         'transaction_amount' => 'float',
         'status' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Optional: relationship to User

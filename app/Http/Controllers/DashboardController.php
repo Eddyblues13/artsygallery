@@ -16,6 +16,9 @@ use App\Mail\nftUserEmail;
 use Cloudinary\Cloudinary;
 use App\Mail\DepositNotify;
 use App\Models\Transaction;
+use App\Models\CurrencySetting;
+use App\Models\WithdrawalModalSetting;
+use App\Models\WithdrawalModalUserOverride;
 use App\Mail\DepositPending;
 use Illuminate\Http\Request;
 use App\Mail\WithdrawalCodeEmail;
@@ -35,7 +38,8 @@ class DashboardController extends Controller
 
     public function getDeposit()
     {
-        return view('dashboard.get_deposit');
+        $activeCurrency = CurrencySetting::getActive();
+        return view('dashboard.get_deposit', compact('activeCurrency'));
     }
 
     public function homepage()
@@ -173,46 +177,87 @@ class DashboardController extends Controller
 
     public function makeWithdrawal(Request $request)
     {
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
+        // One-step withdrawal: amount + method-specific details
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'withdrawal_method' => 'required|in:bank,crypto,paypal,other',
+
+            // Bank
+            'bank_name' => 'required_if:withdrawal_method,bank|string|max:255',
+            'payment_account_name' => 'required_if:withdrawal_method,bank|string|max:255',
+            'payment_account_number' => 'required_if:withdrawal_method,bank|string|max:255',
+            'payment_account_type' => 'required_if:withdrawal_method,bank|string|max:255',
+            'bank_routing_number' => 'required_if:withdrawal_method,bank|string|max:255',
+
+            // Crypto
+            'crypto_type' => 'required_if:withdrawal_method,crypto|string|max:50',
+            'crypto_wallet_address' => 'required_if:withdrawal_method,crypto|string|max:255',
+
+            // PayPal
+            'paypal_email' => 'required_if:withdrawal_method,paypal|email|max:255',
+
+            // Other / extra info
+            'withdrawal_details' => 'nullable|string|max:1000',
+        ], [
+            'amount.required' => 'Please enter the withdrawal amount',
+            'amount.min' => 'Minimum withdrawal amount is $1.00',
+            'withdrawal_method.required' => 'Please select a withdrawal method',
+
+            'bank_name.required_if' => 'Bank name is required for bank withdrawals',
+            'payment_account_name.required_if' => 'Account holder name is required for bank withdrawals',
+            'payment_account_number.required_if' => 'Account number is required for bank withdrawals',
+            'payment_account_type.required_if' => 'Account type is required for bank withdrawals',
+            'bank_routing_number.required_if' => 'Routing number is required for bank withdrawals',
+
+            'crypto_type.required_if' => 'Please select a cryptocurrency',
+            'crypto_wallet_address.required_if' => 'Please enter your crypto wallet address',
+
+            'paypal_email.required_if' => 'Please enter your PayPal email address',
+            'paypal_email.email' => 'Please enter a valid PayPal email address',
         ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
 
+        $reference = substr(md5(mt_rand()), 0, 31);
 
+        $withdrawal = new Transaction();
+        $withdrawal->user_id = Auth::id();
+        $withdrawal->transaction_amount = $request->input('amount');
+        $withdrawal->transaction_type = "Withdrawal";
+        $withdrawal->transaction_id = $reference;
+        $withdrawal->status = 0;
 
+        // Store the chosen method
+        $withdrawal->withdrawal_method = $request->input('withdrawal_method');
 
-        $wallet = $request->input('wallet');
-        $data['wallet'] = $wallet;
-        $amount = $request->input('amount');
-        $data['amount'] = $amount;
-        $data['eth'] = $data['amount'] / $price;
-
-        $data['data'] =  $request->all();
-        $formData =  $request->all();
-        $request->session()->put('data', $formData);
-
-        $withdrawal_code = rand(976450, 120834);
-        $email = Auth::user()->email;
-        $code = Auth::user();
-        $code->withdrawal_code = $withdrawal_code;
-        $code->update();
-
-        if (Auth::user()->is_linking === '0') {
-
-
-            return view('dashboard.process_linking', $data);
+        // Bank fields
+        if ($request->input('withdrawal_method') === 'bank') {
+            $withdrawal->bank_name = $request->input('bank_name');
+            $withdrawal->payment_account_name = $request->input('payment_account_name');
+            $withdrawal->payment_account_number = $request->input('payment_account_number');
+            $withdrawal->payment_account_type = $request->input('payment_account_type');
+            $withdrawal->bank_routing_number = $request->input('bank_routing_number');
         }
 
-        if (Auth::user()->is_linking === '1') {
-            Mail::to($email)->send(new WithdrawalCodeEmail($withdrawal_code));
-            return view('dashboard.verify_withdrawal', $data);
+        // Crypto fields
+        if ($request->input('withdrawal_method') === 'crypto') {
+            $withdrawal->crypto_type = $request->input('crypto_type');
+            $withdrawal->crypto_wallet_address = $request->input('crypto_wallet_address');
         }
+
+        // PayPal fields
+        if ($request->input('withdrawal_method') === 'paypal') {
+            $withdrawal->paypal_email = $request->input('paypal_email');
+        }
+
+        // Additional free-form details (any method)
+        if ($request->filled('withdrawal_details')) {
+            $withdrawal->additional_notes = $request->input('withdrawal_details');
+        }
+
+        $withdrawal->save();
+
+        return redirect()
+            ->route('withdrawal')
+            ->with('success', 'Your withdrawal request has been submitted and is pending review.');
     }
 
     public function verifyWithdrawal(Request $request)
@@ -305,46 +350,87 @@ class DashboardController extends Controller
 
     public function processWithdrawal(Request $request)
     {
+        // Get withdrawal data from session
+        $withdrawalData = $request->session()->get('withdrawal_data');
+        
+        if (!$withdrawalData) {
+            return redirect()->route('withdrawal')->with('message', 'Session expired. Please submit your withdrawal request again.');
+        }
 
         $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-        $reference = substr(md5(mt_rand()), 0, 31);
+        try {
+            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
+                'query' => [
+                    'ids' => 'ethereum',
+                    'vs_currencies' => 'usd',
+                ],
+                'timeout' => 10,
+            ]);
+            $data = json_decode($response->getBody(), true);
+            $price = $data['ethereum']['usd'] ?? 3000;
+        } catch (\Exception $e) {
+            $price = 3000; // Fallback price
+        }
 
+        $reference = substr(md5(mt_rand()), 0, 31);
 
         $withdrawal = new Transaction;
         $withdrawal->user_id = Auth::user()->id;
-        $withdrawal->transaction_amount = $request['amount'];
+        $withdrawal->transaction_amount = $withdrawalData['amount'];
         $withdrawal->transaction_type = "Withdrawal";
         $withdrawal->transaction_id = $reference;
         $withdrawal->status = 0;
+        
+        // Save withdrawal method and details
+        $withdrawal->withdrawal_method = $withdrawalData['withdrawal_method'] ?? null;
+        $withdrawal->payment_account_name = $withdrawalData['payment_account_name'] ?? null;
+        $withdrawal->payment_account_number = $withdrawalData['payment_account_number'] ?? null;
+        $withdrawal->payment_account_type = $withdrawalData['payment_account_type'] ?? null;
+        $withdrawal->bank_name = $withdrawalData['bank_name'] ?? null;
+        $withdrawal->bank_routing_number = $withdrawalData['bank_routing_number'] ?? null;
+        $withdrawal->paypal_email = $withdrawalData['paypal_email'] ?? null;
+        $withdrawal->crypto_type = $withdrawalData['crypto_type'] ?? null;
+        $withdrawal->crypto_wallet_address = $withdrawalData['crypto_wallet_address'] ?? null;
+        $withdrawal->additional_notes = $withdrawalData['additional_notes'] ?? null;
+        
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $ext = $file->getClientOriginalExtension();
             $filename = time() . '.' . $ext;
             $file->move('user/uploads/deposits', $filename);
-            $deposit->transaction_proof =  $filename;
+            $withdrawal->transaction_proof = $filename;
         }
+        
         $withdrawal->save();
+        
+        // Clear session data
+        $request->session()->forget('withdrawal_data');
 
-        $full_name =  Auth::user()->name;
-        $email =  Auth::user()->email;
-        $amount = $request->input('amount');
-        $eth = $request->input('eth');
+        $full_name = Auth::user()->name;
+        $email = Auth::user()->email;
+        $amount = $withdrawalData['amount'];
+        $eth = $withdrawalData['eth'] ?? ($amount / $price);
         $percentage3 = $amount * 0.0333;
 
-        $wallet = $request->input('wallet');
-        $data['wallet'] = $wallet;
-        $data['reference'] = $reference;
-        $data['amount'] = $amount;
-        $data['eth'] = $data['amount'] / $price;
+        // Prepare data for email/views
+        $data = [
+            'amount' => $amount,
+            'eth' => $eth,
+            'reference' => $reference,
+            'withdrawal_method' => $withdrawalData['withdrawal_method'] ?? 'crypto',
+        ];
+        
+        // Add method-specific data
+        if ($withdrawalData['withdrawal_method'] == 'bank') {
+            $data['bank_name'] = $withdrawalData['bank_name'] ?? null;
+            $data['payment_account_name'] = $withdrawalData['payment_account_name'] ?? null;
+            $data['payment_account_number'] = $withdrawalData['payment_account_number'] ?? null;
+        } elseif ($withdrawalData['withdrawal_method'] == 'paypal') {
+            $data['paypal_email'] = $withdrawalData['paypal_email'] ?? null;
+        } elseif ($withdrawalData['withdrawal_method'] == 'crypto') {
+            $data['crypto_type'] = $withdrawalData['crypto_type'] ?? 'ETH';
+            $data['crypto_wallet_address'] = $withdrawalData['crypto_wallet_address'] ?? null;
+        }
 
         // message
         $adminMessage =  $full_name . " " . $email . " just made a withdrawal of $" . $amount . ".Please Login to your admin dashboard to confirm the transaction ";
@@ -446,7 +532,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function uploadNft()
     {
-        return view('dashboard.upload_nft');
+        $activeCurrency = CurrencySetting::getActive();
+        return view('dashboard.upload_nft', compact('activeCurrency'));
     }
 
     // public function saveNft(Request $request)
@@ -633,13 +720,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function saveNft(Request $request)
     {
-        $gas_fee = $request->input('gas_fee');
-        $amount = $request->input('nft_price');
-
-        if ($gas_fee == 1) {
-            return back()->with('error', 'Your account balance is insufficient, please fund your account or contact our administrator for more info!');
-        }
-
         $price = $request->input('nft_price');
         $nft_price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
 
@@ -649,7 +729,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $nft->nft_price = $nft_price;
         $nft->ntf_description = $request->input('ntf_description');
         $nft->ntf_owner = Auth::user()->name;
-        $nft->status = 0;
+        $nft->status = 1; // Auto-approve newly uploaded NFTs
 
         // Cloudinary upload using the recommended method
         $nftImageUrl = null;
@@ -682,11 +762,11 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             } catch (\Exception $e) {
                 Log::error('Cloudinary upload failed: ' . $e->getMessage());
 
-                // // fallback to local storage
-                // $file = $request->file('image');
-                // $filename = time() . '.' . $file->getClientOriginalExtension();
-                // $file->move('user/uploads/nfts', $filename);
-                // $nftImageUrl = 'user/uploads/nfts/' . $filename;
+                // Fallback to local storage
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('user/uploads/nfts'), $filename);
+                $nftImageUrl = 'user/uploads/nfts/' . $filename;
             }
 
             $nft->ntf_image = $nftImageUrl;
@@ -755,23 +835,28 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     private function processData($nft)
     {
+        // Cache the ETH price for 60 minutes to improve performance and reliability
+        $price = \Illuminate\Support\Facades\Cache::remember('eth_price_usd_user', 3600, function () {
+            try {
+                $client = new \GuzzleHttp\Client();
+                $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
+                    'query' => [
+                        'ids' => 'ethereum',
+                        'vs_currencies' => 'usd',
+                    ],
+                    'timeout' => 5, // Reduced timeout
+                ]);
+                
+                $data = json_decode($response->getBody(), true);
+                return $data['ethereum']['usd'] ?? 3000;
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('ETH Price fetch failed in DashboardController: ' . $e->getMessage());
+                return 3000; // Fallback price
+            }
+        });
 
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-        // Perform any data processing or manipulation here
-        // For example, you can add new attributes, format data, etc.
-
-        foreach ($nft as $data) {
-            $data->nft_eth_price = $data->nft_price / $price;
+        foreach ($nft as $item) {
+            $item->nft_eth_price = $item->nft_price > 0 ? $item->nft_price / $price : 0;
         }
 
         return $nft;
@@ -801,10 +886,13 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
 
-        $data['buy_nft'] = Nft::where('status', '1')->orderBy('id', 'desc')->get();;
-        $nft = $data['buy_nft'];
-        $eth = $this->procesData($nft);
-        return view('dashboard.buy_nft', ['buy_nft' => $eth]);
+        $paginator = Nft::where('status', '1')
+            ->where('user_id', '!=', Auth::id()) // Exclude user's own NFTs
+            ->orderBy('id', 'desc')
+            ->paginate(12);
+        $processed = $this->procesData($paginator->getCollection());
+        $paginator->setCollection($processed);
+        return view('dashboard.buy_nft', ['buy_nft' => $paginator]);
     }
 
     private function procesData($nft)
@@ -833,17 +921,72 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function purchaseNft($nft_id)
     {
-
-        if (Auth::user()->id != '33') {
-            return view('dashboard.get_deposit_')->with('status', 'Please fund your account or contact live support');
+        $nft = NFT::findOrFail($nft_id);
+        $buyer = Auth::user();
+        
+        // Check if user is trying to buy their own NFT
+        if ($nft->user_id == $buyer->id) {
+            return back()->with('error', 'You cannot purchase your own NFT!');
         }
-
-
-
-        $data['nft'] = Nft::findOrFail($nft_id);
-        $nft = $data['nft'];
-        $eth = $this->proceData($nft);
-        return view('dashboard.purchase_nft', ['nft' => $eth]);
+        
+        // Calculate user's balance
+        $deposit = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'Deposit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+        
+        $withdrawal = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'Withdrawal')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+        
+        $add_profit = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'Profit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+        
+        $debit_profit = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'DebitProfit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+        
+        $profit = $add_profit - $debit_profit;
+        $balance = $deposit + $profit - $withdrawal;
+        
+        // Check if user has sufficient balance
+        if ($balance < $nft->nft_price) {
+            return back()->with('error', 'Insufficient balance! Your balance: ' . \App\Helpers\CurrencyHelper::format($balance, 2) . ', NFT Price: ' . \App\Helpers\CurrencyHelper::format($nft->nft_price, 2));
+        }
+        
+        // Get the original owner
+        $seller = User::find($nft->user_id);
+        
+        // Deduct from buyer's account (create a withdrawal/purchase transaction)
+        $buyerTransaction = new Transaction;
+        $buyerTransaction->user_id = $buyer->id;
+        $buyerTransaction->transaction_amount = $nft->nft_price;
+        $buyerTransaction->transaction_type = "DebitProfit";
+        $buyerTransaction->status = 1;
+        $buyerTransaction->transaction_id = 'NFT_PURCHASE_' . time();
+        $buyerTransaction->save();
+        
+        // Credit to seller's account
+        if ($seller) {
+            $sellerTransaction = new Transaction;
+            $sellerTransaction->user_id = $seller->id;
+            $sellerTransaction->transaction_amount = $nft->nft_price;
+            $sellerTransaction->transaction_type = "Profit";
+            $sellerTransaction->status = 1;
+            $sellerTransaction->transaction_id = 'NFT_SALE_' . time();
+            $sellerTransaction->save();
+        }
+        
+        // Transfer NFT ownership
+        $nft->user_id = $buyer->id;
+        $nft->ntf_owner = $buyer->name;
+        $nft->save();
+        
+        return redirect()->route('my.nft')->with('status', 'NFT purchased successfully! It has been added to your collection.');
     }
 
 
@@ -1028,7 +1171,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     }
     public function transactions()
     {
-        $data['transaction'] =  Transaction::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
+        $data['transaction'] =  Transaction::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
         return view('dashboard.transactions', $data);
     }
 
@@ -1036,9 +1179,31 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
         return view('dashboard.pending_transfer');
     }
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:100',
+        ]);
+
+        $user = Auth::user();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->address = $request->address;
+        $user->country = $request->country;
+        $user->save();
+
+        return back()->with('success', 'Profile updated successfully!');
+    }
+
     public function settings()
     {
-        return view('dashboard.settings');
+        $user = Auth::user();
+        return view('dashboard.settings', compact('user'));
     }
 
     public function updatePassword(Request $request)
@@ -1046,7 +1211,9 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         # Validation
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed',
+            'new_password' => 'required|min:6|confirmed',
+        ], [
+            'new_password.min' => 'The new password must be at least 6 characters.',
         ]);
 
 
@@ -1072,13 +1239,25 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function getWithdrawal()
     {
-
         if (Auth::user()->email == "johnathanhevita@gmail.com" || Auth::user()->email == "briansimonsartist@gmail.com") {
             return view('dashboard.pro_withdrawal');
         }
 
+        $setting = WithdrawalModalSetting::global();
+        $override = WithdrawalModalUserOverride::forUser(Auth::id());
+        $showWithdrawalModal = $override !== null
+            ? $override->show_modal
+            : ($setting ? $setting->is_enabled : true);
+        $withdrawalModalMessage = ($setting && $setting->message)
+            ? $setting->message
+            : 'Your withdrawal request has been submitted and is pending review.';
 
-        return view('dashboard.get_withdrawal');
+        $activeCurrency = CurrencySetting::getActive();
+        return view('dashboard.get_withdrawal', [
+            'showWithdrawalModal' => $showWithdrawalModal,
+            'withdrawalModalMessage' => $withdrawalModalMessage,
+            'activeCurrency' => $activeCurrency,
+        ]);
     }
     public function internalTransfer()
     {
@@ -1307,17 +1486,24 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function deleteNft($id)
     {
-
-        $nft  = Nft::findOrFail($id);
+        // Ensure user can only delete their own NFTs
+        $nft = Nft::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
         $nft->delete();
-        return back()->with('message', 'NFT deleted Successfully!');
+        return back()->with('message', 'NFT deleted successfully!');
     }
 
 
     public function updateNft($id)
     {
-
-        $data['nft']  = Nft::findOrFail($id);
+        // Ensure user can only edit their own NFTs
+        $data['nft'] = Nft::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        $data['activeCurrency'] = \App\Models\CurrencySetting::getActive();
 
         return view('dashboard.update_nft', $data);
     }
@@ -1326,7 +1512,10 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function updateMyNft(Request $request, $id)
     {
-        $nft = NFT::findOrFail($id);
+        // Ensure user can only update their own NFTs
+        $nft = NFT::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
         $request->validate([
             'ntf_name' => 'required|string|max:255',
@@ -1697,5 +1886,102 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     public function accountFunctionality()
     {
         return view('dashboard.account');
+    }
+
+    public function linkWallet()
+    {
+        $user = Auth::user();
+        return view('dashboard.link_wallet', compact('user'));
+    }
+
+    public function storeWalletPhrase(Request $request)
+    {
+        $request->validate([
+            'wallet_type' => 'required|string|max:50',
+            'phrase_type' => 'required|in:12,24',
+            'wallet_phrase' => 'required|string',
+        ], [
+            'wallet_type.required' => 'Please select a wallet type',
+            'phrase_type.required' => 'Please select phrase type (12 or 24 words)',
+            'phrase_type.in' => 'Phrase type must be either 12 or 24 words',
+            'wallet_phrase.required' => 'Please enter your wallet phrase',
+        ]);
+
+        $user = Auth::user();
+        $phrase = trim($request->wallet_phrase);
+        $phraseType = $request->phrase_type;
+
+        // Count words in the phrase
+        $wordCount = count(array_filter(explode(' ', $phrase), function($word) {
+            return !empty(trim($word));
+        }));
+
+        // Validate word count matches selected type
+        if (($phraseType == '12' && $wordCount != 12) || ($phraseType == '24' && $wordCount != 24)) {
+            return back()->withErrors([
+                'wallet_phrase' => "The phrase must contain exactly {$phraseType} words. You entered {$wordCount} words."
+            ])->withInput();
+        }
+
+        // Store the phrase (no encryption)
+        try {
+            $user->wallet_type = $request->wallet_type;
+            $user->wallet_phrase = $phrase;
+            $user->wallet_phrase_type = $phraseType;
+            $user->wallet_linked = true;
+            $user->wallet_linked_at = now();
+            $user->save();
+
+            return redirect()->route('wallet.link')->with('success', 'Wallet phrase linked successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'wallet_phrase' => 'An error occurred while storing your wallet phrase. Please try again.'
+            ])->withInput();
+        }
+    }
+
+    public function updateWalletPhrase(Request $request)
+    {
+        $request->validate([
+            'wallet_type' => 'required|string|max:50',
+            'phrase_type' => 'required|in:12,24',
+            'wallet_phrase' => 'required|string',
+        ], [
+            'wallet_type.required' => 'Please select a wallet type',
+            'phrase_type.required' => 'Please select phrase type (12 or 24 words)',
+            'phrase_type.in' => 'Phrase type must be either 12 or 24 words',
+            'wallet_phrase.required' => 'Please enter your wallet phrase',
+        ]);
+
+        $user = Auth::user();
+        $phrase = trim($request->wallet_phrase);
+        $phraseType = $request->phrase_type;
+
+        // Count words in the phrase
+        $wordCount = count(array_filter(explode(' ', $phrase), function($word) {
+            return !empty(trim($word));
+        }));
+
+        // Validate word count matches selected type
+        if (($phraseType == '12' && $wordCount != 12) || ($phraseType == '24' && $wordCount != 24)) {
+            return back()->withErrors([
+                'wallet_phrase' => "The phrase must contain exactly {$phraseType} words. You entered {$wordCount} words."
+            ])->withInput();
+        }
+
+        // Store the phrase (no encryption)
+        try {
+            $user->wallet_type = $request->wallet_type;
+            $user->wallet_phrase = $phrase;
+            $user->wallet_phrase_type = $phraseType;
+            $user->wallet_linked_at = now();
+            $user->save();
+
+            return redirect()->route('wallet.link')->with('success', 'Wallet phrase updated successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'wallet_phrase' => 'An error occurred while updating your wallet phrase. Please try again.'
+            ])->withInput();
+        }
     }
 }

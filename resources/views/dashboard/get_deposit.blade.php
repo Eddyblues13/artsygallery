@@ -8,8 +8,11 @@
                     <div class="text-center mt-4">
 
                         <p class="h2">
-                            Enter amount in Dollar
+                            Enter amount in {{ $activeCurrency->currency_name ?? 'USD' }}
                         </p>
+                        @if($activeCurrency ?? null)
+                        <p class="text-muted small mb-0">Display currency: {{ $activeCurrency->currency_code }} ({{ $activeCurrency->currency_symbol }})</p>
+                        @endif
                     </div>
 
                     <div class="card">
@@ -18,9 +21,12 @@
                                 <form method="post" action="{{route('make.deposit')}}">
                                     {{csrf_field()}}
                                     <div class="mb-3">
-                                        <label class="form-label">Amount</label>
-                                        <input class="form-control form-control-lg" type="number" name="amount"
-                                            placeholder="Enter Amount" />
+                                        <label class="form-label">Amount ({{ $activeCurrency->currency_code ?? 'USD' }})</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$' }}</span>
+                                            <input class="form-control" type="number" name="amount"
+                                                placeholder="Enter Amount" step="0.01" min="0" />
+                                        </div>
                                     </div>
                                     <div>
                                     </div>

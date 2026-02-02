@@ -462,7 +462,6 @@
 <script src="auth/js/app.js"></script>
 <!-- Bootstrap Toasts Js -->
 <script src="assets/js/pages/bootstrap-toastr.init.js"></script>
-<script src="//code.tidio.co/dybjgzwinacdhy36b4thubjfjx0dmvix.js" async></script>
 </body>
 
 </html>

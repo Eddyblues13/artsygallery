@@ -1,22 +1,8 @@
 @include('dashboard.header')
 
-@if(session('success'))
-<div class="alert alert-success"
-	style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px;">
-	{{ session('success') }}
-</div>
-@endif
-
-@if($errors->any())
-<div class="alert alert-danger"
-	style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px;">
-	<ul style="margin: 0; padding-left: 20px;">
-		@foreach($errors->all() as $error)
-		<li>{{ $error }}</li>
-		@endforeach
-	</ul>
-</div>
-@endif
+<main class="content">
+	<div class="container-fluid p-0">
+		@include('dashboard.alert')
 
 
 <main class="content">
@@ -64,7 +50,7 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>${{number_format($balance, 2, '.', ',')}}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</b></h3>
 									<div class="mb-0">
 										<span class="text-danger">{{$balance_eth}} ETH</span>
 
@@ -85,7 +71,7 @@
 										</div>
 									</div>
 
-									<h3 class="mt-1 mb-3"><b>${{number_format($profit, 2, '.', ',')}}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</b></h3>
 									<div class="mb-0">
 										<span class="text-success">{{ number_format($profit_eth, 2) }} ETH</span>
 
@@ -107,7 +93,7 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>${{number_format($deposit, 2, '.', ',')}}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($deposit, 2) }}</b></h3>
 
 									<div class="mb-0">
 										<span class="text-success">{{ number_format($deposit_eth, 2) }} ETH</span>
@@ -128,7 +114,7 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>${{number_format($withdrawal, 2, '.', ',')}}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2) }}</b></h3>
 
 									<div class="mb-0">
 										<span class="text-danger">{{ number_format($withdrawal_eth, 2) }} ETH</span>

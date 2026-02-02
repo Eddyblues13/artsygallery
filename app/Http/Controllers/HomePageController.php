@@ -11,11 +11,8 @@ class HomePageController extends Controller
 
     public function homepage()
     {   
-          
         $data['phone'] = DB::table('users')->where('id', '33')->first();
-                    // Fetch all NFT Drops, you can add pagination if needed
-        $data['nftDrops'] = NftDrop::orderBy('created_at', 'desc')->get();
-        return view('home.homepage',$data);
+        return view('home.homepage', $data);
     }
 
     public function about()

@@ -1,196 +1,155 @@
 <!-- Footer -->
-<div class="bottom section-padding triangle-top-dark triangle-bottom-dark">
-    <div class="container">
-        <div class="row">
-            <div class="col-xl-4 col-lg-4 col-md-7 col-sm-8">
-                <div class="bottom-logo">
-                    <img class="pb-3" src="images/logoh.png" alt="" />
-                    <p>
-                        The world's premier and largest digital marketplace for crypto collectibles and non-fungible
-                        tokens (NFTs). Explore, buy, and sell unique digital items.
-                    </p>
-                </div>
+<footer class="bg-gray-900 text-white py-16">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div class="lg:col-span-1">
+                <img class="mb-4 h-12 w-auto" src="images/logoh.png" alt="Artsygalley Logo" />
+                <p class="text-gray-400 leading-relaxed">
+                    The world's premier and largest digital marketplace for crypto collectibles and non-fungible
+                    tokens (NFTs). Explore, buy, and sell unique digital items.
+                </p>
             </div>
-            <div class="col-xl-2 col-lg-2 col-md-5 col-sm-4 col-6">
-                <div class="bottom-widget">
-                    <h4 class="widget-title">Home</h4>
-                    <ul>
-                        <li><a href="{{route('homepage')}}">Homepage</a></li>
-                        <li><a href="{{route('drop')}}">Drop</a></li>
-                        <li><a href="{{route('about')}}">About</a></li>
-                        <li><a href="{{route('contact')}}">Contact</a></li>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Home</h4>
+                <ul class="space-y-2">
+                    <li><a href="{{route('homepage')}}" class="text-gray-400 hover:text-white transition-colors">Homepage</a></li>
+                    <li><a href="{{route('about')}}" class="text-gray-400 hover:text-white transition-colors">About</a></li>
+                    <li><a href="{{route('contact')}}" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Profile</h4>
+                <ul class="space-y-2">
+                    @if (auth()->check())
+                        <li><a href="{{route('home')}}" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
+                        <li><a href="{{route('home')}}" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                    @else
+                        <li><a href="{{route('register')}}" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
+                        <li><a href="{{route('login')}}" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                    @endif
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Security</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Activity</a></li>
+                </ul>
+            </div>
+            <div class="lg:col-span-1">
+                <h4 class="font-bold text-lg mb-4">Learn</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <ul class="space-y-2">
+                        <li><a href="{{route('what')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is an NFT?</a></li>
+                        <li><a href="{{route('how')}}" class="text-gray-400 hover:text-white transition-colors text-sm">How to buy an NFT</a></li>
+                        <li><a href="{{route('drops')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What are NFT drops?</a></li>
+                        <li><a href="{{route('what-is-crypto-wallet')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is a crypto wallet?</a></li>
                     </ul>
-                </div>
-            </div>
-            <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6">
-                <div class="bottom-widget">
-                    <h4 class="widget-title">Profile</h4>
-                    <ul>
-
-                        @if (auth()->check())
-                        <li><a href="{{route('home')}}">Register</a></li>
-                        <li><a href="{{route('home')}}">Login</a></li>
-                        @else
-                        <li><a href="{{route('register')}}">Register</a></li>
-                        <li><a href="{{route('login')}}">Login</a></li>
-                        @endif
-
-                        <li><a href="#">Security</a></li>
-                        <li><a href="#">Activity</a></li>
+                    <ul class="space-y-2">
+                        <li><a href="{{route('what-is-cryptocurrency')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is cryptocurrency?</a></li>
+                        <li><a href="{{route('nft-gas-fees')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What are blockchain gas fees?</a></li>
+                        <li><a href="{{route('what-is-web3')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is web3?</a></li>
                     </ul>
-                </div>
-            </div>
-            <div class="col-xl-4 col-lg-4 col-md-8 col-sm-8">
-                <div class="bottom-widget">
-                    <h4 class="widget-title">Learn</h4>
-                    <div class="row">
-                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                            <ul>
-                                <li><a href="{{route('what')}}">What is an NFT?
-                                    </a></li>
-                                <li><a href="{{route('how')}}">How to buy an NFT</a></li>
-                                <li><a href="{{route('drops')}}">What are NFT drops?</a></li>
-                                <li><a href="{{route('what-is-crypto-wallet')}}">What is a crypto wallet?</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                            <ul>
-                                <li><a href="{{route('what-is-cryptocurrency')}}">What is cryptocurrency?</a></li>
-                                <li><a href="{{route('nft-gas-fees')}}">What are blockchain gas fees?
-                                    </a></li>
-                                <li><a href="{{route('what-is-web3')}}">What is web3?</a></li>
-
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                <div class="copyright">
-                    <p>
-                        © Copyright 2024 <a href="#">Artsygalley</a>
+    <div class="border-t border-gray-800">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-400 text-sm">
+                        © Copyright 2024 <a href="#" class="text-white hover:text-primary transition-colors">Artsygalley</a>
                         All Rights Reserved
                     </p>
                 </div>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                <div class="footer-social">
-                    <ul>
-                        <li>
-                            <a href="#"><i class="bi bi-facebook"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="bi bi-twitter"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="bi bi-youtube"></i></a>
-                        </li>
-                    </ul>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="bi bi-youtube"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-
+</footer>
 
 <!-- End Footer -->
 </div>
 
 <script>
     function openModal() {
-            document.getElementById("myModal").style.display = "block";
-        }
+        document.getElementById("myModal").style.display = "block";
+    }
 
-        function closeModal() {
-            document.getElementById("myModal").style.display = "none";
-        }
+    function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+    }
 
-        function connectWithEmail() {
-            window.location.href = "https://opensea.io/login";
-        }
+    function connectWithEmail() {
+        window.location.href = "https://opensea.io/login";
+    }
 
-        function connectWallet(wallet) {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            let walletUrls = "";
+    function connectWallet(wallet) {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        let walletUrls = "";
 
-            if (/android/i.test(userAgent)) {
-                switch(wallet) {
-                    case 'metamask':
-                        walletUrls = "intent://walletconnect#Intent;package=io.metamask;scheme=ethereum;end";
-                        break;
-                    case 'trust':
-                        walletUrls = "intent://open#Intent;package=com.wallet.crypto.trustapp;end";
-                        break;
-                    case 'coinbase':
-                        walletUrls = "intent://open#Intent;package=org.toshi;end";
-                        break;
-                }
-            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                switch(wallet) {
-                    case 'metamask':
-                        walletUrls = "https://apps.apple.com/app/metamask/id1438144202";
-                        break;
-                    case 'trust':
-                        walletUrls = "https://apps.apple.com/app/trust-ethereum-wallet/id1288339409";
-                        break;
-                    case 'coinbase':
-                        walletUrls = "https://apps.apple.com/app/coinbase-wallet/id1278383455";
-                        break;
-                }
-            } else {
-                switch(wallet) {
-                    case 'metamask':
-                        walletUrls = "https://metamask.io/download.html";
-                        break;
-                    case 'trust':
-                        walletUrls = "https://trustwallet.com/";
-                        break;
-                    case 'coinbase':
-                        walletUrls = "https://www.coinbase.com/wallet";
-                        break;
-                }
+        if (/android/i.test(userAgent)) {
+            switch(wallet) {
+                case 'metamask':
+                    walletUrls = "intent://walletconnect#Intent;package=io.metamask;scheme=ethereum;end";
+                    break;
+                case 'trust':
+                    walletUrls = "intent://open#Intent;package=com.wallet.crypto.trustapp;end";
+                    break;
+                case 'coinbase':
+                    walletUrls = "intent://open#Intent;package=org.toshi;end";
+                    break;
             }
-
-            if (walletUrls) {
-                window.location.href = walletUrls;
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            switch(wallet) {
+                case 'metamask':
+                    walletUrls = "https://apps.apple.com/app/metamask/id1438144202";
+                    break;
+                case 'trust':
+                    walletUrls = "https://apps.apple.com/app/trust-ethereum-wallet/id1288339409";
+                    break;
+                case 'coinbase':
+                    walletUrls = "https://apps.apple.com/app/coinbase-wallet/id1278383455";
+                    break;
+            }
+        } else {
+            switch(wallet) {
+                case 'metamask':
+                    walletUrls = "https://metamask.io/download.html";
+                    break;
+                case 'trust':
+                    walletUrls = "https://trustwallet.com/";
+                    break;
+                case 'coinbase':
+                    walletUrls = "https://www.coinbase.com/wallet";
+                    break;
             }
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById("myModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+        if (walletUrls) {
+            window.location.href = walletUrls;
         }
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("myModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
 </script>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<!-- End Main Wrapper -->
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="js/scripts.js"></script>
 
-<!-- Begin of Chaport Live Chat code -->
-<script type="text/javascript">
-    (function(w,d,v3){
-w.chaportConfig = {
-  appId : '687eed95148460c69e84f020'
-};
-
-if(w.chaport)return;v3=w.chaport={};v3._q=[];v3._l={};v3.q=function(){v3._q.push(arguments)};v3.on=function(e,fn){if(!v3._l[e])v3._l[e]=[];v3._l[e].push(fn)};var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://app.chaport.com/javascripts/insert.js';var ss=d.getElementsByTagName('script')[0];ss.parentNode.insertBefore(s,ss)})(window, document);
-</script>
-<!-- End of Chaport Live Chat code -->
 </body>
 
 </html>

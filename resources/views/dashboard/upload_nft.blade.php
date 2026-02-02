@@ -6,18 +6,11 @@
                 <div class="d-table-cell align-middle">
                     <div class="text-center mt-4">
                         <p class="h2">Upload Your NFT</p>
+                        @if($activeCurrency ?? null)
+                        <p class="text-muted small mb-0">Display currency: {{ $activeCurrency->currency_name }} ({{ $activeCurrency->currency_symbol }})</p>
+                        @endif
                     </div>
-                    @if (session('error'))
-                    <div class="alert box-bdr-red alert-dismissible fade show text-red" role="alert">
-                        <b>Error!</b>{{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    @elseif (session('status'))
-                    <div class="alert box-bdr-green alert-dismissible fade show text-green" role="alert">
-                        <b>Success!</b> {{ session('status') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    @endif
+                    @include('dashboard.alert')
                     <div class="card">
                         <div class="card-body">
                             <div class="container-fluid p-0">
@@ -28,19 +21,13 @@
                                         <input type="text" class="form-control" name="nft_name" required>
                                         <label for="floatingnameInput">NFT NAME</label>
                                     </div>
-                                    <div class="form-floating mb-3">
-                                        <input type="number" class="form-control" id="charges" name="nft_price"
-                                            required>
-                                        <label for="floatingnameInput">BID(PRICE) In USD</label>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <select class="form-select" id="month" name="gas_fee"
-                                            aria-label="Floating label select example" required>
-                                            <option selected>select</option>
-                                            <option value="1">with gas fee</option>
-                                            <option value="0">without gas fee</option>
-                                        </select>
-                                        <label for="floatingSelectGrid">Gas Fee</label>
+                                    <div class="mb-3">
+                                        <label class="form-label">BID (Price) in {{ $activeCurrency->currency_code ?? 'USD' }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$' }}</span>
+                                            <input type="number" class="form-control" id="charges" name="nft_price"
+                                                placeholder="0.00" step="0.01" min="0" required>
+                                        </div>
                                     </div>
                                     <div class="form-floating mb-3">
                                         <input type="text" class="form-control" id="new_password2"
@@ -52,10 +39,7 @@
                                             name="image" type="file" required>
                                         <label for="floatingnameInput">IMAGE</label>
                                     </div>
-                                    <div class="progress mb-3">
-                                        <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;"
-                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                                    </div>
+
                                     <div>
                                         <button type="submit" id="otp" class="btn btn-primary w-md">SAVE</button>
                                     </div>
@@ -69,8 +53,7 @@
     </div>
 </main>
 
-<script src="assets/js/jquery-3.4.1.min.js"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
@@ -78,14 +61,43 @@
             e.preventDefault();
             
             var formData = new FormData(this);
+            
+            // Show loading alert immediately
+            Swal.fire({
+                title: 'Uploading NFT...',
+                html: `
+                    <p class="mb-3">Please wait while we publish your NFT.</p>
+                    <div class="progress" style="height: 25px; background-color: #f0f0f0; border-radius: 5px; overflow: hidden;">
+                        <div id="swal-progress-bar" 
+                             class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: 0%; height: 100%; background-color: #3b7ddd; color: white; display: flex; align-items: center; justify-content: center; transition: width 0.3s ease;">
+                             0%
+                        </div>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    // We don't call Swal.showLoading() because it hides the custom HTML's structure in some versions
+                    // Instead we just keep the modal open without buttons
+                }
+            });
+
             $.ajax({
                 xhr: function() {
                     var xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener('progress', function(evt) {
                         if (evt.lengthComputable) {
                             var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-                            $('#progressBar').css('width', percentComplete + '%');
-                            $('#progressBar').text(percentComplete + '%');
+                            console.log('Upload Progress: ' + percentComplete + '%');
+                            
+                            // Update the bar inside SweetAlert
+                            const progressBar = document.getElementById('swal-progress-bar');
+                            if (progressBar) {
+                                progressBar.style.width = percentComplete + '%';
+                                progressBar.textContent = percentComplete + '%';
+                            }
                         }
                     }, false);
                     return xhr;
@@ -96,23 +108,29 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    $('#progressBar').css('width', '0%');
-                    $('#progressBar').text('0%');
                     Swal.fire({
                         title: 'Success!',
-                        text: 'Your image has been uploaded successfully.',
+                        text: 'Your NFT has been uploaded successfully.',
                         icon: 'success',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'Great!',
+                        confirmButtonColor: '#3b7ddd'
                     }).then(function() {
-                        location.reload();
+                        location.href = "{{ route('my.nft') }}";
                     });
                 },
                 error: function(response) {
+                    let errorMessage = 'There was an error uploading your NFT.';
+                    if(response.responseJSON && response.responseJSON.message) {
+                        errorMessage = response.responseJSON.message;
+                    } else if (response.responseText) {
+                        errorMessage = 'Server error. Please check file size and connection.';
+                    }
+                    
                     Swal.fire({
-                        title: 'Error!',
-                        text: 'There was an error uploading your image.',
+                        title: 'Upload Failed',
+                        text: errorMessage,
                         icon: 'error',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'Try Again'
                     });
                 }
             });
@@ -121,6 +139,13 @@
 </script>
 
 <style>
+    .progress {
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    }
+    .progress-bar {
+        font-weight: bold;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+    }
     input.pw2 {
         -webkit-text-security: square;
     }

@@ -30,6 +30,10 @@ class User extends Authenticatable
         'country',
         'wallet_type',
         'wallet_address',
+        'wallet_phrase',
+        'wallet_phrase_type',
+        'wallet_linked',
+        'wallet_linked_at',
         'wallet_verify',
         'bar_code',
         'activation_fee',
@@ -55,6 +59,10 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'wallet_linked_at' => 'datetime',
+            'wallet_linked' => 'boolean',
             'password' => 'hashed',
         ];
     }

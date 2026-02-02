@@ -33,9 +33,12 @@
                                     required>{{ $nft->ntf_description }}</textarea>
                             </div>
                             <div class="mb-3">
-                                <label for="ntf_price_usd" class="form-label">Price in USD</label>
-                                <input type="number" class="form-control" id="ntf_price_usd" name="ntf_price_usd"
-                                    value="{{ $nft->nft_price}}" required>
+                                <label for="ntf_price_usd" class="form-label">Price ({{ $activeCurrency->currency_code ?? 'USD' }})</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$' }}</span>
+                                    <input type="number" class="form-control" id="ntf_price_usd" name="ntf_price_usd"
+                                        value="{{ $nft->nft_price}}" step="0.01" min="0" required>
+                                </div>
                             </div>
 
 

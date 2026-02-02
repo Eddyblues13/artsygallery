@@ -43,7 +43,6 @@
 
 
 
-    <script src="//code.tidio.co/0xke2chmigcbbqfnsswfyzbmmuzk8rka.js" async></script>
 </head>
 
 <body data-sidebar="dark" data-layout-mode="light">
@@ -84,25 +83,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-4"></h4>
-                            @if (session('error'))
-                            <div class="alert box-bdr-red alert-dismissible fade show text-red" role="alert">
-                                <b>Error!</b>{{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                            @elseif (session('status'))
-                            <div class="alert box-bdr-green alert-dismissible fade show text-green" role="alert">
-                                <b>Success!</b> {{ session('status') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                            @elseif (session('message'))
-                            <div class="alert box-bdr-green alert-dismissible fade show text-green" role="alert">
-                                <b>Success!</b> {{ session('message') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                            @endif
+                            @include('dashboard.alert')
                             <form method="post" action="{{route('make.deposit')}}">
                                 {{csrf_field()}}
                                 <div class="row mb-4">

@@ -76,7 +76,7 @@
                         onsubmit="return confirm('Are you sure you want to delete this NFT Drop?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                        <button type="submit" class="btn btn-danger btn w-100">
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     </form>

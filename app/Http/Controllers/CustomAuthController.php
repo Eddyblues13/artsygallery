@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Transaction;
+use App\Models\PopupMessage;
 use App\Mail\welcomeEmail;
-use App\Events\NewUser;
-use GuzzleHttp\Client;
-use App\Models\verifyToken;
-use Illuminate\Http\Request;
 use App\Mail\VerificationEmail;
-use App\Mail\supportEmail;
-use Illuminate\Support\Facades\DB;
+use App\Mail\SupportEmail;
+use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -24,32 +23,30 @@ class CustomAuthController extends Controller
         return view('auth.login');
     }
 
-
     public function customLogin(Request $request)
     {
         $request->validate([
-            'email' => 'required',
-            'password' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
 
         $credentials = $request->only('email', 'password');
+
         if (Auth::attempt($credentials)) {
-
+            $request->session()->regenerate();
 
             return response()->json([
-                "content" => 'Successful',
-                "message" => 'Login Successful',
-                "redirect" => url("dashboard")
-            ]);
-        } else {
-            return response()->json([
-                "content" => 'Error',
-                "message" => "Invalid credentials",
-                "redirect" => url("login")
+                "content" => "Successful",
+                "message" => "Login Successful",
+                "redirect" => url("dashboard"),
             ]);
         }
 
-        return redirect("login")->withSuccess('Login details are not valid');
+        return response()->json([
+            "content" => "Error",
+            "message" => "Invalid credentials",
+            "redirect" => url("login"),
+        ], 401);
     }
 
     public function registration()
@@ -60,130 +57,145 @@ class CustomAuthController extends Controller
     public function customRegistration(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'address' => 'required',
-            'phone' => 'required',
-            'country' => 'required',
-            'password' => 'string|required|confirmed|min:3',
-
-
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|string|max:30',
+            'country' => 'required|string|max:100',
+            'password' => 'required|string|confirmed|min:3',
         ]);
 
+        $user = $this->create($request->all());
 
-        $data = $request->all();
-        $check = $this->create($data);
+        // ✅ 4-digit token
+        $token = random_int(1000, 9999);
 
+        // ✅ store token on user (consistent with your emailVerify())
+        $user->token = $token;
+        $user->save();
 
-        $email = $request['email'];
+        Mail::to($user->email)->send(new VerificationEmail($token));
 
-        //$user_data['email'] = $request['email'];
-
-
-        $validToken = rand(7650, 1234);
-        $get_token = new verifyToken();
-        $get_token->token = $validToken;
-        $get_token->email = $email;
-        $get_token->save();
-
-
-
-        Mail::to($email)->send(new VerificationEmail($validToken));
-        $userData = User::where('email', $request->email)->first();
-
-        return redirect("verify/" . $userData->id);
+        return redirect("verify/" . $user->id);
     }
 
     public function resendCode($id)
     {
+        $user = User::findOrFail($id);
 
-        $userData = User::where('id', $id)->first();
-        $email = $userData->email;
+        // ✅ 4-digit token
+        $token = random_int(1000, 9999);
 
-        $validToken = rand(7650, 1234);
-        $get_token = Auth::user();
-        $get_token->token = $validToken;
-        $get_token->update();
+        // ✅ update the SAME user being verified
+        $user->token = $token;
+        $user->save();
 
+        Mail::to($user->email)->send(new VerificationEmail($token));
 
-
-        Mail::to($email)->send(new VerificationEmail($validToken));
-
-
-        return redirect("verify/" . $userData->id)->with('message', 'verification code has been resent to your email');
+        return redirect("verify/" . $user->id)
+            ->with('message', 'Verification code has been resent to your email');
     }
 
     public function create(array $data)
     {
-        $accountNumber = rand(1645566556, 5575755768);
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'address' => $data['address'],
             'phone' => $data['phone'],
             'country' => $data['country'],
-            'password' => Hash::make($data['password'])
+            'password' => Hash::make($data['password']),
         ]);
     }
 
     public function dashboard()
     {
-        if (Auth::check()) {
-            if (Auth::user()->user_type == '1') {
-                $result = DB::table('users')->where('user_type', '0')->get();
-                return view('admin.home', compact('result'));
-            } else {
-
-
-                if (Auth::user()->is_activated == '1') {
-                    $client = new Client();
-                    $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                        'query' => [
-                            'ids' => 'ethereum',
-                            'vs_currencies' => 'usd',
-                        ],
-                    ]);
-                    // Decode the JSON response
-                    $data = json_decode($response->getBody(), true);
-                    $price = $data['ethereum']['usd'];
-
-
-
-
-                    $data['deposit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
-
-                    // deposit conversion
-                    $data['deposit_eth'] = $data['deposit'] / $price;
-
-                    $data['withdrawal'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Withdrawal')->where('status', '1')->sum('transaction_amount');
-
-                    // deposit conversion
-                    $data['withdrawal_eth'] = $data['withdrawal'] / $price;
-
-
-                    $data['add_profit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
-                    $data['debit_profit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
-                    $data['profit'] = $data['add_profit'] - $data['debit_profit'];
-                    // deposit conversion
-                    $data['profit_eth'] = $data['profit'] / $price;
-
-
-                    $data['balance'] = $data['deposit'] + $data['profit'] -  $data['withdrawal'];
-                    $data['balance_eth'] = $data['balance'] / $price;
-                    return view('dashboard.home', $data);
-                } else {
-
-                    return redirect("verify/" . Auth::user()->id);
-                }
-            }
+        if (!Auth::check()) {
+            return redirect("login")->withSuccess('You are not allowed to access');
         }
 
-        return redirect("login")->withSuccess('You are not allowed to access');
+        // Admin
+        if (Auth::user()->user_type == '1') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // User not activated
+        if (Auth::user()->is_activated != '1') {
+            return redirect("verify/" . Auth::user()->id);
+        }
+
+        // ✅ Safely get ETH price (don’t crash dashboard if API fails)
+        $price = 0;
+        try {
+            $client = new Client(['timeout' => 10]);
+            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
+                'query' => [
+                    'ids' => 'ethereum',
+                    'vs_currencies' => 'usd',
+                ],
+            ]);
+            $json = json_decode($response->getBody(), true);
+            $price = (float) ($json['ethereum']['usd'] ?? 0);
+        } catch (\Throwable $e) {
+            $price = 0;
+        }
+
+        $userId = Auth::id();
+
+        $data = [];
+
+        $data['deposit'] = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'Deposit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $data['withdrawal'] = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'Withdrawal')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $data['add_profit'] = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'Profit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $data['debit_profit'] = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'DebitProfit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $data['profit'] = $data['add_profit'] - $data['debit_profit'];
+        $data['balance'] = $data['deposit'] + $data['profit'] - $data['withdrawal'];
+
+        // ✅ conversions only if price is valid
+        $data['deposit_eth'] = $price > 0 ? $data['deposit'] / $price : 0;
+        $data['withdrawal_eth'] = $price > 0 ? $data['withdrawal'] / $price : 0;
+        $data['profit_eth'] = $price > 0 ? $data['profit'] / $price : 0;
+        $data['balance_eth'] = $price > 0 ? $data['balance'] / $price : 0;
+
+        // ✅ POPUPS
+        $user = Auth::user();
+
+        $general = PopupMessage::query()
+            ->active()
+            ->where('type', 'general')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $userSpecific = PopupMessage::query()
+            ->active()
+            ->where('type', 'user_specific')
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $data['popups'] = $general->merge($userSpecific);
+
+        return view('dashboard.home', $data);
     }
 
     public function adminHome()
     {
-
         return view('admin.home');
     }
 
@@ -192,10 +204,7 @@ class CustomAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        $response = ['content' => 'Logout Successful'];
-
-
-        return response()->json($response);
+        return response()->json(['content' => 'Logout Successful']);
     }
 
     public function logOut()
@@ -203,66 +212,66 @@ class CustomAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        return redirect("login")->with('Message', 'Your account has been verified Successfully.');
+        return redirect("login")->with('Message', 'Logged out successfully.');
     }
 
     public function verify($id)
     {
-        $user = User::where('id', $id)->first();
-        $data['email'] = $user->email;
-        $data['hash'] = $user->password;
-        $data['id'] = $user->id;
+        $user = User::findOrFail($id);
 
-        return view('auth.verify', $data);
+        return view('auth.verify', [
+            'email' => $user->email,
+            'hash' => $user->password,
+            'id' => $user->id,
+        ]);
     }
-
 
     public function emailVerify(Request $request)
     {
-        $first_token = $request->input('digit');
-        $second_token = $request->input('digit2');
-        $third_token = $request->input('digit3');
-        $fourth_token = $request->input('digit4');
-        $get_token =  $first_token;
-        $verify_token = User::where('token', $get_token)->first();
-        if ($verify_token) {
-            $user = User::where('email', $verify_token->email)->first();
-            $user->is_activated = 1;
-            $user->save();
-            $user_email =  $user->email;
-            $user_password =  $user->password;
+        // ✅ combine 4 digits (you were using only digit1 before)
+        $code = trim(
+            ($request->input('digit') ?? '') .
+            ($request->input('digit2') ?? '') .
+            ($request->input('digit3') ?? '') .
+            ($request->input('digit4') ?? '')
+        );
 
+        if (strlen($code) !== 4 || !ctype_digit($code)) {
+            return back()->with('error', 'Invalid Activation Code format!');
+        }
 
-            $data = [
-                'name' => $user->name,
-                'email' => $user->email,
-                'password' => '*********',
+        $user = User::where('token', $code)->first();
 
-            ];
-
-
-            Mail::to($user_email)->send(new welcomeEmail($data));
-
-            return redirect("dashboard")->with('status', 'Your account has been verified Successfully, you can now login');
-        } else {
+        if (!$user) {
             return back()->with('error', 'Incorrect Activation Code!');
         }
+
+        $user->is_activated = 1;
+        $user->token = null; // ✅ invalidate token after use
+        $user->save();
+
+        Mail::to($user->email)->send(new welcomeEmail([
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => '*********',
+        ]));
+
+        return redirect("dashboard")->with('status', 'Your account has been verified Successfully, you can now login');
     }
 
     public function supportEmail(Request $request)
-
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string',
+        ]);
 
-        $data = [
+        Mail::to('support@vanamanllc.com')->send(new SupportEmail([
             'name' => $request->name,
             'email' => $request->email,
             'message' => $request->message,
-        ];
-
-
-
-
-        Mail::to('support@vanamanllc.com ')->send(new supportEmail($data));
+        ]));
 
         return back()->with('status', 'Email Successfully sent');
     }

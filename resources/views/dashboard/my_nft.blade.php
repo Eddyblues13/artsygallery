@@ -1,70 +1,140 @@
 @include('dashboard.header')
 
 <main class="content">
-	<div class="container-fluid p-0">
-		@if(session('message'))
-		<div class="btn btn-success">{{session('message')}}</div>
-		@endif
+    <div class="container-fluid p-0">
+        @include('dashboard.alert')
 
-		<div class="mb-3">
-			<h1 class="h3 d-inline align-middle">Cards</h1>
-			<a class="badge bg-dark text-white ms-2" href="{{route('my.nft')}}">
-				My NFTs
-			</a>
-		</div>
-		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-			@foreach($my_nft as $nft)
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0"><strong>My Collection</strong></h1>
+            <a href="{{ route('upload.nft') }}" class="btn btn-primary shadow-sm">
+                <i class="align-middle" data-feather="plus"></i> Add New NFT
+            </a>
+        </div>
 
-			<div class="col col-lg-3 col-md-4 col-6">
-				<div class="card">
-					<img class="card-img-top" src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}"
-						alt="{{ $nft->ntf_name }}" style="height: 300px; object-fit: cover;">
-					<div class="card-header">
-						<h5 class="card-title mb-0">{{ $nft->ntf_name }}</h5>
-					</div>
-					<div class="card-body">
-						<p class="card-text">{{ $nft->ntf_description }}</p>
-						<p class="card-text"><strong>Price in USD:</strong> ${{number_format($nft->nft_price, 2, '.',
-							',')}}</p>
-						<p class="card-text"><strong>Price in ETH:</strong> {{ number_format($nft->nft_eth_price,
-							2)}} ETH</p>
-						<p class="card-text"><strong>Creator:</strong> {{ $nft->ntf_owner }}</p>
-						<p class="card-text"><strong>Status:</strong>
-							@if($nft->status == '1')
-							<button type="button" class="btn btn-success">Approved</button>
-							@elseif($nft->status == '0')
-							<button type="button" class="btn btn-danger">Unapproved</button>
-							@elseif($nft->status == '2')
-							<button type="button" class="btn btn-success">Sold</button>
-							@endif
-						</p>
+        <div class="row g-4">
+            @forelse($my_nft as $nft)
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="card h-100 shadow-sm border-0 nft-card overflow-hidden">
+                    <div class="position-relative">
+                        <!-- Image Display Logic -->
+                        @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
+                            <img src="{{ $nft->ntf_image }}" 
+                                 class="card-img-top nft-img" 
+                                 alt="{{ $nft->ntf_name }}"
+                                 onerror="this.src='https://via.placeholder.com/400?text=NFT'">
+                        @else
+                            <img src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}" 
+                                 class="card-img-top nft-img" 
+                                 alt="{{ $nft->ntf_name }}"
+                                 onerror="this.src='https://via.placeholder.com/400?text=NFT'">
+                        @endif
 
-						<button class="btn btn-secondary" onclick="shareNFT('{{ $nft->id }}')">Share</button>
-						<a href="{{ url('update-nft/' . $nft->id) }}" class="btn btn-warning">Edit</a>
-						<button class="btn btn-danger" onclick="confirmDelete('{{ $nft->id }}')">Delete</button>
-					</div>
-				</div>
-			</div>
-			@endforeach
-		</div>
-	</div>
+                        <!-- Status Badge -->
+                        <div class="position-absolute top-0 end-0 m-2">
+                            @if($nft->status == '1')
+                                <span class="badge bg-success shadow-sm">Approved</span>
+                            @elseif($nft->status == '0')
+                                <span class="badge bg-warning text-dark shadow-sm">Pending</span>
+                            @elseif($nft->status == '2')
+                                <span class="badge bg-info shadow-sm">Sold</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">{{ $nft->ntf_name }}</h5>
+                        <p class="text-muted small mb-3 text-truncate">{{ $nft->ntf_description }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-0">
+                            <div>
+                                <small class="text-muted d-block">Current Price</small>
+                                <span class="h5 fw-bold text-primary mb-0">
+                                    {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}
+                                </span>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">ETH Value</small>
+                                <span class="fw-medium">{{ number_format($nft->nft_eth_price ?? 0, 4) }} ETH</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light border-0 py-3">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <button class="btn btn-sm btn-outline-secondary w-100" onclick="shareNFT('{{ $nft->id }}')" title="Copy Link">
+                                    <i data-feather="share-2" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <a href="{{ route('update.nft', $nft->id) }}" class="btn btn-sm btn-outline-primary w-100" title="Edit">
+                                    <i data-feather="edit-2" style="width: 14px; height: 14px;"></i>
+                                </a>
+                            </div> 
+                            <div class="col-4">
+                                <a href="{{ route('delete.nft', $nft->id) }}" 
+                                   class="btn btn-sm btn-outline-danger w-100" 
+                                   onclick="return confirm('Do you want to delete this NFT?')" 
+                                   title="Delete">
+                                    <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-12 text-center py-5">
+                <div class="card border-0 shadow-sm py-5">
+                    <div class="card-body">
+                        <i data-feather="image" class="text-muted mb-3" style="width: 64px; height: 64px;"></i>
+                        <h4>No NFTs found in your collection</h4>
+                        <p class="text-muted">Start by uploading your first digital artwork.</p>
+                        <a href="{{ route('upload.nft') }}" class="btn btn-primary mt-3">Upload NFT</a>
+                    </div>
+                </div>
+            </div>
+            @endforelse
+        </div>
+    </div>
 </main>
 
-<script>
-	function shareNFT(nftId) {
-        const url = `{{ url('nft-purchase') }}/${nftId}`;
-        navigator.clipboard.writeText(url).then(() => {
-            alert('NFT link copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-        });
+<style>
+    .nft-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
     }
+    .nft-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+    }
+    .nft-img {
+        height: 250px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+    .nft-card:hover .nft-img {
+        transform: scale(1.05);
+    }
+    .badge {
+        padding: 0.5em 0.8em;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+</style>
 
-    function confirmDelete(nftId) {
-        if (confirm('Are you sure you want to delete this NFT?')) {
-            // Assuming you have a delete route set up
-            window.location.href = `{{ url('delete-nft') }}/${nftId}`; 
-        }
+<script>
+    function shareNFT(nftId) {
+        const url = `{{ url('nft-purchase') }}/${nftId}`;
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        // Show a quick tooltip or toast instead of a clunky alert if possible
+        alert('NFT Purchase link copied to clipboard!');
     }
 </script>
 
