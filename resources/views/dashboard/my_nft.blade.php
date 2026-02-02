@@ -52,10 +52,7 @@
                                     {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}
                                 </span>
                             </div>
-                            <div class="text-end">
-                                <small class="text-muted d-block">ETH Value</small>
-                                <span class="fw-medium">{{ number_format($nft->nft_eth_price ?? 0, 4) }} ETH</span>
-                            </div>
+
                         </div>
                     </div>
 
