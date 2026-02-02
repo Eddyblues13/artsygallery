@@ -106,23 +106,9 @@ class DashboardController extends Controller
 
     public function makeDeposit(Request $request)
     {
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-
-
-
-
         $amount = $request->input('amount');
         $data['amount'] = $amount;
-        $data['eth'] = $data['amount'] / $price;
+        $data['eth'] = 0;
 
         $data['payment'] = DB::table('users')->where('id', '33')->get();
 
@@ -328,19 +314,7 @@ class DashboardController extends Controller
     public function proceedWithdrawal(Request $request)
     {
         $data['data'] = $request->session()->get('data');
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $datas = json_decode($response->getBody(), true);
-        $price = $datas['ethereum']['usd'];
-
-        $data['eth'] = $price;
+        $data['eth'] = 0;
 
 
         return view('dashboard.process_withdrawal', $data);
@@ -357,20 +331,7 @@ class DashboardController extends Controller
             return redirect()->route('withdrawal')->with('message', 'Session expired. Please submit your withdrawal request again.');
         }
 
-        $client = new Client();
-        try {
-            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                'query' => [
-                    'ids' => 'ethereum',
-                    'vs_currencies' => 'usd',
-                ],
-                'timeout' => 10,
-            ]);
-            $data = json_decode($response->getBody(), true);
-            $price = $data['ethereum']['usd'] ?? 3000;
-        } catch (\Exception $e) {
-            $price = 3000; // Fallback price
-        }
+
 
         $reference = substr(md5(mt_rand()), 0, 31);
 
@@ -409,7 +370,7 @@ class DashboardController extends Controller
         $full_name = Auth::user()->name;
         $email = Auth::user()->email;
         $amount = $withdrawalData['amount'];
-        $eth = $withdrawalData['eth'] ?? ($amount / $price);
+        $eth = 0;
         $percentage3 = $amount * 0.0333;
 
         // Prepare data for email/views
@@ -792,7 +753,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
         $data['my_nft'] =  Nft::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
         $nft = $data['my_nft'];
-        $eth = $this->processData($nft);
+        $eth = $nft;
         return view('dashboard.my_nft', ['my_nft' => $eth]);
     }
 

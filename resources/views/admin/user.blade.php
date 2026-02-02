@@ -41,9 +41,7 @@
 							</div>
 						</div>
 						<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</b></h3>
-						<div class="mb-0">
-							<span class="text-muted">{{ number_format($balance_eth, 4) }} ETH</span>
-						</div>
+
 					</div>
 				</div>
 			</div>
@@ -61,9 +59,7 @@
 							</div>
 						</div>
 						<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($deposit, 2) }}</b></h3>
-						<div class="mb-0">
-							<span class="text-muted">{{ number_format($deposit_eth, 4) }} ETH</span>
-						</div>
+
 					</div>
 				</div>
 			</div>
@@ -81,9 +77,7 @@
 							</div>
 						</div>
 						<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2) }}</b></h3>
-						<div class="mb-0">
-							<span class="text-muted">{{ number_format($withdrawal_eth, 4) }} ETH</span>
-						</div>
+
 					</div>
 				</div>
 			</div>
@@ -101,9 +95,7 @@
 							</div>
 						</div>
 						<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</b></h3>
-						<div class="mb-0">
-							<span class="text-muted">{{ number_format($profit_eth, 4) }} ETH</span>
-						</div>
+
 					</div>
 				</div>
 			</div>

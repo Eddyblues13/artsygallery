@@ -154,7 +154,6 @@
                                 </td>
                                 <td>
                                     <div class="fw-bold text-dark">${{ number_format($artwork->nft_price, 2) }}</div>
-                                    <small class="text-muted">{{ number_format($artwork->nft_eth_price ?? 0, 4) }} ETH</small>
                                 </td>
                                 <td>
                                     @if($artwork->status == '1')

@@ -32,20 +32,7 @@ class AdminController extends Controller
 
     public function home()
     {
-        // Get Ethereum price
-        $client = new Client();
-        try {
-            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                'query' => [
-                    'ids' => 'ethereum',
-                    'vs_currencies' => 'usd',
-                ],
-            ]);
-            $priceData = json_decode($response->getBody(), true);
-            $price = $priceData['ethereum']['usd'];
-        } catch (\Exception $e) {
-            $price = 3000; // Default price if API fails
-        }
+
 
         // Admin Dashboard Stats - Overall Platform Statistics
         $data['total_users'] = User::count();
@@ -60,11 +47,7 @@ class AdminController extends Controller
                                 - Transaction::where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
         $data['total_balance'] = $data['total_deposits'] + $data['total_profit'] - $data['total_withdrawals'];
         
-        // ETH Conversions
-        $data['total_deposits_eth'] = $data['total_deposits'] / $price;
-        $data['total_withdrawals_eth'] = $data['total_withdrawals'] / $price;
-        $data['total_profit_eth'] = $data['total_profit'] / $price;
-        $data['total_balance_eth'] = $data['total_balance'] / $price;
+
         
         // Pending Transactions
         $data['pending_deposits'] = Transaction::where('transaction_type', 'Deposit')->where('status', '0')->count();
@@ -364,7 +347,7 @@ class AdminController extends Controller
 
         $buy_nft = $query->paginate(12)->appends($request->query());
         $nft = $buy_nft;
-        $eth = $this->procesData($nft);
+        $eth = $nft;
 
         // Statistics
         $stats = [
@@ -375,33 +358,7 @@ class AdminController extends Controller
 
         return view('admin.nftmarkets', ['buy_nft' => $eth, 'stats' => $stats]);
     }
-    private function procesData($nft)
-    {
-        // Cache the ETH price for 60 minutes to improve performance
-        $price = \Illuminate\Support\Facades\Cache::remember('eth_price_usd', 3600, function () {
-            try {
-                $client = new Client();
-                $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                    'query' => [
-                        'ids' => 'ethereum',
-                        'vs_currencies' => 'usd',
-                    ],
-                    'timeout' => 5, // Reduced timeout
-                ]);
-                
-                $data = json_decode($response->getBody(), true);
-                return $data['ethereum']['usd'] ?? 3000;
-            } catch (\Exception $e) {
-                return 3000; // Fallback price
-            }
-        });
 
-        foreach ($nft as $item) {
-            $item->nft_eth_price = $item->nft_price > 0 ? $item->nft_price / $price : 0;
-        }
-
-        return $nft;
-    }
 
     public function usersTransaction(Request $request)
     {
@@ -528,7 +485,7 @@ class AdminController extends Controller
 
         $nfts = $query->paginate(20)->appends($request->query());
         $nft = $nfts;
-        $eth = $this->procesData($nft);
+        $eth = $nft;
 
         // Statistics
         $stats = [
@@ -574,42 +531,20 @@ class AdminController extends Controller
         $extension = $filePath ? strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) : null;
 
 
-        // 4. Fetch Ethereum price from CoinGecko API
-        $client = new Client();
-        try {
-            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                'query' => [
-                    'ids' => 'ethereum',
-                    'vs_currencies' => 'usd',
-                ],
-                'timeout' => 10, // Optional: Set a timeout
-            ]);
-
-            $data_price = json_decode($response->getBody(), true);
-            $price = $data_price['ethereum']['usd'] ?? 0;
-
-            if ($price == 0) {
-                throw new \Exception('Ethereum price not found.');
-            }
-        } catch (\Exception $e) {
-            // Handle API errors gracefully
-            return redirect()->back()->with('error', 'Failed to fetch Ethereum price.');
-        }
-
         // 5. Calculate transaction sums
         $deposit = Transaction::where('user_id', $id)
             ->where('transaction_type', 'Deposit')
             ->where('status', '1')
             ->sum('transaction_amount');
 
-        $deposit_eth = $deposit / $price;
+        $deposit_eth = 0;
 
         $withdrawal = Transaction::where('user_id', $id)
             ->where('transaction_type', 'Withdrawal')
             ->where('status', '1')
             ->sum('transaction_amount');
 
-        $withdrawal_eth = $withdrawal / $price;
+        $withdrawal_eth = 0;
 
         $add_profit = Transaction::where('user_id', $id)
             ->where('transaction_type', 'Profit')
@@ -622,10 +557,10 @@ class AdminController extends Controller
             ->sum('transaction_amount');
 
         $profit = $add_profit - $debit_profit;
-        $profit_eth = $profit / $price;
+        $profit_eth = 0;
 
         $balance = $deposit + $profit - $withdrawal;
-        $balance_eth = $balance / $price;
+        $balance_eth = 0;
 
         // 6. Prepare data array
         $data = [
@@ -788,7 +723,6 @@ class AdminController extends Controller
         $nft['status'] = $request->status;
         $update = DB::table('nfts')->where('id', $id)->update($nft);
 
-        $client = new Client();
         $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
             'query' => [
                 'ids' => 'ethereum',

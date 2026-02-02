@@ -124,21 +124,7 @@ class CustomAuthController extends Controller
             return redirect("verify/" . Auth::user()->id);
         }
 
-        // ✅ Safely get ETH price (don’t crash dashboard if API fails)
-        $price = 0;
-        try {
-            $client = new Client(['timeout' => 10]);
-            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                'query' => [
-                    'ids' => 'ethereum',
-                    'vs_currencies' => 'usd',
-                ],
-            ]);
-            $json = json_decode($response->getBody(), true);
-            $price = (float) ($json['ethereum']['usd'] ?? 0);
-        } catch (\Throwable $e) {
-            $price = 0;
-        }
+
 
         $userId = Auth::id();
 
@@ -168,10 +154,10 @@ class CustomAuthController extends Controller
         $data['balance'] = $data['deposit'] + $data['profit'] - $data['withdrawal'];
 
         // ✅ conversions only if price is valid
-        $data['deposit_eth'] = $price > 0 ? $data['deposit'] / $price : 0;
-        $data['withdrawal_eth'] = $price > 0 ? $data['withdrawal'] / $price : 0;
-        $data['profit_eth'] = $price > 0 ? $data['profit'] / $price : 0;
-        $data['balance_eth'] = $price > 0 ? $data['balance'] / $price : 0;
+        $data['deposit_eth'] = 0;
+        $data['withdrawal_eth'] = 0;
+        $data['profit_eth'] = 0;
+        $data['balance_eth'] = 0;
 
         // ✅ POPUPS
         $user = Auth::user();

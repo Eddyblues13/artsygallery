@@ -174,7 +174,6 @@
 						<div class="d-flex justify-content-between align-items-center">
 							<div>
 								<div class="fw-bold text-primary">{{ \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</div>
-								<small class="text-muted">{{ number_format($artwork->nft_eth_price ?? 0, 4) }} ETH</small>
 							</div>
 							<button type="button" class="btn btn-primary" 
 								data-bs-toggle="modal" 
@@ -212,7 +211,6 @@
 											<div class="mb-3">
 												<strong>Price:</strong>
 												<div class="h5 text-primary">{{ \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</div>
-												<small class="text-muted">{{ number_format($artwork->nft_eth_price ?? 0, 4) }} ETH</small>
 											</div>
 
 											@if($artwork->ntf_owner)
