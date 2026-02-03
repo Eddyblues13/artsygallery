@@ -129,10 +129,10 @@
         <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div class="max-w-2xl">
                 <h2 class="text-4xl md:text-5xl font-extrabold mb-6 text-slate-900 leading-tight">
-                    World-Class <span class="text-purple-600">Curated</span> Collections
+                    World-Class <span class="text-purple-600">Featured</span> Artworks
                 </h2>
                 <p class="text-slate-600 text-lg">
-                    We've hand-picked the most influential movements in digital art. Explore themes that define the future of modern creativity and digital ownership.
+                    Discover recently approved digital masterpieces available for collection. Explore unique pieces that define the future of modern creativity.
                 </p>
             </div>
             <div class="hidden md:block">
@@ -143,71 +143,46 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Experience Card 1 -->
+            @forelse($nfts as $nft)
+            <!-- NFT Card -->
             <div class="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 h-[450px]">
-                <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&h=1200&fit=crop" 
-                     alt="Cyber-City" 
-                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
+                @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
+                    <img src="{{ $nft->ntf_image }}" 
+                         alt="{{ $nft->ntf_name }}" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                @else
+                    <img src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}" 
+                         alt="{{ $nft->ntf_name }}" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                @endif
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-8">
                     <div class="mb-4">
                         <span class="px-3 py-1 bg-purple-500/20 backdrop-blur-md rounded-full text-xs font-bold text-purple-200 border border-purple-500/30">
-                            NEW ERA
+                            FEATURED
                         </span>
                     </div>
-                    <h3 class="text-3xl font-bold text-white mb-3">Cyber-Punk Horizons</h3>
-                    <p class="text-slate-300 mb-6 line-clamp-2">
-                        Exploring the intersection of neon-lit cities and the digital human experience.
+                    <h3 class="text-2xl font-bold text-white mb-2">{{ $nft->ntf_name }}</h3>
+                    <p class="text-slate-300 mb-4 line-clamp-1">
+                        By {{ $nft->ntf_owner }}
                     </p>
-                    <a href="{{route('register')}}" class="inline-flex items-center text-white font-semibold hover:gap-3 transition-all">
-                        Enter Collection <i class="bi bi-arrow-right ml-2 transition-all"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Experience Card 2 -->
-            <div class="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 h-[450px]">
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=1200&fit=crop" 
-                     alt="Digital Fluid" 
-                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 right-0 p-8">
-                    <div class="mb-4">
-                        <span class="px-3 py-1 bg-pink-500/20 backdrop-blur-md rounded-full text-xs font-bold text-pink-200 border border-pink-500/30">
-                            PREMIUM
-                        </span>
+                    <div class="flex justify-between items-end">
+                        <div class="flex flex-col">
+                            <span class="text-slate-400 text-xs uppercase tracking-wider">Price</span>
+                            <span class="text-xl font-bold text-white">${{ number_format($nft->nft_price, 2) }}</span>
+                        </div>
+                        <a href="{{route('register')}}" class="inline-flex items-center text-white font-semibold hover:gap-3 transition-all bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
+                            Buy Now <i class="bi bi-arrow-right ml-2 transition-all"></i>
+                        </a>
                     </div>
-                    <h3 class="text-3xl font-bold text-white mb-3">Neo-Impressionism</h3>
-                    <p class="text-slate-300 mb-6 line-clamp-2">
-                        Bringing classical brushwork into the infinite possibilities of the digital canvas.
-                    </p>
-                    <a href="{{route('register')}}" class="inline-flex items-center text-white font-semibold hover:gap-3 transition-all">
-                        Enter Collection <i class="bi bi-arrow-right ml-2 transition-all"></i>
-                    </a>
                 </div>
             </div>
-
-            <!-- Experience Card 3 -->
-            <div class="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 h-[450px]">
-                <img src="https://images.unsplash.com/photo-1633167606207-d840b5070fc2?w=800&h=1200&fit=crop" 
-                     alt="3D Abstract" 
-                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 right-0 p-8">
-                    <div class="mb-4">
-                        <span class="px-3 py-1 bg-blue-500/20 backdrop-blur-md rounded-full text-xs font-bold text-blue-200 border border-blue-500/30">
-                            EXCLUSIVE
-                        </span>
-                    </div>
-                    <h3 class="text-3xl font-bold text-white mb-3">Architectural Logic</h3>
-                    <p class="text-slate-300 mb-6 line-clamp-2">
-                        Mathematically perfect 3D structures that challenge the laws of physics and perception.
-                    </p>
-                    <a href="{{route('register')}}" class="inline-flex items-center text-white font-semibold hover:gap-3 transition-all">
-                        Enter Collection <i class="bi bi-arrow-right ml-2 transition-all"></i>
-                    </a>
-                </div>
+            @empty
+            <div class="col-span-full text-center py-12">
+                <p class="text-slate-500 text-lg">No artworks currently on display. Check back soon!</p>
             </div>
+            @endforelse
         </div>
     </div>
 </section>

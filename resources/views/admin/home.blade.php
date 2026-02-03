@@ -66,7 +66,6 @@
 									</div>
 									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_balance, 2) }}</b></h3>
 									<div class="mb-0">
-										<span class="text-danger">{{number_format($total_balance_eth, 2)}} ETH</span>
 
 									</div>
 								</div>
@@ -87,7 +86,6 @@
 
 									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_profit, 2) }}</b></h3>
 									<div class="mb-0">
-										<span class="text-success">{{ number_format($total_profit_eth, 2) }} ETH</span>
 
 									</div>
 								</div>
@@ -110,7 +108,6 @@
 									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_deposits, 2) }}</b></h3>
 
 									<div class="mb-0">
-										<span class="text-success">{{ number_format($total_deposits_eth, 2) }} ETH</span>
 
 									</div>
 								</div>
@@ -131,7 +128,6 @@
 									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_withdrawals, 2) }}</b></h3>
 
 									<div class="mb-0">
-										<span class="text-danger">{{ number_format($total_withdrawals_eth, 2) }} ETH</span>
 
 									</div>
 								</div>
@@ -233,40 +229,11 @@
 					<div class="card-body py-3">
 						<div class="chart chart-sm">
 							<div class="pt-1 col-12">
-								<h3>Platform Trading Chart</h3>
-								<div class="tradingview-widget-container" style="margin:30px 0px 10px 0px;">
-									<div id="tradingview_ethereum"></div>
-									<div class="tradingview-widget-copyright">
-										<a href="#" rel="noopener" target="_blank">
-											<span class="blue-text"></span>
-											<span class="blue-text">Platform trading chart</span>
-										</a>
-									</div>
-									<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-									<script type="text/javascript">
-										new TradingView.widget({
-											"width": "100%",
-											"height": "550",
-											"symbol": "COINBASE:ETHUSD",
-											"interval": "1",
-											"timezone": "Etc/UTC",
-											"theme": 'light',
-											"style": "9",
-											"locale": "en",
-											"toolbar_bg": "#f1f3f6",
-											"enable_publishing": false,
-											"hide_side_toolbar": false,
-											"allow_symbol_change": true,
-											"calendar": false,
-											"studies": [
-												"BB@tv-basicstudies"
-											],
-											"container_id": "tradingview_ethereum"
-										});
-									</script>
+								<h3>Platform Statistics</h3>
+								<div class="mt-4">
+									<p class="text-muted">General platform usage statistics and trends will appear here.</p>
 								</div>
 							</div>
-
 						</div>
 					</div>
 				</div>

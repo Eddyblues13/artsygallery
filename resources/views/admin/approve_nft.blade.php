@@ -40,7 +40,7 @@
                 <i class="bi bi-house"></i>
             </div>
             <div class="page-title ms-2">
-                <h5>Welcome back, {{ Auth::user()->name }}</h5>
+                <h5>Welcome back, {{ Auth::guard('admin')->user()->name }}</h5>
             </div>
         </div>
     </div>

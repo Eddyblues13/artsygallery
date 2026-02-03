@@ -29,8 +29,7 @@
 						</div>
 
 						<div class="d-inline-flex gap-3">
-							<b>{{ number_format($my_nft->nft_eth_price, 2)}}ETH Floor</b>
-							<b>{{ number_format($my_nft->nft_eth_price, 2) }}ETH Volume</b>
+							<b>Price: {{ \App\Helpers\CurrencyHelper::format($my_nft->nft_price, 2) }}</b>
 						</div>
 						<div class="card-footer">
 							<div class="d-inline-flex gap-3">

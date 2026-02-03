@@ -6,12 +6,15 @@ use DB;
 use Illuminate\Http\Request;
 use App\Models\NftDrop;
 
+use App\Models\Nft;
+
 class HomePageController extends Controller
 {
 
     public function homepage()
     {   
         $data['phone'] = DB::table('users')->where('id', '33')->first();
+        $data['nfts'] = Nft::where('status', 1)->latest()->take(9)->get();
         return view('home.homepage', $data);
     }
 
