@@ -142,10 +142,10 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             @forelse($nfts as $nft)
             <!-- NFT Card -->
-            <div class="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 h-[450px]">
+            <div class="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 h-[300px] md:h-[450px]">
                 @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
                     <img src="{{ $nft->ntf_image }}" 
                          alt="{{ $nft->ntf_name }}" 
@@ -157,23 +157,23 @@
                 @endif
                 
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 right-0 p-8">
-                    <div class="mb-4">
-                        <span class="px-3 py-1 bg-purple-500/20 backdrop-blur-md rounded-full text-xs font-bold text-purple-200 border border-purple-500/30">
+                <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8">
+                    <div class="mb-2 md:mb-4">
+                        <span class="px-2 py-1 md:px-3 md:py-1 bg-purple-500/20 backdrop-blur-md rounded-full text-[10px] md:text-xs font-bold text-purple-200 border border-purple-500/30">
                             FEATURED
                         </span>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">{{ $nft->ntf_name }}</h3>
-                    <p class="text-slate-300 mb-4 line-clamp-1">
+                    <h3 class="text-lg md:text-2xl font-bold text-white mb-1 md:mb-2 truncate">{{ $nft->ntf_name }}</h3>
+                    <p class="text-slate-300 mb-2 md:mb-4 text-xs md:text-base line-clamp-1">
                         By {{ $nft->ntf_owner }}
                     </p>
                     <div class="flex justify-between items-end">
                         <div class="flex flex-col">
-                            <span class="text-slate-400 text-xs uppercase tracking-wider">Price</span>
-                            <span class="text-xl font-bold text-white">${{ number_format($nft->nft_price, 2) }}</span>
+                            <span class="text-slate-400 text-[10px] md:text-xs uppercase tracking-wider">Price</span>
+                            <span class="text-base md:text-xl font-bold text-white">${{ number_format($nft->nft_price, 2) }}</span>
                         </div>
-                        <a href="{{route('register')}}" class="inline-flex items-center text-white font-semibold hover:gap-3 transition-all bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
-                            Buy Now <i class="bi bi-arrow-right ml-2 transition-all"></i>
+                        <a href="{{route('register')}}" class="inline-flex items-center text-white font-semibold hover:gap-3 transition-all bg-white/10 hover:bg-white/20 px-3 py-1.5 md:px-4 md:py-2 rounded-lg backdrop-blur-sm text-xs md:text-base">
+                            Buy <i class="bi bi-arrow-right ml-1 md:ml-2 transition-all"></i>
                         </a>
                     </div>
                 </div>

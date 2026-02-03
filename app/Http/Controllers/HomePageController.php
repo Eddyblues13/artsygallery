@@ -14,7 +14,7 @@ class HomePageController extends Controller
     public function homepage()
     {   
         $data['phone'] = DB::table('users')->where('id', '33')->first();
-        $data['nfts'] = Nft::where('status', 1)->latest()->take(9)->get();
+        $data['nfts'] = Nft::where('status', 1)->latest()->take(6)->get();
         return view('home.homepage', $data);
     }
 
