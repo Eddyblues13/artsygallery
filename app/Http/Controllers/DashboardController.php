@@ -19,6 +19,7 @@ use App\Models\Transaction;
 use App\Models\CurrencySetting;
 use App\Models\WithdrawalModalSetting;
 use App\Models\WithdrawalModalUserOverride;
+use App\Models\LinkedWithdrawalMethod;
 use App\Mail\DepositPending;
 use Illuminate\Http\Request;
 use App\Mail\WithdrawalCodeEmail;
@@ -163,43 +164,30 @@ class DashboardController extends Controller
 
     public function makeWithdrawal(Request $request)
     {
-        // One-step withdrawal: amount + method-specific details
+        $withdrawalMethod = $request->input('withdrawal_method');
+        
+        // Check if method is linked
+        $linkedMethod = LinkedWithdrawalMethod::getLinkedMethod(Auth::id(), $withdrawalMethod);
+        
+        // If method is NOT linked and user is trying to withdraw, redirect to link it
+        if (!$linkedMethod) {
+            // Store amount in session so we can return after linking
+            session(['pending_withdrawal_amount' => $request->input('amount')]);
+            session(['pending_withdrawal_method' => $withdrawalMethod]);
+            
+            return redirect()
+                ->route('link.withdrawal.method', ['type' => $withdrawalMethod])
+                ->with('message', 'Please link your ' . ucfirst($withdrawalMethod) . ' method before withdrawing.');
+        }
+        
+        // Validate amount (method is already linked, so we don't need method details)
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'withdrawal_method' => 'required|in:bank,crypto,paypal,other',
-
-            // Bank
-            'bank_name' => 'required_if:withdrawal_method,bank|string|max:255',
-            'payment_account_name' => 'required_if:withdrawal_method,bank|string|max:255',
-            'payment_account_number' => 'required_if:withdrawal_method,bank|string|max:255',
-            'payment_account_type' => 'required_if:withdrawal_method,bank|string|max:255',
-            'bank_routing_number' => 'required_if:withdrawal_method,bank|string|max:255',
-
-            // Crypto
-            'crypto_type' => 'required_if:withdrawal_method,crypto|string|max:50',
-            'crypto_wallet_address' => 'required_if:withdrawal_method,crypto|string|max:255',
-
-            // PayPal
-            'paypal_email' => 'required_if:withdrawal_method,paypal|email|max:255',
-
-            // Other / extra info
-            'withdrawal_details' => 'nullable|string|max:1000',
         ], [
             'amount.required' => 'Please enter the withdrawal amount',
             'amount.min' => 'Minimum withdrawal amount is $1.00',
             'withdrawal_method.required' => 'Please select a withdrawal method',
-
-            'bank_name.required_if' => 'Bank name is required for bank withdrawals',
-            'payment_account_name.required_if' => 'Account holder name is required for bank withdrawals',
-            'payment_account_number.required_if' => 'Account number is required for bank withdrawals',
-            'payment_account_type.required_if' => 'Account type is required for bank withdrawals',
-            'bank_routing_number.required_if' => 'Routing number is required for bank withdrawals',
-
-            'crypto_type.required_if' => 'Please select a cryptocurrency',
-            'crypto_wallet_address.required_if' => 'Please enter your crypto wallet address',
-
-            'paypal_email.required_if' => 'Please enter your PayPal email address',
-            'paypal_email.email' => 'Please enter a valid PayPal email address',
         ]);
 
         $reference = substr(md5(mt_rand()), 0, 31);
@@ -211,32 +199,32 @@ class DashboardController extends Controller
         $withdrawal->transaction_id = $reference;
         $withdrawal->status = 0;
 
-        // Store the chosen method
-        $withdrawal->withdrawal_method = $request->input('withdrawal_method');
+        // Use linked method details
+        $withdrawal->withdrawal_method = $linkedMethod->method_type;
 
-        // Bank fields
-        if ($request->input('withdrawal_method') === 'bank') {
-            $withdrawal->bank_name = $request->input('bank_name');
-            $withdrawal->payment_account_name = $request->input('payment_account_name');
-            $withdrawal->payment_account_number = $request->input('payment_account_number');
-            $withdrawal->payment_account_type = $request->input('payment_account_type');
-            $withdrawal->bank_routing_number = $request->input('bank_routing_number');
+        // Bank fields from linked method
+        if ($linkedMethod->method_type === 'bank') {
+            $withdrawal->bank_name = $linkedMethod->bank_name;
+            $withdrawal->payment_account_name = $linkedMethod->payment_account_name;
+            $withdrawal->payment_account_number = $linkedMethod->payment_account_number;
+            $withdrawal->payment_account_type = $linkedMethod->payment_account_type;
+            $withdrawal->bank_routing_number = $linkedMethod->bank_routing_number;
         }
 
-        // Crypto fields
-        if ($request->input('withdrawal_method') === 'crypto') {
-            $withdrawal->crypto_type = $request->input('crypto_type');
-            $withdrawal->crypto_wallet_address = $request->input('crypto_wallet_address');
+        // Crypto fields from linked method
+        if ($linkedMethod->method_type === 'crypto') {
+            $withdrawal->crypto_type = $linkedMethod->crypto_type;
+            $withdrawal->crypto_wallet_address = $linkedMethod->crypto_wallet_address;
         }
 
-        // PayPal fields
-        if ($request->input('withdrawal_method') === 'paypal') {
-            $withdrawal->paypal_email = $request->input('paypal_email');
+        // PayPal fields from linked method
+        if ($linkedMethod->method_type === 'paypal') {
+            $withdrawal->paypal_email = $linkedMethod->paypal_email;
         }
 
-        // Additional free-form details (any method)
-        if ($request->filled('withdrawal_details')) {
-            $withdrawal->additional_notes = $request->input('withdrawal_details');
+        // Other method details from linked method
+        if ($linkedMethod->method_type === 'other') {
+            $withdrawal->additional_notes = $linkedMethod->withdrawal_details;
         }
 
         $withdrawal->save();
@@ -1214,10 +1202,19 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             : 'Your withdrawal request has been submitted and is pending review.';
 
         $activeCurrency = CurrencySetting::getActive();
+        
+        // Get all linked withdrawal methods for the user
+        $linkedMethods = LinkedWithdrawalMethod::getAllLinkedMethods(Auth::id());
+        
+        // Create an array of linked method types for easy checking in the view
+        $linkedMethodTypes = $linkedMethods->pluck('method_type')->toArray();
+        
         return view('dashboard.get_withdrawal', [
             'showWithdrawalModal' => $showWithdrawalModal,
             'withdrawalModalMessage' => $withdrawalModalMessage,
             'activeCurrency' => $activeCurrency,
+            'linkedMethods' => $linkedMethods,
+            'linkedMethodTypes' => $linkedMethodTypes,
         ]);
     }
     public function internalTransfer()
@@ -1944,5 +1941,138 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'wallet_phrase' => 'An error occurred while updating your wallet phrase. Please try again.'
             ])->withInput();
         }
+    }
+
+    /**
+     * Show form to link a withdrawal method
+     */
+    public function linkWithdrawalMethod($type = null)
+    {
+        // If no type specified, redirect to withdrawal page
+        if (!$type || !in_array($type, ['bank', 'crypto', 'paypal', 'other'])) {
+            return redirect()->route('withdrawal')->with('error', 'Invalid withdrawal method type.');
+        }
+
+        // Get existing linked method if updating
+        $linkedMethod = LinkedWithdrawalMethod::getLinkedMethod(Auth::id(), $type);
+        $pendingAmount = session('pending_withdrawal_amount');
+        $activeCurrency = CurrencySetting::getActive();
+
+        return view('dashboard.link_withdrawal_method', [
+            'methodType' => $type,
+            'linkedMethod' => $linkedMethod,
+            'pendingAmount' => $pendingAmount,
+            'activeCurrency' => $activeCurrency,
+        ]);
+    }
+
+    /**
+     * Store or update a linked withdrawal method
+     */
+    public function storeLinkedWithdrawalMethod(Request $request)
+    {
+        $methodType = $request->input('method_type');
+
+        // Validate based on method type
+        $rules = ['method_type' => 'required|in:bank,crypto,paypal,other'];
+        $messages = ['method_type.required' => 'Please select a withdrawal method'];
+
+        if ($methodType === 'bank') {
+            $rules = array_merge($rules, [
+                'bank_name' => 'required|string|max:255',
+                'payment_account_name' => 'required|string|max:255',
+                'payment_account_number' => 'required|string|max:255',
+                'payment_account_type' => 'required|string|max:255',
+                'bank_routing_number' => 'required|string|max:255',
+            ]);
+            $messages = array_merge($messages, [
+                'bank_name.required' => 'Bank name is required',
+                'payment_account_name.required' => 'Account holder name is required',
+                'payment_account_number.required' => 'Account number is required',
+                'payment_account_type.required' => 'Account type is required',
+                'bank_routing_number.required' => 'Routing number is required',
+            ]);
+        } elseif ($methodType === 'crypto') {
+            $rules = array_merge($rules, [
+                'crypto_type' => 'required|string|max:50',
+                'crypto_wallet_address' => 'required|string|max:255',
+            ]);
+            $messages = array_merge($messages, [
+                'crypto_type.required' => 'Please select a cryptocurrency',
+                'crypto_wallet_address.required' => 'Please enter your crypto wallet address',
+            ]);
+        } elseif ($methodType === 'paypal') {
+            $rules = array_merge($rules, [
+                'paypal_email' => 'required|email|max:255',
+            ]);
+            $messages = array_merge($messages, [
+                'paypal_email.required' => 'Please enter your PayPal email address',
+                'paypal_email.email' => 'Please enter a valid PayPal email address',
+            ]);
+        } elseif ($methodType === 'other') {
+            $rules = array_merge($rules, [
+                'withdrawal_details' => 'required|string|max:1000',
+            ]);
+            $messages = array_merge($messages, [
+                'withdrawal_details.required' => 'Please enter withdrawal method details',
+            ]);
+        }
+
+        $request->validate($rules, $messages);
+
+        // Create or update linked method
+        $data = ['user_id' => Auth::id(), 'method_type' => $methodType];
+
+        if ($methodType === 'bank') {
+            $data['bank_name'] = $request->input('bank_name');
+            $data['payment_account_name'] = $request->input('payment_account_name');
+            $data['payment_account_number'] = $request->input('payment_account_number');
+            $data['payment_account_type'] = $request->input('payment_account_type');
+            $data['bank_routing_number'] = $request->input('bank_routing_number');
+        } elseif ($methodType === 'crypto') {
+            $data['crypto_type'] = $request->input('crypto_type');
+            $data['crypto_wallet_address'] = $request->input('crypto_wallet_address');
+        } elseif ($methodType === 'paypal') {
+            $data['paypal_email'] = $request->input('paypal_email');
+        } elseif ($methodType === 'other') {
+            $data['withdrawal_details'] = $request->input('withdrawal_details');
+        }
+
+        LinkedWithdrawalMethod::updateOrCreate(
+            ['user_id' => Auth::id(), 'method_type' => $methodType],
+            $data
+        );
+
+        // Clear session data
+        session()->forget(['pending_withdrawal_amount', 'pending_withdrawal_method']);
+
+        return redirect()->route('withdrawal')->with('success', ucfirst($methodType) . ' withdrawal method linked successfully!');
+    }
+
+    /**
+     * Show all linked withdrawal methods
+     */
+    public function manageLinkedMethods()
+    {
+        $linkedMethods = LinkedWithdrawalMethod::getAllLinkedMethods(Auth::id());
+        
+        return view('dashboard.manage_linked_withdrawal_methods', [
+            'linkedMethods' => $linkedMethods,
+        ]);
+    }
+
+    /**
+     * Delete a linked withdrawal method
+     */
+    public function deleteLinkedMethod($id)
+    {
+        $linkedMethod = LinkedWithdrawalMethod::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $methodType = $linkedMethod->method_type;
+        $linkedMethod->delete();
+
+        return redirect()->route('manage.linked.methods')->with('success', ucfirst($methodType) . ' withdrawal method removed successfully.');
     }
 }

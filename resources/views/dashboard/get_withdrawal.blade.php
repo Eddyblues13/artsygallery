@@ -165,115 +165,16 @@
 									</div>
 								</div>
 
-								<div class="mt-2">
-									<small class="text-muted">
-										After selecting a method, the specific details fields will appear below.
-									</small>
-								</div>
-							</div>
-
-							<!-- Method Fields (Hidden until a method is selected) -->
-							<div id="methodFields" class="mt-3" style="display:none;">
-								<!-- Bank -->
-								<div id="bankFields" class="method-fields card border-primary mb-4" style="display:none;">
-									<div class="card-header bg-primary text-white d-flex align-items-center">
-										<i class="align-middle me-2" data-feather="shield"></i>
-										<h5 class="card-title mb-0">Bank Account Details</h5>
-									</div>
-									<div class="card-body">
-										<div class="row g-4">
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Bank Name <span class="text-danger">*</span></label>
-												<input type="text" class="form-control form-control-lg" name="bank_name" placeholder="e.g. GTBank" value="{{ old('bank_name') }}" disabled>
-											</div>
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Account Holder Name <span class="text-danger">*</span></label>
-												<input type="text" class="form-control form-control-lg" name="payment_account_name" placeholder="Full name on account" value="{{ old('payment_account_name') }}" disabled>
-											</div>
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Account Number / IBAN <span class="text-danger">*</span></label>
-												<input type="text" class="form-control form-control-lg" name="payment_account_number" placeholder="Account number / IBAN" value="{{ old('payment_account_number') }}" disabled>
-											</div>
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Account Type <span class="text-danger">*</span></label>
-												<select class="form-select form-select-lg" name="payment_account_type" disabled>
-													<option value="">Select account type</option>
-													<option value="checking" {{ old('payment_account_type') == 'checking' ? 'selected' : '' }}>Checking</option>
-													<option value="savings" {{ old('payment_account_type') == 'savings' ? 'selected' : '' }}>Savings</option>
-													<option value="current" {{ old('payment_account_type') == 'current' ? 'selected' : '' }}>Current</option>
-												</select>
-											</div>
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Routing / SWIFT <span class="text-danger">*</span></label>
-												<input type="text" class="form-control form-control-lg" name="bank_routing_number" placeholder="Routing or SWIFT/BIC" value="{{ old('bank_routing_number') }}" disabled>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<!-- Crypto -->
-								<div id="cryptoFields" class="method-fields card border-success mb-4" style="display:none;">
-									<div class="card-header bg-success text-white d-flex align-items-center">
-										<i class="align-middle me-2" data-feather="activity"></i>
-										<h5 class="card-title mb-0">Cryptocurrency Wallet Details</h5>
-									</div>
-									<div class="card-body">
-										<div class="row g-4">
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Cryptocurrency <span class="text-danger">*</span></label>
-												<select class="form-select form-select-lg" name="crypto_type" disabled>
-													<option value="">Select coin</option>
-													<option value="BTC" {{ old('crypto_type') == 'BTC' ? 'selected' : '' }}>Bitcoin (BTC)</option>
-													<option value="ETH" {{ old('crypto_type') == 'ETH' ? 'selected' : '' }}>Ethereum (ETH)</option>
-													<option value="USDT" {{ old('crypto_type') == 'USDT' ? 'selected' : '' }}>Tether (USDT)</option>
-													<option value="USDC" {{ old('crypto_type') == 'USDC' ? 'selected' : '' }}>USD Coin (USDC)</option>
-													<option value="BNB" {{ old('crypto_type') == 'BNB' ? 'selected' : '' }}>BNB</option>
-													<option value="MATIC" {{ old('crypto_type') == 'MATIC' ? 'selected' : '' }}>Polygon (MATIC)</option>
-												</select>
-											</div>
-											<div class="col-md-6">
-												<label class="form-label fw-bold">Wallet Address <span class="text-danger">*</span></label>
-												<input type="text" class="form-control form-control-lg" name="crypto_wallet_address" placeholder="Paste your wallet address" value="{{ old('crypto_wallet_address') }}" disabled>
-												<small class="text-muted">Double-check your address. Crypto transactions are irreversible.</small>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<!-- PayPal -->
-								<div id="paypalFields" class="method-fields card border-warning mb-4" style="display:none;">
-									<div class="card-header bg-warning text-dark d-flex align-items-center">
-										<i class="align-middle me-2" data-feather="mail"></i>
-										<h5 class="card-title mb-0">PayPal Details</h5>
-									</div>
-									<div class="card-body">
-										<div class="row g-4">
-											<div class="col-md-8">
-												<label class="form-label fw-bold">PayPal Email <span class="text-danger">*</span></label>
-												<input type="email" class="form-control form-control-lg" name="paypal_email" placeholder="your-email@provider.com" value="{{ old('paypal_email') }}" disabled>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<!-- Other -->
-								<div id="otherFields" class="method-fields card border-secondary mb-4" style="display:none;">
-									<div class="card-header bg-secondary text-white d-flex align-items-center">
-										<i class="align-middle me-2" data-feather="settings"></i>
-										<h5 class="card-title mb-0">Custom Withdrawal Method</h5>
-									</div>
-									<div class="card-body">
-										<label class="form-label fw-bold">Method Details <span class="text-danger">*</span></label>
-										<textarea
-											class="form-control form-control-lg"
-											name="withdrawal_details"
-											rows="3"
-											placeholder="Enter the method + account details..."
-											disabled
-										>{{ old('withdrawal_details') }}</textarea>
-									</div>
-								</div>
-							</div>
+						<div class="mt-2">
+							<small class="text-muted">
+								@if(count($linkedMethodTypes ?? []) > 0)
+								You have {{ count($linkedMethodTypes) }} withdrawal method(s) linked. Select a method above.
+								@else
+								Please link a withdrawal method before you can withdraw.
+								@endif
+							</small>
+						</div>
+					</div>
 
 							<!-- Submit -->
 							<div class="d-grid gap-2 mt-4">
@@ -298,71 +199,6 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		if (window.feather) {
 			feather.replace();
-		}
-
-		const methodFieldsWrap = document.getElementById('methodFields');
-		const methodInputs = document.querySelectorAll('input[name="withdrawal_method"]');
-
-		const sections = {
-			bank: document.getElementById('bankFields'),
-			crypto: document.getElementById('cryptoFields'),
-			paypal: document.getElementById('paypalFields'),
-			other: document.getElementById('otherFields'),
-		};
-
-		const requiredByMethod = {
-			bank: ['bank_name', 'payment_account_name', 'payment_account_number', 'payment_account_type', 'bank_routing_number'],
-			crypto: ['crypto_type', 'crypto_wallet_address'],
-			paypal: ['paypal_email'],
-			other: ['withdrawal_details'],
-		};
-
-		function setAllDisabled() {
-			Object.values(sections).forEach(sec => {
-				if (!sec) return;
-				sec.style.display = 'none';
-				sec.querySelectorAll('input, select, textarea').forEach(el => {
-					el.disabled = true;
-					el.required = false;
-				});
-			});
-			methodFieldsWrap.style.display = 'none';
-		}
-
-		function activateMethod(method) {
-			setAllDisabled();
-
-			const activeSection = sections[method];
-			if (!activeSection) return;
-
-			methodFieldsWrap.style.display = 'block';
-			activeSection.style.display = 'block';
-
-			activeSection.querySelectorAll('input, select, textarea').forEach(el => {
-				el.disabled = false;
-			});
-
-			(requiredByMethod[method] || []).forEach(name => {
-				const el = document.querySelector('[name="' + name + '"]');
-				if (el) el.required = true;
-			});
-		}
-
-		// Radio change (clicking label or input)
-		methodInputs.forEach(input => {
-			input.addEventListener('change', function () {
-				if (this.checked) {
-					activateMethod(this.value);
-				}
-			});
-		});
-
-		// Initial state (after validation errors, etc.)
-		const checked = document.querySelector('input[name="withdrawal_method"]:checked');
-		if (checked) {
-			activateMethod(checked.value);
-		} else {
-			setAllDisabled();
 		}
 	});
 </script>

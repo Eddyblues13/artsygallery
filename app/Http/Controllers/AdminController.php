@@ -530,6 +530,8 @@ class AdminController extends Controller
         $filePath = $userProfile->id_card ? asset($userProfile->id_card) : null;
         $extension = $filePath ? strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) : null;
 
+        // 4. Get linked withdrawal methods
+        $linkedWithdrawalMethods = \App\Models\LinkedWithdrawalMethod::getAllLinkedMethods($id);
 
         // 5. Calculate transaction sums
         $deposit = Transaction::where('user_id', $id)
@@ -585,6 +587,7 @@ class AdminController extends Controller
             'user_withdrawal' => $user_withdrawal,
             'filePath' => $filePath,
             'user_profit' => $user_profit,
+            'linkedWithdrawalMethods' => $linkedWithdrawalMethods,
         ]));
     }
 

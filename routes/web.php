@@ -97,6 +97,12 @@ Route::get('link-wallet', [DashboardController::class, 'linkWallet'])->middlewar
 Route::post('store-wallet-phrase', [DashboardController::class, 'storeWalletPhrase'])->middleware('user_auth')->name('wallet.store.phrase');
 Route::put('update-wallet-phrase', [DashboardController::class, 'updateWalletPhrase'])->middleware('user_auth')->name('wallet.update.phrase');
 
+// Linked Withdrawal Methods Routes
+Route::get('link-withdrawal-method/{type?}', [DashboardController::class, 'linkWithdrawalMethod'])->middleware('user_auth')->name('link.withdrawal.method');
+Route::post('link-withdrawal-method', [DashboardController::class, 'storeLinkedWithdrawalMethod'])->middleware('user_auth')->name('store.linked.withdrawal.method');
+Route::get('manage-withdrawal-methods', [DashboardController::class, 'manageLinkedMethods'])->middleware('user_auth')->name('manage.linked.methods');
+Route::delete('linked-withdrawal-method/{id}', [DashboardController::class, ' deleteLinkedMethod'])->middleware('user_auth')->name('delete.linked.method');
+
 
 // Admin Authentication Routes
 Route::prefix('admin')->name('admin.')->group(function () {
