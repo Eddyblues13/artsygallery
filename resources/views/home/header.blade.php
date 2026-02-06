@@ -60,8 +60,8 @@
                         <a href="{{route('homepage')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Home</a>
                         <a href="{{route('about')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">About</a>
                         <a href="{{route('contact')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Contact</a>
-                        <a href="#categories" class="text-gray-800 hover:text-primary font-semibold transition-colors">Categories</a>
                         @if (auth()->check())
+                            <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Dashboard</a>
                             <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Create</a>
                         @else
                             <a href="{{route('login')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Login</a>
@@ -84,8 +84,8 @@
                         <a href="{{route('homepage')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Home</a>
                         <a href="{{route('about')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">About</a>
                         <a href="{{route('contact')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Contact</a>
-                        <a href="#categories" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Categories</a>
                         @if (auth()->check())
+                            <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Dashboard</a>
                             <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Create</a>
                         @else
                             <a href="{{route('login')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Login</a>

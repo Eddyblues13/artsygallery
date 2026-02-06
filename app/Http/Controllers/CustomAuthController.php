@@ -38,7 +38,7 @@ class CustomAuthController extends Controller
             return response()->json([
                 "content" => "Successful",
                 "message" => "Login Successful",
-                "redirect" => url("dashboard"),
+                "redirect" => route("homepage"),
             ]);
         }
 
