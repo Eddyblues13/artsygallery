@@ -242,7 +242,7 @@ class CustomAuthController extends Controller
             'password' => '*********',
         ]));
 
-        return redirect("dashboard")->with('status', 'Your account has been verified Successfully, you can now login');
+        return redirect()->route("homepage")->with('status', 'Your account has been verified Successfully!');
     }
 
     public function supportEmail(Request $request)
