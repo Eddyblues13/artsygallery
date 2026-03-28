@@ -17,7 +17,7 @@
 
     <link rel="canonical" href="https://demo-basic.adminkit.io/" />
 
-    <title>Artsygalley - NFT Marketplace</title>
+    <title>Artisttocollectors - NFT Marketplace</title>
 
     <link href="{{asset('css/app.css')}}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -274,9 +274,6 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex gap-3 align-items-center mb-3">
-                                        <img src="https://img.icons8.com/ios-filled/24/000000/ethereum.png"
-                                            alt="Ethereum Icon">
-                                        <b>{{ number_format($nft->nft_eth_price, 2) }} ETH</b>
                                         <img src="https://img.icons8.com/ios-filled/24/000000/us-dollar.png"
                                             alt="Dollar Icon">
                                         <b>${{ number_format($nft->nft_price, 2) }}</b>

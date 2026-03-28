@@ -5,7 +5,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-	<title>Artsygalley</title>
+	<title>Artisttocollectors</title>
 
 	<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap"
 		rel="stylesheet" />
@@ -209,11 +209,11 @@
 						</center>
 
 						<br>
-						<h2>Welcome to Artsygalley</h2>
+						<h2>Welcome to Artisttocollectors</h2>
 						<br>
 						<br>
 						<p style='line-height: 24px;margin-bottom:15px;'>
-							Thanks for joining Artsygalley as your new home. We're excited to have you on board!
+							Thanks for joining Artisttocollectors as your new home. We're excited to have you on board!
 						</p>
 						<p style='line-height: 24px;margin-bottom:15px;'>
 							Account Details:
@@ -235,7 +235,7 @@
 				<tr class="proton-tr">
 					<td class="proton-td" colspan="10" style="">
 						<h3>Warm regards,</h3>
-						<p>Artsygalley Inc.</p>
+						<p>Artisttocollectors Inc.</p>
 					</td>
 				</tr>
 
@@ -243,7 +243,7 @@
 					<td class="proton-td" colspan="10" style="">
 						<div class="proton-divider"></div>
 						<center>
-							<span style="color: #706d6b"> © 2024 Artsygalley</span>
+							<span style="color: #706d6b"> © 2024 Artisttocollectors</span>
 						</center>
 						<div class="proton-flex">
 							<a href="https://proton.me" class="proton-link">

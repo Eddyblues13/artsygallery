@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Artsygalley</title>
+    <title>Admin Login - Artisttocollectors</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -67,7 +67,7 @@
                             required 
                             value="{{ old('email') }}"
                             class="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300 outline-none"
-                            placeholder="admin@artsygalley.com">
+                            placeholder="admin@artisttocollectors.com">
                     </div>
                 </div>
 
@@ -119,7 +119,7 @@
             <!-- Footer -->
             <div class="mt-6 text-center">
                 <p class="text-xs text-gray-500">
-                    © {{ date('Y') }} Artsygalley. All rights reserved.
+                    © {{ date('Y') }} Artisttocollectors. All rights reserved.
                 </p>
             </div>
         </div>

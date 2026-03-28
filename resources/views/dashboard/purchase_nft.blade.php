@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Artsygalley</title>
+    <title>Artisttocollectors</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -321,13 +321,42 @@
                                     </p>
                                     <div class="d-inline-flex gap-3">
                                         <b>Owner: {{$nft->ntf_owner}}</b>
-
                                     </div>
                                     <br>
-                                    <div class="d-inline-flex gap-3">
-                                        <b>{{ number_format($nft->nft_eth_price, 2)}}ETH Floor</b>
-                                        <b>{{ number_format($nft->nft_eth_price, 2) }}ETH Volume</b>
+
+                                    <!-- Seller Profile Card -->
+                                    @if($nft->user)
+                                    <div
+                                        style="background: #f8f9fa; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                                        <div class="d-flex align-items-center gap-3 mb-2">
+                                            @if($nft->user->profile_picture)
+                                            <img src="{{ $nft->user->profile_picture }}" alt="{{ $nft->user->name }}"
+                                                style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #667eea;">
+                                            @else
+                                            <div
+                                                style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">
+                                                {{ strtoupper(substr($nft->user->name, 0, 1)) }}
+                                            </div>
+                                            @endif
+                                            <div>
+                                                <div style="font-weight: 600; color: #333;">{{ $nft->user->name }}</div>
+                                                @if($nft->user->country)
+                                                <small class="text-muted"><i class="bx bx-map"></i> {{
+                                                    $nft->user->country }}</small>
+                                                @endif
+                                                @if($nft->user->id_card_status === '1')
+                                                <span class="badge bg-success" style="font-size: 0.7rem;">✓
+                                                    Verified</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <a href="{{ route('seller.profile', $nft->user_id) }}"
+                                            class="btn btn-sm btn-outline-primary w-100" style="border-radius: 8px;">
+                                            View Seller Profile & More Artworks
+                                        </a>
                                     </div>
+                                    @endif
+
                                     @if($nft->user_id == Auth::user()->id)
                                     <br>
                                     <br>

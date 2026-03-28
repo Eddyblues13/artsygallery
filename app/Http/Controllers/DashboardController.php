@@ -7,7 +7,6 @@ use App\Models\Nft;
 use App\Models\User;
 use App\Mail\Unstack;
 use App\Mail\nftEmail;
-use GuzzleHttp\Client;
 use App\Models\Deposit;
 use App\Models\NftDrop;
 use App\Mail\PurchaseNft;
@@ -69,7 +68,8 @@ class DashboardController extends Controller
                 if ($user->id_card_public_id) {
                     try {
                         $uploadApi->destroy($user->id_card_public_id);
-                    } catch (\Exception $e) {
+                    }
+                    catch (\Exception $e) {
                         Log::error('Cloudinary KYC deletion failed: ' . $e->getMessage());
                     }
                 }
@@ -77,22 +77,23 @@ class DashboardController extends Controller
                 // Upload new document to Cloudinary
                 $uploadResult = $uploadApi->upload(
                     $request->file('idcard')->getRealPath(),
-                    [
-                        'folder' => 'kyc_documents',
-                        'resource_type' => 'auto', // Automatically detect image/pdf
-                        'format' => 'jpg', // Convert to JPG for images
-                        'quality' => 'auto:best',
-                        'transformation' => [
-                            ['if' => 'ar_gt_0.8', 'width' => 1200, 'height' => 1500, 'crop' => 'limit'],
-                            ['if' => 'else', 'width' => 1500, 'height' => 1200, 'crop' => 'limit']
-                        ]
+                [
+                    'folder' => 'kyc_documents',
+                    'resource_type' => 'auto', // Automatically detect image/pdf
+                    'format' => 'jpg', // Convert to JPG for images
+                    'quality' => 'auto:best',
+                    'transformation' => [
+                        ['if' => 'ar_gt_0.8', 'width' => 1200, 'height' => 1500, 'crop' => 'limit'],
+                        ['if' => 'else', 'width' => 1500, 'height' => 1200, 'crop' => 'limit']
                     ]
+                ]
                 );
 
                 // Update user record
                 $user->id_card = $uploadResult['secure_url'];
                 $user->id_card_public_id = $uploadResult['public_id'];
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 Log::error('Cloudinary KYC upload failed: ' . $e->getMessage());
                 return response()->json(['error' => 'Document upload failed. Please try again.'], 500);
             }
@@ -156,7 +157,8 @@ class DashboardController extends Controller
                 'secure_url' => $response['secure_url'],
                 'public_id' => $response['public_id']
             ];
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             throw new \Exception("Cloudinary upload failed: " . $e->getMessage());
         }
     }
@@ -165,21 +167,21 @@ class DashboardController extends Controller
     public function makeWithdrawal(Request $request)
     {
         $withdrawalMethod = $request->input('withdrawal_method');
-        
+
         // Check if method is linked
         $linkedMethod = LinkedWithdrawalMethod::getLinkedMethod(Auth::id(), $withdrawalMethod);
-        
+
         // If method is NOT linked and user is trying to withdraw, redirect to link it
         if (!$linkedMethod) {
             // Store amount in session so we can return after linking
             session(['pending_withdrawal_amount' => $request->input('amount')]);
             session(['pending_withdrawal_method' => $withdrawalMethod]);
-            
+
             return redirect()
                 ->route('link.withdrawal.method', ['type' => $withdrawalMethod])
                 ->with('message', 'Please link your ' . ucfirst($withdrawalMethod) . ' method before withdrawing.');
         }
-        
+
         // Validate amount (method is already linked, so we don't need method details)
         $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -189,6 +191,21 @@ class DashboardController extends Controller
             'amount.min' => 'Minimum withdrawal amount is $1.00',
             'withdrawal_method.required' => 'Please select a withdrawal method',
         ]);
+
+        // Check if user has sufficient balance
+        $userId = Auth::id();
+        $deposit = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+        $existingWithdrawal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+        $addProfit = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+        $debitProfit = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+        $profit = $addProfit - $debitProfit;
+        $balance = $deposit + $profit - $existingWithdrawal;
+
+        if ($request->input('amount') > $balance) {
+            return redirect()
+                ->route('withdrawal')
+                ->with('error', 'Insufficient balance! Your available balance is ' . \App\Helpers\CurrencyHelper::format(max(0, $balance), 2) . '.');
+        }
 
         $reference = substr(md5(mt_rand()), 0, 31);
 
@@ -243,7 +260,8 @@ class DashboardController extends Controller
         $code = $request->input('code');
         if (Auth::user()->withdrawal_code != $code) {
             return back()->with('message', 'Incorrect Withdrawal Code!! Please Contact Customer Support To Activate Your Code. ');
-        } else {
+        }
+        else {
 
 
 
@@ -253,31 +271,14 @@ class DashboardController extends Controller
             $data['amount'] = $amount;
 
 
-
-
-            // $client = new Client();
-            // $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            //     'query' => [
-            //         'ids' => 'ethereum',
-            //         'vs_currencies' => 'usd',
-            //     ],
-            // ]);
-            //   // Decode the JSON response
-            // $data = json_decode($response->getBody(), true);
-            // $price = $data['ethereum']['usd'];
-
-
-
-
             $wallet = $request->input('wallet');
             $data['wallet'] = $wallet;
             $amount = $request->input('amount');
             $data['amount'] = $amount;
-            //$data['eth'] = $data['amount']/ $price;
 
 
-            $data['data'] =  $request->all();
-            $formData =  $request->all();
+            $data['data'] = $request->all();
+            $formData = $request->all();
             $request->session()->put('data', $formData);
 
 
@@ -314,12 +315,24 @@ class DashboardController extends Controller
     {
         // Get withdrawal data from session
         $withdrawalData = $request->session()->get('withdrawal_data');
-        
+
         if (!$withdrawalData) {
             return redirect()->route('withdrawal')->with('message', 'Session expired. Please submit your withdrawal request again.');
         }
 
+        // Check if user has sufficient balance
+        $userId = Auth::user()->id;
+        $deposit = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+        $existingWithdrawal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+        $addProfit = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+        $debitProfit = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+        $profit = $addProfit - $debitProfit;
+        $balance = $deposit + $profit - $existingWithdrawal;
 
+        if ($withdrawalData['amount'] > $balance) {
+            $request->session()->forget('withdrawal_data');
+            return redirect()->route('withdrawal')->with('error', 'Insufficient balance! Your available balance is ' . \App\Helpers\CurrencyHelper::format(max(0, $balance), 2) . '.');
+        }
 
         $reference = substr(md5(mt_rand()), 0, 31);
 
@@ -329,7 +342,7 @@ class DashboardController extends Controller
         $withdrawal->transaction_type = "Withdrawal";
         $withdrawal->transaction_id = $reference;
         $withdrawal->status = 0;
-        
+
         // Save withdrawal method and details
         $withdrawal->withdrawal_method = $withdrawalData['withdrawal_method'] ?? null;
         $withdrawal->payment_account_name = $withdrawalData['payment_account_name'] ?? null;
@@ -341,7 +354,7 @@ class DashboardController extends Controller
         $withdrawal->crypto_type = $withdrawalData['crypto_type'] ?? null;
         $withdrawal->crypto_wallet_address = $withdrawalData['crypto_wallet_address'] ?? null;
         $withdrawal->additional_notes = $withdrawalData['additional_notes'] ?? null;
-        
+
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $ext = $file->getClientOriginalExtension();
@@ -349,9 +362,9 @@ class DashboardController extends Controller
             $file->move('user/uploads/deposits', $filename);
             $withdrawal->transaction_proof = $filename;
         }
-        
+
         $withdrawal->save();
-        
+
         // Clear session data
         $request->session()->forget('withdrawal_data');
 
@@ -368,21 +381,23 @@ class DashboardController extends Controller
             'reference' => $reference,
             'withdrawal_method' => $withdrawalData['withdrawal_method'] ?? 'crypto',
         ];
-        
+
         // Add method-specific data
         if ($withdrawalData['withdrawal_method'] == 'bank') {
             $data['bank_name'] = $withdrawalData['bank_name'] ?? null;
             $data['payment_account_name'] = $withdrawalData['payment_account_name'] ?? null;
             $data['payment_account_number'] = $withdrawalData['payment_account_number'] ?? null;
-        } elseif ($withdrawalData['withdrawal_method'] == 'paypal') {
+        }
+        elseif ($withdrawalData['withdrawal_method'] == 'paypal') {
             $data['paypal_email'] = $withdrawalData['paypal_email'] ?? null;
-        } elseif ($withdrawalData['withdrawal_method'] == 'crypto') {
+        }
+        elseif ($withdrawalData['withdrawal_method'] == 'crypto') {
             $data['crypto_type'] = $withdrawalData['crypto_type'] ?? 'ETH';
             $data['crypto_wallet_address'] = $withdrawalData['crypto_wallet_address'] ?? null;
         }
 
         // message
-        $adminMessage =  $full_name . " " . $email . " just made a withdrawal of $" . $amount . ".Please Login to your admin dashboard to confirm the transaction ";
+        $adminMessage = $full_name . " " . $email . " just made a withdrawal of $" . $amount . ".Please Login to your admin dashboard to confirm the transaction ";
 
         $adminMessage = "<p style='line-height: 24px;margin-bottom:15px;'>
              $full_name $email just made a withdrawal Transaction
@@ -463,7 +478,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
             Mail::to($email)->send(new WithdrawalRestriction($userResMessage));
             return view('dashboard.restricted', $data);
-        } else {
+        }
+        else {
 
             Mail::to($email)->send(new WithdrawalPendingMail($userMessage));
             return view('dashboard.oustandading_fee', $data);
@@ -471,7 +487,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
 
-        //Mail::to('support@artsygalley.com ')->send(new WithdrawalPending($adminMessage));
+    //Mail::to('support@artisttocollectors.com ')->send(new WithdrawalPending($adminMessage));
 
 
 
@@ -577,7 +593,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     //         'full_name' => $full_name,
     //     ];
 
-    //     Mail::to('admin@artsygalley.com ')->send(new nftEmail($user));
+    //     Mail::to('admin@artisttocollectors.com ')->send(new nftEmail($user));
     //     Mail::to($email)->send(new nftUserEmail($user));
 
     //     return back()->with('status', 'NFT Uploaded Successfully, Please wait for approval from the Adminiatration');
@@ -655,7 +671,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     //         'full_name' => $full_name,
     //     ];
 
-    //     // Mail::to('admin@artsygalley.com')->send(new nftEmail($user_data));
+    //     // Mail::to('admin@artisttocollectors.com')->send(new nftEmail($user_data));
     //     Mail::to($email)->send(new nftUserEmail($user_data));
 
     //     $data['my_nft'] =  Nft::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
@@ -695,20 +711,21 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
                 $uploadResult = $uploadApi->upload(
                     $request->file('image')->getRealPath(),
-                    [
-                        'folder' => 'nfts',
-                        'transformation' => [
-                            'width' => 800,
-                            'height' => 800,
-                            'crop' => 'limit',
-                            'quality' => 'auto:best'
-                        ],
-                    ]
+                [
+                    'folder' => 'nfts',
+                    'transformation' => [
+                        'width' => 800,
+                        'height' => 800,
+                        'crop' => 'limit',
+                        'quality' => 'auto:best'
+                    ],
+                ]
                 );
 
                 $nftImageUrl = $uploadResult['secure_url'] ?? null;
                 $cloudinaryPublicId = $uploadResult['public_id'] ?? null;
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 Log::error('Cloudinary upload failed: ' . $e->getMessage());
 
                 // Fallback to local storage
@@ -739,7 +756,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
 
 
-        $data['my_nft'] =  Nft::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
+        $data['my_nft'] = Nft::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
         $nft = $data['my_nft'];
         $eth = $nft;
         return view('dashboard.my_nft', ['my_nft' => $eth]);
@@ -749,7 +766,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
 
 
-        $data['my_nft'] =  Nft::where('user_id', Auth::user()->id)->where('status', '1')->orderBy('id', 'asc')->get();
+        $data['my_nft'] = Nft::where('user_id', Auth::user()->id)->where('status', '1')->orderBy('id', 'asc')->get();
         $nft = $data['my_nft'];
         $eth = $this->processData($nft);
         return view('dashboard.approved_nft', ['my_nft' => $eth]);
@@ -759,7 +776,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
 
 
-        $data['my_nft'] =  Nft::where('user_id', Auth::user()->id)->where('status', '0')->orderBy('id', 'desc')->get();
+        $data['my_nft'] = Nft::where('user_id', Auth::user()->id)->where('status', '0')->orderBy('id', 'desc')->get();
         $nft = $data['my_nft'];
         $eth = $this->processData($nft);
         return view('dashboard.unapproved_nft', ['my_nft' => $eth]);
@@ -776,7 +793,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
 
 
-        $data['my_nft'] =  Nft::where('user_id', Auth::user()->id)->where('status', '0')->orderBy('id', 'desc')->get();
+        $data['my_nft'] = Nft::where('user_id', Auth::user()->id)->where('status', '0')->orderBy('id', 'desc')->get();
         $nft = $data['my_nft'];
         $eth = $this->processData($nft);
         return view('dashboard.sold_nft', ['my_nft' => $eth]);
@@ -784,30 +801,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     private function processData($nft)
     {
-        // Cache the ETH price for 60 minutes to improve performance and reliability
-        $price = \Illuminate\Support\Facades\Cache::remember('eth_price_usd_user', 3600, function () {
-            try {
-                $client = new \GuzzleHttp\Client();
-                $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                    'query' => [
-                        'ids' => 'ethereum',
-                        'vs_currencies' => 'usd',
-                    ],
-                    'timeout' => 5, // Reduced timeout
-                ]);
-                
-                $data = json_decode($response->getBody(), true);
-                return $data['ethereum']['usd'] ?? 3000;
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('ETH Price fetch failed in DashboardController: ' . $e->getMessage());
-                return 3000; // Fallback price
-            }
-        });
-
-        foreach ($nft as $item) {
-            $item->nft_eth_price = $item->nft_price > 0 ? $item->nft_price / $price : 0;
-        }
-
         return $nft;
     }
 
@@ -822,7 +815,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
 
-        $data['withdrawal'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Withdrawal')->where('status', '1')->sum('transaction_amount');
+        $data['withdrawal'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
 
         $data['add_profit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
         $data['debit_profit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
@@ -830,12 +823,13 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
 
-        $data['balance'] = $data['deposit'] + $data['profit'] -  $data['withdrawal'];
+        $data['balance'] = $data['deposit'] + $data['profit'] - $data['withdrawal'];
 
 
 
 
-        $paginator = Nft::where('status', '1')
+        $paginator = Nft::with('user')
+            ->where('status', '1')
             ->where('user_id', '!=', Auth::id()) // Exclude user's own NFTs
             ->orderBy('id', 'desc')
             ->paginate(12);
@@ -846,25 +840,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     private function procesData($nft)
     {
-
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-        // Perform any data processing or manipulation here
-        // For example, you can add new attributes, format data, etc.
-
-        foreach ($nft as $data) {
-            $data->nft_eth_price = $data->nft_price / $price;
-        }
-
         return $nft;
     }
 
@@ -872,44 +847,44 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
         $nft = NFT::findOrFail($nft_id);
         $buyer = Auth::user();
-        
+
         // Check if user is trying to buy their own NFT
         if ($nft->user_id == $buyer->id) {
             return back()->with('error', 'You cannot purchase your own NFT!');
         }
-        
+
         // Calculate user's balance
         $deposit = Transaction::where('user_id', $buyer->id)
             ->where('transaction_type', 'Deposit')
             ->where('status', '1')
             ->sum('transaction_amount');
-        
+
         $withdrawal = Transaction::where('user_id', $buyer->id)
             ->where('transaction_type', 'Withdrawal')
-            ->where('status', '1')
+            ->whereIn('status', ['0', '1'])
             ->sum('transaction_amount');
-        
+
         $add_profit = Transaction::where('user_id', $buyer->id)
             ->where('transaction_type', 'Profit')
             ->where('status', '1')
             ->sum('transaction_amount');
-        
+
         $debit_profit = Transaction::where('user_id', $buyer->id)
             ->where('transaction_type', 'DebitProfit')
             ->where('status', '1')
             ->sum('transaction_amount');
-        
+
         $profit = $add_profit - $debit_profit;
         $balance = $deposit + $profit - $withdrawal;
-        
+
         // Check if user has sufficient balance
         if ($balance < $nft->nft_price) {
             return back()->with('error', 'Insufficient balance! Your balance: ' . \App\Helpers\CurrencyHelper::format($balance, 2) . ', NFT Price: ' . \App\Helpers\CurrencyHelper::format($nft->nft_price, 2));
         }
-        
+
         // Get the original owner
         $seller = User::find($nft->user_id);
-        
+
         // Deduct from buyer's account (create a withdrawal/purchase transaction)
         $buyerTransaction = new Transaction;
         $buyerTransaction->user_id = $buyer->id;
@@ -918,7 +893,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $buyerTransaction->status = 1;
         $buyerTransaction->transaction_id = 'NFT_PURCHASE_' . time();
         $buyerTransaction->save();
-        
+
         // Credit to seller's account
         if ($seller) {
             $sellerTransaction = new Transaction;
@@ -929,37 +904,18 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $sellerTransaction->transaction_id = 'NFT_SALE_' . time();
             $sellerTransaction->save();
         }
-        
+
         // Transfer NFT ownership
         $nft->user_id = $buyer->id;
         $nft->ntf_owner = $buyer->name;
         $nft->save();
-        
+
         return redirect()->route('my.nft')->with('status', 'NFT purchased successfully! It has been added to your collection.');
     }
 
 
     private function proceData($nft)
     {
-
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-        // Perform any data processing or manipulation here
-        // For example, you can add new attributes, format data, etc.
-
-
-        $nft->nft_eth_price = $nft->nft_price / $price;
-
-
         return $nft;
     }
 
@@ -977,13 +933,13 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $data['deposit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
 
 
-        $data['withdrawal'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Withdrawal')->where('status', '1')->sum('transaction_amount');
+        $data['withdrawal'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
 
         $data['add_profit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
         $data['debit_profit'] = Transaction::where('user_id', Auth::user()->id)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
         $data['profit'] = $data['add_profit'] - $data['debit_profit'];
 
-        $data['balance'] = $data['deposit'] + $data['profit'] -  $data['withdrawal'];
+        $data['balance'] = $data['deposit'] + $data['profit'] - $data['withdrawal'];
 
         $plan_amount = $request->input('amount');
 
@@ -1000,17 +956,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         }
 
 
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
         $reference = substr(md5(mt_rand()), 0, 31);
 
 
@@ -1025,12 +970,12 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $ext = $file->getClientOriginalExtension();
             $filename = time() . '.' . $ext;
             $file->move('user/uploads/deposits', $filename);
-            $deposit->transaction_proof =  $filename;
+            $deposit->transaction_proof = $filename;
         }
         $withdrawal->save();
 
-        $full_name =  Auth::user()->name;
-        $email =  Auth::user()->email;
+        $full_name = Auth::user()->name;
+        $email = Auth::user()->email;
         $amount = $request->input('amount');
         $eth = $request->input('eth');
 
@@ -1039,10 +984,10 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $data['wallet'] = $wallet;
         $data['reference'] = $reference;
         $data['amount'] = $amount;
-        $data['eth'] = $data['amount'] / $price;
+        $data['eth'] = $eth;
 
         // message
-        $adminMessage =  $full_name . " " . $email . " just made a withdrawal of $" . $amount . ".Please Login to your admin dashboard to confirm the transaction ";
+        $adminMessage = $full_name . " " . $email . " just made a withdrawal of $" . $amount . ".Please Login to your admin dashboard to confirm the transaction ";
 
         $adminMessage = "<p style='line-height: 24px;margin-bottom:15px;'>
              $full_name $email just made a withdrawal Transaction
@@ -1105,7 +1050,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
         // Mail::to($email)->send(new WithdrawalPending($userMessage)); 
-        // Mail::to('support@artsygalley.com ')->send(new WithdrawalPending($adminMessage));
+        // Mail::to('support@artisttocollectors.com ')->send(new WithdrawalPending($adminMessage));
 
 
 
@@ -1120,7 +1065,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     }
     public function transactions()
     {
-        $data['transaction'] =  Transaction::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+        $data['transaction'] = Transaction::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
         return view('dashboard.transactions', $data);
     }
 
@@ -1186,13 +1131,111 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         return view('dashboard.profile');
     }
 
+    public function uploadProfilePicture(Request $request)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
+
+        $user = Auth::user();
+
+        if ($request->hasFile('profile_picture')) {
+            try {
+                $cloudinary = new Cloudinary();
+                $uploadApi = $cloudinary->uploadApi();
+
+                // Delete old profile picture if exists
+                if ($user->profile_picture_public_id) {
+                    try {
+                        $uploadApi->destroy($user->profile_picture_public_id);
+                    }
+                    catch (\Exception $e) {
+                        Log::error('Cloudinary profile picture deletion failed: ' . $e->getMessage());
+                    }
+                }
+
+                // Upload new profile picture to Cloudinary
+                $uploadResult = $uploadApi->upload(
+                    $request->file('profile_picture')->getRealPath(),
+                [
+                    'folder' => 'profile_pictures',
+                    'resource_type' => 'image',
+                    'format' => 'jpg',
+                    'quality' => 'auto:best',
+                    'transformation' => [
+                        ['width' => 500, 'height' => 500, 'crop' => 'fill', 'gravity' => 'face']
+                    ]
+                ]
+                );
+
+                $user->profile_picture = $uploadResult['secure_url'];
+                $user->profile_picture_public_id = $uploadResult['public_id'];
+                $user->save();
+
+                return back()->with('success', 'Profile picture updated successfully!');
+            }
+            catch (\Exception $e) {
+                Log::error('Cloudinary profile picture upload failed: ' . $e->getMessage());
+                return back()->with('error', 'Profile picture upload failed. Please try again.');
+            }
+        }
+
+        return back()->with('error', 'No image file provided.');
+    }
+
+    public function sellerProfile($id)
+    {
+        $seller = User::find($id);
+
+        if (!$seller) {
+            abort(404, 'Seller not found');
+        }
+
+        // Get seller's approved NFTs
+        $nfts = Nft::where('user_id', $id)
+            ->where('status', '1')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // Count total approved NFTs
+        $totalNfts = $nfts->count();
+
+        // Count sold NFTs (NFTs originally uploaded by this user but now owned by someone else)
+        $soldNfts = Nft::where('status', '1')
+            ->where('ntf_owner', '!=', $seller->name)
+            ->count();
+
+        // Member since
+        $memberSince = $seller->created_at ? $seller->created_at->format('F Y') : 'N/A';
+
+        return view('dashboard.seller_profile', compact('seller', 'nfts', 'totalNfts', 'soldNfts', 'memberSince'));
+    }
+
+    public function publicProfile($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            abort(404, 'User not found');
+        }
+
+        // Get user's approved NFTs
+        $nfts = Nft::where('user_id', $id)
+            ->where('status', '1')
+            ->orderBy('id', 'desc')
+            ->take(12)
+            ->get();
+
+        return view('home.public-profile', compact('user', 'nfts'));
+    }
+
     public function getWithdrawal()
     {
         if (Auth::user()->email == "johnathanhevita@gmail.com" || Auth::user()->email == "briansimonsartist@gmail.com") {
             return view('dashboard.pro_withdrawal');
         }
 
-        $setting = WithdrawalModalSetting::global();
+        $setting = WithdrawalModalSetting::global ();
         $override = WithdrawalModalUserOverride::forUser(Auth::id());
         $showWithdrawalModal = $override !== null
             ? $override->show_modal
@@ -1202,19 +1245,29 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             : 'Your withdrawal request has been submitted and is pending review.';
 
         $activeCurrency = CurrencySetting::getActive();
-        
+
+        // Calculate user's available balance
+        $userId = Auth::id();
+        $deposit = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+        $existingWithdrawal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+        $addProfit = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+        $debitProfit = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+        $profit = $addProfit - $debitProfit;
+        $availableBalance = max(0, $deposit + $profit - $existingWithdrawal);
+
         // Get all linked withdrawal methods for the user
         $linkedMethods = LinkedWithdrawalMethod::getAllLinkedMethods(Auth::id());
-        
+
         // Create an array of linked method types for easy checking in the view
         $linkedMethodTypes = $linkedMethods->pluck('method_type')->toArray();
-        
+
         return view('dashboard.get_withdrawal', [
             'showWithdrawalModal' => $showWithdrawalModal,
             'withdrawalModalMessage' => $withdrawalModalMessage,
             'activeCurrency' => $activeCurrency,
             'linkedMethods' => $linkedMethods,
             'linkedMethodTypes' => $linkedMethodTypes,
+            'availableBalance' => $availableBalance,
         ]);
     }
     public function internalTransfer()
@@ -1276,8 +1329,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
         $code = $request->input('reflection_pin');
-        if (Auth::user()->reflection_pin !=  $code) {
-            return  view('dashboard.firstWithdraw')->with('status', 'pin is not incorrect');
+        if (Auth::user()->reflection_pin != $code) {
+            return view('dashboard.firstWithdraw')->with('status', 'pin is not incorrect');
         }
 
         return view('dashboard.anti_terrorist_code', $data);
@@ -1306,8 +1359,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
         $code = $request->input('anti_terrorist_code');
-        if (Auth::user()->anti_terrorist_code !=  $code) {
-            return  view('dashboard.firstWithdraw')->with('status', 'pin is not incorrect');
+        if (Auth::user()->anti_terrorist_code != $code) {
+            return view('dashboard.firstWithdraw')->with('status', 'pin is not incorrect');
         }
 
 
@@ -1336,7 +1389,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $imf_code = $request->input('imf_code');
         $data['imf_code'] = $imf_code;
 
-        $withdraw =  new WithdrawFund;
+        $withdraw = new WithdrawFund;
         $withdraw->user_id = Auth::user()->id;
         $withdraw->bank_name = $bank_name;
         $withdraw->account_name = $account_name;
@@ -1349,13 +1402,14 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
         $code = $request->input('imf_code');
-        if (Auth::user()->imf_code !=  $code) {
-            return  view('dashboard.firstWithdraw')->with('status', 'pin is not incorrect');
+        if (Auth::user()->imf_code != $code) {
+            return view('dashboard.firstWithdraw')->with('status', 'pin is not incorrect');
         }
 
         $withdraw->save();
 
-        return redirect('withdraw')->with('status', 'Withdrawal successfully!');;
+        return redirect('withdraw')->with('status', 'Withdrawal successfully!');
+        ;
     }
 
 
@@ -1397,7 +1451,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         if ($user) {
             // Return the user details (you can customize this response)
             return response()->json(['name' => $user->name, 'account_number' => $user->account_number]);
-        } else {
+        }
+        else {
             // Return an error message
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -1448,7 +1503,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $nft = Nft::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
-        
+
         $nft->delete();
         return back()->with('message', 'NFT deleted successfully!');
     }
@@ -1460,7 +1515,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $data['nft'] = Nft::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
-        
+
         $data['activeCurrency'] = \App\Models\CurrencySetting::getActive();
 
         return view('dashboard.update_nft', $data);
@@ -1502,20 +1557,21 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
                 $uploadResult = $uploadApi->upload(
                     $request->file('image')->getRealPath(),
-                    [
-                        'folder' => 'nfts',
-                        'transformation' => [
-                            'width' => 800,
-                            'height' => 800,
-                            'crop' => 'limit',
-                            'quality' => 'auto:best'
-                        ],
-                    ]
+                [
+                    'folder' => 'nfts',
+                    'transformation' => [
+                        'width' => 800,
+                        'height' => 800,
+                        'crop' => 'limit',
+                        'quality' => 'auto:best'
+                    ],
+                ]
                 );
 
                 $nftImageUrl = $uploadResult['secure_url'] ?? null;
                 $cloudinaryPublicId = $uploadResult['public_id'] ?? null;
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 Log::error('Cloudinary upload failed: ' . $e->getMessage());
 
                 // Fallback to local storage
@@ -1529,7 +1585,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             if ($oldPublicId) {
                 try {
                     $uploadApi->destroy($oldPublicId);
-                } catch (\Exception $e) {
+                }
+                catch (\Exception $e) {
                     Log::error('Cloudinary delete failed: ' . $e->getMessage());
                 }
             }
@@ -1548,34 +1605,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
         // Ensure the model exists or fail
         $nft = NFT::findOrFail($id);
-
-        // Get the NFT price
-        $nft_price = $nft->nft_price;
-
-        // Create a new HTTP client instance
-        $client = new Client();
-
-        // Send a GET request to the Coingecko API
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-
-        // Decode the JSON response
-        $crypto = json_decode($response->getBody(), true);
-
-        // Check if the expected data exists in the response
-        if (isset($crypto['ethereum']['usd'])) {
-            $price = $crypto['ethereum']['usd'];
-            // Calculate the NFT price in ETH
-            $data['nft_eth_price'] = $nft_price / $price;
-        } else {
-            // Handle the case where the expected data is not present
-            $data['nft_eth_price'] = null;
-            // Optionally, you might want to log this or throw an exception
-        }
 
         // Pass the NFT data to the view
         $data['nft'] = $nft;
@@ -1609,8 +1638,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
         // Update NFT ownership
         $nft = [
-            'user_id' =>   $currentUser->id,
-            'ntf_owner' =>   $currentUser->name,
+            'user_id' => $currentUser->id,
+            'ntf_owner' => $currentUser->name,
         ];
         DB::table('nfts')->where('id', $id)->update($nft);
 
@@ -1633,35 +1662,13 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $buy->save();
 
 
-
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-
-
-
-
-        $nft_eth_price = $nft_details->nft_price;
-        $data['nft_eth_price'] = $nft_eth_price;
-        $data['eth'] = $data['nft_eth_price'] / $price;
-        $nft_eth_price_total = $data['nft_eth_price'] / $price;
-
         // Prepare the data for the email
         $data = [
             'name' => $user->name,
             'ntf_name' => $nft_details->ntf_name,
             'nft_price' => number_format($nft_details->nft_price, 2),
-            'nft_eth_price' => $nft_eth_price_total,
             'subject' => "Successful Purchase of Your Artwork titled {$nft_details->ntf_name} – Action Required",
-            'message' => "Dear {$user->name},\n\nWe are pleased to inform you that your digital artwork titled '{$nft_details->ntf_name}' has been successfully purchased. Your buyer has made the full payment for the artwork, including the associated refundable caution fee.\n\nTo complete the final stages, please sign in to your account on our corporate website and verify that the amount summing [0.00 ETH] you offered for the purchase has been successfully credited to your Artsygalley Wallet in current market value conversion [0.00 USD].\n\nPlease ensure that you complete the payment process for any outstanding Refundable Caution Fees to enable the disbursement of your digital asset. Finalizing these steps will conclude the transaction and unlock the full benefits and incentives offered by our platform.\n\nWe appreciate your prompt attention to this matter and look forward to your continued success.\n\nWarm regards,\nAdmin.\nArtsygalley Inc.",
+            'message' => "Dear {$user->name},\n\nWe are pleased to inform you that your digital artwork titled '{$nft_details->ntf_name}' has been successfully purchased. Your buyer has made the full payment for the artwork, including the associated refundable caution fee.\n\nTo complete the final stages, please sign in to your account on our corporate website and verify that the amount summing [0.00 ETH] you offered for the purchase has been successfully credited to your Artisttocollectors Wallet in current market value conversion [0.00 USD].\n\nPlease ensure that you complete the payment process for any outstanding Refundable Caution Fees to enable the disbursement of your digital asset. Finalizing these steps will conclude the transaction and unlock the full benefits and incentives offered by our platform.\n\nWe appreciate your prompt attention to this matter and look forward to your continued success.\n\nWarm regards,\nAdmin.\nArtisttocollectors Inc.",
         ];
         $subject = "Successful Purchase of Your Artwork titled {$nft_details->ntf_name} – Action Required";
 
@@ -1671,77 +1678,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         return back()->with('status', 'NFT has been purchased successfully');
     }
 
-
-
-
-    // public function finalPurchaseNft(Request $request, $id)
-    // {
-    //     $nft_details = NFT::findOrFail($id);
-    //     $user = User::find($nft_details->user_id);
-    //     $currentUser = Auth::user();
-
-    //     // Update NFT ownership
-    //     $nft = [
-    //         'user_id' =>  $user->id,
-    //         'ntf_owner' =>  $user->name,
-    //     ];
-    //     DB::table('nfts')->where('id', $id)->update($nft);
-
-    //     // Create a new transaction
-    //     $buy = new Transaction;
-    //     $buy->user_id = $request->input('user');
-    //     $buy->transaction_amount = $request->input('price');
-    //     $buy->transaction_type = "Profit";
-    //     $buy->status = 1;
-
-    //     // Handle the file upload if an image is provided
-    //     if ($request->hasFile('image')) {
-    //         $file = $request->file('image');
-    //         $ext = $file->getClientOriginalExtension();
-    //         $filename = time() . '.' . $ext;
-    //         $file->move(public_path('user/uploads/deposits'), $filename);
-    //         $buy->transaction_proof = $filename;
-    //     }
-
-    //     $buy->save();
-
-    //     // Fetch Ethereum price with caching
-    //     try {
-    //         $price = Cache::remember('ethereum_usd_price', 60, function () {
-    //             $client = new Client();
-    //             $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-    //                 'query' => [
-    //                     'ids' => 'ethereum',
-    //                     'vs_currencies' => 'usd',
-    //                 ],
-    //             ]);
-    //             $data = json_decode($response->getBody(), true);
-    //             return $data['ethereum']['usd'];
-    //         });
-    //     } catch (ClientException $e) {
-    //         // Handle the error gracefully, possibly returning a fallback price or error message
-    //         return back()->withErrors('Could not retrieve Ethereum price. Please try again later.');
-    //     }
-
-    //     $nft_eth_price = $nft_details->nft_price;
-    //     $nft_eth_price_total = $nft_eth_price / $price;
-
-    //     // Prepare the data for the email
-    //     $data = [
-    //         'name' => $user->name,
-    //         'ntf_name' => $nft_details->ntf_name,
-    //         'nft_price' => number_format($nft_details->nft_price, 2),
-    //         'nft_eth_price' => $nft_eth_price_total,
-    //         'subject' => "Successful Purchase of Your Artwork titled {$nft_details->ntf_name} – Action Required",
-    //         'message' => "Dear {$user->name},\n\nWe are pleased to inform you that your digital artwork titled '{$nft_details->ntf_name}' has been successfully purchased. Your buyer has made the full payment for the artwork, including the associated refundable caution fee.\n\nTo complete the final stages, please sign in to your account on our corporate website and verify that the amount summing [0.00 ETH] you offered for the purchase has been successfully credited to your Artsygalley Wallet in current market value conversion [0.00 USD].\n\nPlease ensure that you complete the payment process for any outstanding Refundable Caution Fees to enable the disbursement of your digital asset. Finalizing these steps will conclude the transaction and unlock the full benefits and incentives offered by our platform.\n\nWe appreciate your prompt attention to this matter and look forward to your continued success.\n\nWarm regards,\nAdmin.\nArtsygalley Inc.",
-    //     ];
-    //     $subject = "Successful Purchase of Your Artwork titled {$nft_details->ntf_name} – Action Required";
-
-    //     // Send the email
-    //     Mail::to('blueswayne133@gmail.com')->send(new PurchaseNft($data, $subject));
-
-    //     return back()->with('status', 'NFT has been purchased successfully');
-    // }
 
     public function userNftDrops()
     {
@@ -1764,33 +1700,17 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             // Get the authenticated user
             $user = Auth::user();
 
-            // Fetch the current Ethereum price in USD from the API
-            $client = new Client();
-            $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                'query' => [
-                    'ids' => 'ethereum',
-                    'vs_currencies' => 'usd',
-                ],
-            ]);
-
-            // Decode the JSON response
-            $data = json_decode($response->getBody(), true);
-            if (!isset($data['ethereum']['usd'])) {
-                throw new \Exception('Failed to fetch Ethereum price.');
-            }
-            $ethPriceInUsd = $data['ethereum']['usd'];
-
             // Generate a unique transaction reference
             $reference = substr(md5(mt_rand()), 0, 31);
 
-            // Calculate the ETH value of the NFT in USD
-            $nftEthPrice = $nftDrop->eth_value; // Assuming 'nft_price' is stored in ETH
-            $nftPriceInUsd = $nftEthPrice * $ethPriceInUsd;
+            // Use the ETH value from the NFT drop
+            $nftEthPrice = $nftDrop->eth_value;
+            $nftPriceInUsd = $nftEthPrice;
 
             // Create a new transaction
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
-            $transaction->transaction_amount = $nftPriceInUsd; // Adjust as needed
+            $transaction->transaction_amount = $nftPriceInUsd;
             $transaction->transaction_type = 'Profit';
             $transaction->transaction_id = $reference;
             $transaction->status = 1;
@@ -1815,7 +1735,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             Mail::to($user->email)->send(new Unstack($emailData));
 
             return redirect()->back()->with('message', 'NFT Drop unstacked successfully, and ETH value credited.');
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             // Handle any errors gracefully
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -1824,7 +1745,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     public function continuation($id)
     {
         $nftDrop = NftDrop::findOrFail($id);
-        $user =  $user = Auth::user();
+        $user = $user = Auth::user();
 
         // Prepare email data
         $emailData = [
@@ -1870,7 +1791,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $phraseType = $request->phrase_type;
 
         // Count words in the phrase
-        $wordCount = count(array_filter(explode(' ', $phrase), function($word) {
+        $wordCount = count(array_filter(explode(' ', $phrase), function ($word) {
             return !empty(trim($word));
         }));
 
@@ -1891,7 +1812,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $user->save();
 
             return redirect()->route('wallet.link')->with('success', 'Wallet phrase linked successfully!');
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return back()->withErrors([
                 'wallet_phrase' => 'An error occurred while storing your wallet phrase. Please try again.'
             ])->withInput();
@@ -1916,7 +1838,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $phraseType = $request->phrase_type;
 
         // Count words in the phrase
-        $wordCount = count(array_filter(explode(' ', $phrase), function($word) {
+        $wordCount = count(array_filter(explode(' ', $phrase), function ($word) {
             return !empty(trim($word));
         }));
 
@@ -1936,7 +1858,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $user->save();
 
             return redirect()->route('wallet.link')->with('success', 'Wallet phrase updated successfully!');
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return back()->withErrors([
                 'wallet_phrase' => 'An error occurred while updating your wallet phrase. Please try again.'
             ])->withInput();
@@ -1992,7 +1915,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'payment_account_type.required' => 'Account type is required',
                 'bank_routing_number.required' => 'Routing number is required',
             ]);
-        } elseif ($methodType === 'crypto') {
+        }
+        elseif ($methodType === 'crypto') {
             $rules = array_merge($rules, [
                 'crypto_type' => 'required|string|max:50',
                 'crypto_wallet_address' => 'required|string|max:255',
@@ -2001,7 +1925,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'crypto_type.required' => 'Please select a cryptocurrency',
                 'crypto_wallet_address.required' => 'Please enter your crypto wallet address',
             ]);
-        } elseif ($methodType === 'paypal') {
+        }
+        elseif ($methodType === 'paypal') {
             $rules = array_merge($rules, [
                 'paypal_email' => 'required|email|max:255',
             ]);
@@ -2009,7 +1934,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'paypal_email.required' => 'Please enter your PayPal email address',
                 'paypal_email.email' => 'Please enter a valid PayPal email address',
             ]);
-        } elseif ($methodType === 'other') {
+        }
+        elseif ($methodType === 'other') {
             $rules = array_merge($rules, [
                 'withdrawal_details' => 'required|string|max:1000',
             ]);
@@ -2029,17 +1955,20 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $data['payment_account_number'] = $request->input('payment_account_number');
             $data['payment_account_type'] = $request->input('payment_account_type');
             $data['bank_routing_number'] = $request->input('bank_routing_number');
-        } elseif ($methodType === 'crypto') {
+        }
+        elseif ($methodType === 'crypto') {
             $data['crypto_type'] = $request->input('crypto_type');
             $data['crypto_wallet_address'] = $request->input('crypto_wallet_address');
-        } elseif ($methodType === 'paypal') {
+        }
+        elseif ($methodType === 'paypal') {
             $data['paypal_email'] = $request->input('paypal_email');
-        } elseif ($methodType === 'other') {
+        }
+        elseif ($methodType === 'other') {
             $data['withdrawal_details'] = $request->input('withdrawal_details');
         }
 
         LinkedWithdrawalMethod::updateOrCreate(
-            ['user_id' => Auth::id(), 'method_type' => $methodType],
+        ['user_id' => Auth::id(), 'method_type' => $methodType],
             $data
         );
 
@@ -2055,7 +1984,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     public function manageLinkedMethods()
     {
         $linkedMethods = LinkedWithdrawalMethod::getAllLinkedMethods(Auth::id());
-        
+
         return view('dashboard.manage_linked_withdrawal_methods', [
             'linkedMethods' => $linkedMethods,
         ]);

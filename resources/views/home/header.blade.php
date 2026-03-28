@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Artsygalley - NFT Marketplace</title>
+    <title>Artisttocollectors - NFT Marketplace</title>
     <meta name="description" content="The world's premier and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs). Explore, buy, and sell unique digital items" />
 
     <!-- Favicon icon -->
@@ -45,28 +45,37 @@
     <!-- Main Wrapper -->
     <div id="main-wrapper" class="pt-20">
         <!-- Header -->
-        <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-            <div class="container mx-auto px-4">
-                <nav class="flex items-center justify-between py-4">
+        <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-100 transition-all duration-300">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <nav class="flex items-center justify-between py-3 sm:py-4">
                     <!-- Logo -->
-                    <div class="flex-shrink-0">
+                    <div class="flex-shrink-0 mr-4">
                         <a href="{{route('homepage')}}" class="block">
-                            <img src="images/logo.png" alt="Artsygalley Logo" class="h-12 w-auto" />
+                            <img src="images/logo.png" alt="Artisttocollectors Logo" class="h-10 sm:h-12 w-auto" />
                         </a>
                     </div>
 
+                    <!-- Search Bar -->
+                    <div class="hidden lg:flex flex-1 max-w-2xl mx-6 relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="bi bi-search text-slate-400 group-focus-within:text-primary transition-colors"></i>
+                        </div>
+                        <input type="text" class="block w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl leading-5 bg-slate-50/50 text-slate-900 placeholder-slate-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300 sm:text-sm shadow-inner" placeholder="Search items, collections, and accounts">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <div class="hidden sm:flex items-center text-slate-400 text-xs font-semibold bg-white border border-slate-200 rounded-md px-2 py-1 shadow-sm">/</div>
+                        </div>
+                    </div>
+
                     <!-- Desktop Navigation -->
-                    <div class="hidden lg:flex items-center space-x-8">
-                        <a href="{{route('homepage')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Home</a>
-                        <a href="{{route('about')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">About</a>
-                        <a href="{{route('contact')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Contact</a>
+                    <div class="hidden lg:flex items-center space-x-6 xl:space-x-8">
+                        <a href="{{route('homepage')}}" class="text-slate-600 hover:text-slate-900 font-bold transition-colors">Explore</a>
+                        <a href="{{route('about')}}" class="text-slate-600 hover:text-slate-900 font-bold transition-colors">About</a>
                         @if (auth()->check())
-                            <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Dashboard</a>
-                            <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Create</a>
+                            <a href="{{route('home')}}" class="text-slate-600 hover:text-slate-900 font-bold transition-colors">Dashboard</a>
+                            <a href="{{route('home')}}" class="px-5 py-2.5 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5 whitespace-nowrap">Create</a>
                         @else
-                            <a href="{{route('login')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Login</a>
-                            <a href="{{route('register')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Register</a>
-                            <a href="{{route('register')}}" class="text-gray-800 hover:text-primary font-semibold transition-colors">Create</a>
+                            <a href="{{route('login')}}" class="text-slate-600 hover:text-slate-900 font-bold transition-colors">Login</a>
+                            <a href="{{route('register')}}" class="px-5 py-2.5 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5 whitespace-nowrap">Sign Up</a>
                         @endif
                     </div>
 
@@ -79,18 +88,24 @@
                 </nav>
 
                 <!-- Mobile Navigation -->
-                <div id="mobile-menu" class="hidden lg:hidden pb-4">
-                    <div class="flex flex-col space-y-4">
-                        <a href="{{route('homepage')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Home</a>
-                        <a href="{{route('about')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">About</a>
-                        <a href="{{route('contact')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Contact</a>
+                <div id="mobile-menu" class="hidden lg:hidden pb-6 pt-2 border-t border-slate-100 mt-2">
+                    <!-- Mobile Search -->
+                    <div class="mb-6 relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="bi bi-search text-slate-400"></i>
+                        </div>
+                        <input type="text" class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="Search items, collections...">
+                    </div>
+                    
+                    <div class="flex flex-col space-y-3">
+                        <a href="{{route('homepage')}}" class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">Explore</a>
+                        <a href="{{route('about')}}" class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">About</a>
                         @if (auth()->check())
-                            <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Dashboard</a>
-                            <a href="{{route('home')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Create</a>
+                            <a href="{{route('home')}}" class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">Dashboard</a>
+                            <a href="{{route('home')}}" class="mt-4 text-center px-5 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">Create</a>
                         @else
-                            <a href="{{route('login')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Login</a>
-                            <a href="{{route('register')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Register</a>
-                            <a href="{{route('register')}}" class="text-gray-800 hover:text-primary font-semibold py-2 transition-colors">Create</a>
+                            <a href="{{route('login')}}" class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">Login</a>
+                            <a href="{{route('register')}}" class="mt-4 text-center px-5 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">Sign Up</a>
                         @endif
                     </div>
                 </div>

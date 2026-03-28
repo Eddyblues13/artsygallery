@@ -39,23 +39,23 @@ class AdminController extends Controller
         $data['active_users'] = User::where('is_activated', '1')->count();
         $data['total_artworks'] = \App\Models\Nft::count();
         $data['approved_artworks'] = \App\Models\Nft::where('status', 1)->count();
-        
+
         // Financial Stats
         $data['total_deposits'] = Transaction::where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
         $data['total_withdrawals'] = Transaction::where('transaction_type', 'Withdrawal')->where('status', '1')->sum('transaction_amount');
-        $data['total_profit'] = Transaction::where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount') 
-                                - Transaction::where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+        $data['total_profit'] = Transaction::where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount')
+            - Transaction::where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
         $data['total_balance'] = $data['total_deposits'] + $data['total_profit'] - $data['total_withdrawals'];
-        
 
-        
+
+
         // Pending Transactions
         $data['pending_deposits'] = Transaction::where('transaction_type', 'Deposit')->where('status', '0')->count();
         $data['pending_withdrawals'] = Transaction::where('transaction_type', 'Withdrawal')->where('status', '0')->count();
-        
+
         // Recent Activity
         $data['recent_transactions'] = Transaction::orderBy('created_at', 'desc')->limit(10)->get();
-        
+
         return view('admin.home', $data);
     }
     public function users(Request $request)
@@ -65,11 +65,11 @@ class AdminController extends Controller
         // Improved search functionality - case insensitive and more accurate
         if ($request->has('search') && $request->search) {
             $search = trim($request->search);
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
-                  ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%'])
-                  ->orWhere('phone', 'like', '%' . $search . '%')
-                  ->orWhere('id', '=', $search);
+                    ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('id', '=', $search);
             });
         }
 
@@ -136,25 +136,25 @@ class AdminController extends Controller
         try {
             $admin = Auth::guard('admin')->user();
             $admin->wallet_address = $request->wallet_address;
-            
+
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $ext = $file->getClientOriginalExtension();
                 $filename = 'wallet_' . time() . '.' . $ext;
-                
+
                 // Create directory if it doesn't exist
                 $uploadPath = public_path('admin/uploads/admin');
                 if (!file_exists($uploadPath)) {
                     mkdir($uploadPath, 0755, true);
                 }
-                
+
                 $file->move($uploadPath, $filename);
-                
+
                 // Delete old bar code image if exists
                 if ($admin->bar_code && file_exists($uploadPath . '/' . $admin->bar_code)) {
                     @unlink($uploadPath . '/' . $admin->bar_code);
                 }
-                
+
                 $admin->bar_code = $filename;
             }
 
@@ -179,7 +179,7 @@ class AdminController extends Controller
             $admin = Auth::guard('admin')->user();
             $admin->phone = $request->phone;
             $admin->save();
-            
+
             return back()->with('status', 'WhatsApp phone number updated successfully!');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Failed to update WhatsApp phone number. Please try again.');
@@ -312,14 +312,14 @@ class AdminController extends Controller
         // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('ntf_name', 'like', '%' . $search . '%')
-                  ->orWhere('ntf_owner', 'like', '%' . $search . '%')
-                  ->orWhere('ntf_description', 'like', '%' . $search . '%')
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', '%' . $search . '%')
-                                ->orWhere('email', 'like', '%' . $search . '%');
-                  });
+                    ->orWhere('ntf_owner', 'like', '%' . $search . '%')
+                    ->orWhere('ntf_description', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%');
+                    });
             });
         }
 
@@ -334,7 +334,7 @@ class AdminController extends Controller
         // Sort options
         $sortBy = $request->get('sort', 'updated_at');
         $sortOrder = $request->get('order', 'desc');
-        
+
         if ($sortBy === 'price_low') {
             $query->orderBy('nft_price', 'asc');
         } elseif ($sortBy === 'price_high') {
@@ -368,13 +368,13 @@ class AdminController extends Controller
         // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('transaction_amount', 'like', '%' . $search . '%')
-                  ->orWhere('transaction_type', 'like', '%' . $search . '%')
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', '%' . $search . '%')
-                                ->orWhere('email', 'like', '%' . $search . '%');
-                  });
+                    ->orWhere('transaction_type', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%');
+                    });
             });
         }
 
@@ -459,14 +459,14 @@ class AdminController extends Controller
         // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('ntf_name', 'like', '%' . $search . '%')
-                  ->orWhere('ntf_owner', 'like', '%' . $search . '%')
-                  ->orWhere('ntf_description', 'like', '%' . $search . '%')
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', '%' . $search . '%')
-                                ->orWhere('email', 'like', '%' . $search . '%');
-                  });
+                    ->orWhere('ntf_owner', 'like', '%' . $search . '%')
+                    ->orWhere('ntf_description', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%');
+                    });
             });
         }
 
@@ -498,7 +498,59 @@ class AdminController extends Controller
         return view('admin.all_nft', ['nfts' => $eth, 'stats' => $stats]);
     }
 
+    public function adminUpdateProfilePicture(Request $request, $id)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
 
+        $user = User::find($id);
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        if ($request->hasFile('profile_picture')) {
+            try {
+                $cloudinary = new \Cloudinary\Cloudinary();
+                $uploadApi = $cloudinary->uploadApi();
+
+                // Delete old profile picture if exists
+                if ($user->profile_picture_public_id) {
+                    try {
+                        $uploadApi->destroy($user->profile_picture_public_id);
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Cloudinary profile picture deletion failed: ' . $e->getMessage());
+                    }
+                }
+
+                // Upload new profile picture to Cloudinary
+                $uploadResult = $uploadApi->upload(
+                    $request->file('profile_picture')->getRealPath(),
+                    [
+                        'folder' => 'profile_pictures',
+                        'resource_type' => 'image',
+                        'format' => 'jpg',
+                        'quality' => 'auto:best',
+                        'transformation' => [
+                            ['width' => 500, 'height' => 500, 'crop' => 'fill', 'gravity' => 'face']
+                        ]
+                    ]
+                );
+
+                $user->profile_picture = $uploadResult['secure_url'];
+                $user->profile_picture_public_id = $uploadResult['public_id'];
+                $user->save();
+
+                return redirect()->back()->with('message', 'Profile picture updated successfully!');
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Cloudinary profile picture upload failed: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Profile picture upload failed. Please try again.');
+            }
+        }
+
+        return redirect()->back()->with('error', 'No image file provided.');
+    }
 
     public function userProfile($id)
     {
@@ -539,14 +591,10 @@ class AdminController extends Controller
             ->where('status', '1')
             ->sum('transaction_amount');
 
-        $deposit_eth = 0;
-
         $withdrawal = Transaction::where('user_id', $id)
             ->where('transaction_type', 'Withdrawal')
-            ->where('status', '1')
+            ->whereIn('status', ['0', '1'])
             ->sum('transaction_amount');
-
-        $withdrawal_eth = 0;
 
         $add_profit = Transaction::where('user_id', $id)
             ->where('transaction_type', 'Profit')
@@ -559,23 +607,17 @@ class AdminController extends Controller
             ->sum('transaction_amount');
 
         $profit = $add_profit - $debit_profit;
-        $profit_eth = 0;
 
         $balance = $deposit + $profit - $withdrawal;
-        $balance_eth = 0;
 
         // 6. Prepare data array
         $data = [
             'deposit' => $deposit,
-            'deposit_eth' => $deposit_eth,
             'withdrawal' => $withdrawal,
-            'withdrawal_eth' => $withdrawal_eth,
             'add_profit' => $add_profit,
             'debit_profit' => $debit_profit,
             'profit' => $profit,
-            'profit_eth' => $profit_eth,
             'balance' => $balance,
-            'balance_eth' => $balance_eth,
             'extension' => $extension,
 
         ];
@@ -704,10 +746,10 @@ class AdminController extends Controller
         try {
             $admin->password = Hash::make($request->new_password);
             $admin->save();
-            
+
             Session::flush();
             Auth::guard('admin')->logout();
-            
+
             return redirect()->route('admin.login')->with('status', 'Password updated successfully! Please log in with your new password.');
         } catch (\Exception $e) {
             return back()->withInput()->with("error", "Failed to update password. Please try again.");
@@ -726,23 +768,9 @@ class AdminController extends Controller
         $nft['status'] = $request->status;
         $update = DB::table('nfts')->where('id', $id)->update($nft);
 
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-
-
-
 
         $amount = $nft_price;
         $data['amount'] = $amount;
-        $data['eth'] = $data['amount'] / $price;
 
 
         $ref = rand(76503737, 12344994);
@@ -751,7 +779,6 @@ class AdminController extends Controller
 
         $user = [
             'amount' => $request['nft_price'],
-            'eth' => $data['eth'],
             'name' => $request['nft_name'],
             'status' => 'Approved',
             'ref' => $ref,
@@ -800,22 +827,20 @@ class AdminController extends Controller
 
     public function addProfit(Request $request)
     {
-
-
-
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
 
         $transaction = new Transaction;
-        $transaction->user_id = $request['id'];
+        $transaction->user_id = $request->id;
         $transaction->transaction_type = "Profit";
-        $transaction->transaction_amount = $request['amount'];
+        $transaction->transaction_amount = $request->amount;
+        $transaction->transaction_id = 'PROFIT_' . time() . '_' . rand(1000, 9999);
         $transaction->status = 1;
         $transaction->save();
 
-
-
-
-
-        return back()->with('status', 'profit added successfully');
+        return back()->with('status', 'Profit added successfully!');
     }
 
     public function withdrawalCode(Request $request, $id)
@@ -836,22 +861,20 @@ class AdminController extends Controller
 
     public function debitProfit(Request $request)
     {
-
-
-
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
 
         $transaction = new Transaction;
-        $transaction->user_id = $request['id'];
+        $transaction->user_id = $request->id;
         $transaction->transaction_type = "DebitProfit";
-        $transaction->transaction_amount = $request['amount'];
+        $transaction->transaction_amount = $request->amount;
+        $transaction->transaction_id = 'DEBIT_' . time() . '_' . rand(1000, 9999);
         $transaction->status = 1;
         $transaction->save();
 
-
-
-
-
-        return back()->with('status', 'profit Reduced successfully');
+        return back()->with('status', 'Profit deducted successfully!');
     }
 
     public function useLinking($id)
@@ -878,25 +901,6 @@ class AdminController extends Controller
 
     private function processData($nft)
     {
-
-
-        $client = new Client();
-        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-            'query' => [
-                'ids' => 'ethereum',
-                'vs_currencies' => 'usd',
-            ],
-        ]);
-        // Decode the JSON response
-        $data = json_decode($response->getBody(), true);
-        $price = $data['ethereum']['usd'];
-        // Perform any data processing or manipulation here
-        // For example, you can add new attributes, format data, etc.
-
-        foreach ($nft as $data) {
-            $data->nft_eth_price = $data->nft_price / $price;
-        }
-
         return $nft;
     }
 
@@ -1246,7 +1250,7 @@ class AdminController extends Controller
     {
         // Deactivate all currencies
         \App\Models\CurrencySetting::where('is_active', true)->update(['is_active' => false]);
-        
+
         // Activate selected currency
         $currency = \App\Models\CurrencySetting::findOrFail($id);
         $currency->is_active = true;
@@ -1258,7 +1262,7 @@ class AdminController extends Controller
     public function deleteCurrency($id)
     {
         $currency = \App\Models\CurrencySetting::findOrFail($id);
-        
+
         // Prevent deleting active currency
         if ($currency->is_active) {
             return back()->with('error', 'Cannot delete active currency. Please activate another currency first.');
@@ -1278,53 +1282,34 @@ class AdminController extends Controller
     {
         try {
             $client = new \GuzzleHttp\Client(['timeout' => 10]);
-            
+
             // Get all currencies except USD
             $currencies = \App\Models\CurrencySetting::where('currency_code', '!=', 'USD')->get();
-            
+
             if ($currencies->isEmpty()) {
                 return back()->with('info', 'No currencies to update (excluding USD).');
             }
 
             // Build currency codes for API
-            $currencyCodes = $currencies->pluck('currency_code')->map(function($code) {
+            $currencyCodes = $currencies->pluck('currency_code')->map(function ($code) {
                 return strtolower($code);
             })->implode(',');
 
-            // Fetch exchange rates from CoinGecko (free API)
-            $response = $client->get('https://api.coingecko.com/api/v3/simple/supported_vs_currencies');
-            $supportedCurrencies = json_decode($response->getBody(), true);
+            // Fetch exchange rates from ExchangeRate API (free)
+            $response = $client->get('https://api.exchangerate-api.com/v4/latest/USD', [
+                'timeout' => 10,
+            ]);
+            $ratesData = json_decode($response->getBody(), true);
 
             $updated = 0;
             foreach ($currencies as $currency) {
-                $code = strtolower($currency->currency_code);
-                
-                // Check if currency is supported by CoinGecko
-                if (in_array($code, $supportedCurrencies)) {
-                    try {
-                        // Get exchange rate (USD to currency)
-                        $response = $client->get('https://api.coingecko.com/api/v3/simple/price', [
-                            'query' => [
-                                'ids' => 'usd-coin',
-                                'vs_currencies' => $code,
-                            ],
-                        ]);
-                        
-                        $data = json_decode($response->getBody(), true);
-                        
-                        // This gives us USDC price in the target currency
-                        // We need to invert it to get USD to currency rate
-                        if (isset($data['usd-coin'][$code])) {
-                            // USDC is pegged to USD, so we can use this
-                            $rate = 1 / $data['usd-coin'][$code];
-                            $currency->exchange_rate = $rate;
-                            $currency->save();
-                            $updated++;
-                        }
-                    } catch (\Exception $e) {
-                        // Skip currencies that fail
-                        continue;
-                    }
+                $code = strtoupper($currency->currency_code);
+
+                if (isset($ratesData['rates'][$code])) {
+                    $rate = $ratesData['rates'][$code];
+                    $currency->exchange_rate = $rate;
+                    $currency->save();
+                    $updated++;
                 }
             }
 
@@ -1347,7 +1332,7 @@ class AdminController extends Controller
 
             $client = new \GuzzleHttp\Client(['timeout' => 10]);
             $currencyCode = strtoupper($code);
-            
+
             // Use free ExchangeRate-API (no API key required)
             // This API provides USD to other currencies
             try {
@@ -1355,7 +1340,7 @@ class AdminController extends Controller
                     'timeout' => 10,
                 ]);
                 $data = json_decode($response->getBody(), true);
-                
+
                 if (isset($data['rates'][$currencyCode])) {
                     $rate = $data['rates'][$currencyCode];
                     return response()->json(['rate' => round($rate, 8), 'success' => true]);
@@ -1363,7 +1348,7 @@ class AdminController extends Controller
             } catch (\Exception $e) {
                 // Fallback to alternative free API
             }
-            
+
             // Fallback: Use exchangerate.host (free, no API key)
             try {
                 $response = $client->get("https://api.exchangerate.host/latest", [
@@ -1374,7 +1359,7 @@ class AdminController extends Controller
                     'timeout' => 10,
                 ]);
                 $data = json_decode($response->getBody(), true);
-                
+
                 if (isset($data['rates'][$currencyCode])) {
                     $rate = $data['rates'][$currencyCode];
                     return response()->json(['rate' => round($rate, 8), 'success' => true]);
@@ -1382,7 +1367,7 @@ class AdminController extends Controller
             } catch (\Exception $e) {
                 // Try one more free API
             }
-            
+
             // Final fallback: Use fixer.io free tier (requires free account but works)
             // Note: This is just a backup, the above should work
             return response()->json(['success' => false, 'message' => 'Exchange rate not found. Please enter manually.'], 404);
@@ -1393,7 +1378,7 @@ class AdminController extends Controller
     public function deleteNft($id)
     {
         $nft = Nft::findOrFail($id);
-        
+
         // Delete image if local
         if ($nft->ntf_image && file_exists(public_path($nft->ntf_image))) {
             @unlink(public_path($nft->ntf_image));
@@ -1433,7 +1418,7 @@ class AdminController extends Controller
         $nft->ntf_name = $request->ntf_name;
         $nft->nft_price = $request->nft_price;
         $nft->ntf_description = $request->ntf_description;
-        
+
         if ($request->has('status')) {
             $nft->status = $request->status;
         }
@@ -1446,7 +1431,7 @@ class AdminController extends Controller
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('user/uploads/nfts'), $filename);
-            
+
             // Delete old local image if it exists and isn't a URL
             if ($nft->ntf_image && !Str::startsWith($nft->ntf_image, ['http', 'https'])) {
                 $oldPath = public_path('user/uploads/nfts/' . $nft->ntf_image);

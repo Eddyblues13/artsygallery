@@ -5,7 +5,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-	<title>Artsygalley</title>
+	<title>Artisttocollectors</title>
 
 	<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap"
 		rel="stylesheet" />
@@ -218,9 +218,9 @@
 						</p>
 						<p style='line-height: 24px;margin-bottom:15px;'>
 							To complete the final stages, please sign in to your account on our corporate website and
-							verify that the amount summing {{$data['nft_eth_price']}}ETH you offered for the purchase
-							has been successfully credited to your Artsygalley Wallet in current market value conversion
-							{{$data['nft_price']}} USD.
+							verify that the amount of
+							{{$data['nft_price']}} USD you offered for the purchase
+							has been successfully credited to your Artisttocollectors Wallet.
 						</p>
 						<p style='line-height: 24px;margin-bottom:15px;'>
 							Please ensure that you complete the payment process for any outstanding Refundable Caution
@@ -241,7 +241,7 @@
 				<tr class="proton-tr">
 					<td class="proton-td" colspan="10" style="">
 						<h3>Warm regards,</h3>
-						<p>Artsygalley Inc.</p>
+						<p>Artisttocollectors Inc.</p>
 					</td>
 				</tr>
 
@@ -249,7 +249,7 @@
 					<td class="proton-td" colspan="10" style="">
 						<div class="proton-divider"></div>
 						<center>
-							<span style="color: #706d6b"> © 2024 Artsygalley</span>
+							<span style="color: #706d6b"> © 2024 Artisttocollectors</span>
 						</center>
 						<div class="proton-flex">
 							<a href="https://proton.me" class="proton-link">

@@ -137,7 +137,7 @@ class CustomAuthController extends Controller
 
         $data['withdrawal'] = Transaction::where('user_id', $userId)
             ->where('transaction_type', 'Withdrawal')
-            ->where('status', '1')
+            ->whereIn('status', ['0', '1'])
             ->sum('transaction_amount');
 
         $data['add_profit'] = Transaction::where('user_id', $userId)
@@ -151,7 +151,7 @@ class CustomAuthController extends Controller
             ->sum('transaction_amount');
 
         $data['profit'] = $data['add_profit'] - $data['debit_profit'];
-        $data['balance'] = $data['deposit'] + $data['profit'] - $data['withdrawal'];
+        $data['balance'] = max(0, $data['deposit'] + $data['profit'] - $data['withdrawal']);
 
         // ✅ conversions only if price is valid
         $data['deposit_eth'] = 0;
@@ -217,9 +217,9 @@ class CustomAuthController extends Controller
         // ✅ combine 4 digits (you were using only digit1 before)
         $code = trim(
             ($request->input('digit') ?? '') .
-            ($request->input('digit2') ?? '') .
-            ($request->input('digit3') ?? '') .
-            ($request->input('digit4') ?? '')
+                ($request->input('digit2') ?? '') .
+                ($request->input('digit3') ?? '') .
+                ($request->input('digit4') ?? '')
         );
 
         if (strlen($code) !== 4 || !ctype_digit($code)) {

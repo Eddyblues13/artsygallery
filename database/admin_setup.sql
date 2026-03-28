@@ -24,6 +24,6 @@ CREATE TABLE IF NOT EXISTS `admin_password_reset_tokens` (
 -- Insert admin users
 -- Password for both: admin123 (bcrypt hashed)
 INSERT INTO `admins` (`name`, `email`, `password`, `is_active`, `created_at`, `updated_at`) VALUES
-('Super Admin', 'admin@artsygalley.com', '$2y$12$kWuVC2kxZJoOHwm7gIZPY.CHuOEEkGtlG7fHgB7luDhmi6yoNWwZm', 1, NOW(), NOW()),
-('Administrator', 'administrator@artsygalley.com', '$2y$12$kWuVC2kxZJoOHwm7gIZPY.CHuOEEkGtlG7fHgB7luDhmi6yoNWwZm', 1, NOW(), NOW())
+('Super Admin', 'admin@artisttocollectors.com', '$2y$12$kWuVC2kxZJoOHwm7gIZPY.CHuOEEkGtlG7fHgB7luDhmi6yoNWwZm', 1, NOW(), NOW()),
+('Administrator', 'administrator@artisttocollectors.com', '$2y$12$kWuVC2kxZJoOHwm7gIZPY.CHuOEEkGtlG7fHgB7luDhmi6yoNWwZm', 1, NOW(), NOW())
 ON DUPLICATE KEY UPDATE `updated_at` = NOW();

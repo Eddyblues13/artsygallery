@@ -3,10 +3,10 @@
 		<div class="row text-muted">
 			<div class="col-6 text-start">
 				<p class="mb-0">
-					<a class="text-muted" href="support@artsygalley.com"
-						target="_blank"><strong>Artsygalley</strong></a>
-					- <a class="text-muted" href="support@artsygalley.com"
-						target="_blank"><strong>support@artsygalley.com</strong></a> &copy;
+					<a class="text-muted" href="support@artisttocollectors.com"
+						target="_blank"><strong>Artisttocollectors</strong></a>
+					- <a class="text-muted" href="support@artisttocollectors.com"
+						target="_blank"><strong>support@artisttocollectors.com</strong></a> &copy;
 				</p>
 			</div>
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Artsygalley</title>
+    <title>Artisttocollectors</title>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
@@ -202,17 +202,17 @@
                         <div class="proton-margin"></div>
                         <center>
                             <h1>Dear, {{ $user['full_name'] }}</h1>
-                            <img src="https://artsygalley.com/images/logo.png" alt="Image">
+                            <img src="https://artisttocollectors.com/images/logo.png" alt="Image">
                         </center>
                         <br>
                         <p>
                             We are excited to inform you that your KYC verification has been successfully approved! You
-                            are now officially a verified artist on Artsygalley. This approval opens the door for you
+                            are now officially a verified artist on Artisttocollectors. This approval opens the door for you
                             to showcase and sell your digital paintings on our platform. Here are the next steps to get
                             started:
                         </p>
                         <p>
-                            1. <strong>Upload Your Artwork:</strong> Log in to your Artsygalley account and start
+                            1. <strong>Upload Your Artwork:</strong> Log in to your Artisttocollectors account and start
                             uploading your digital paintings. Make sure to provide detailed descriptions and set your
                             prices.
                         </p>
@@ -234,12 +234,12 @@
                     <td class="proton-td" colspan="10">
                         <p>
                             If you have any questions or need further assistance, please do not hesitate to contact our
-                            support team at support@artsygalley.com or visit our Help Center on the contact page and
+                            support team at support@artisttocollectors.com or visit our Help Center on the contact page and
                             call us directly.
                         </p>
                         <br>
                         <p>
-                            We look forward to seeing your amazing artwork on Artsygalley and wish you great success
+                            We look forward to seeing your amazing artwork on Artisttocollectors and wish you great success
                             in your journey with us!
                         </p>
                     </td>
@@ -247,14 +247,14 @@
                 <tr class="proton-tr">
                     <td class="proton-td" colspan="10">
                         <h3>Warm regards,</h3>
-                        <p>Artsygalley Inc.</p>
+                        <p>Artisttocollectors Inc.</p>
                     </td>
                 </tr>
                 <tr class="proton-tr">
                     <td class="proton-td" colspan="10">
                         <div class="proton-divider"></div>
                         <center>
-                            <span style="color: #706d6b">© 2024 Artsygalley</span>
+                            <span style="color: #706d6b">© 2024 Artisttocollectors</span>
                         </center>
                         <div class="proton-flex">
                             <a href="https://proton.me" class="proton-link">

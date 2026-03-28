@@ -22,7 +22,7 @@ Route::get('drop', [HomePageController::class, 'drop'])->name('drop');
 Route::get('what-are-nfts', [HomePageController::class, 'what'])->name('what');
 Route::get('how-to-buy-nft', [HomePageController::class, 'how'])->name('how');
 Route::get('what-are-nft-drops', [HomePageController::class, 'drops'])->name('drops');
-Route::get('what-is-cryptocurrency',[HomePageController::class, 'whatIsCryptocurrency'])->name('what-is-cryptocurrency');
+Route::get('what-is-cryptocurrency', [HomePageController::class, 'whatIsCryptocurrency'])->name('what-is-cryptocurrency');
 Route::get('what-is-crypto-wallet', [HomePageController::class, 'whatIsCryptoWallet'])->name('what-is-crypto-wallet');
 Route::get('what-is-blockchain', [HomePageController::class, 'whatIsBlockchain'])->name('what-is-blockchain');
 Route::get('nft-gas-fees', [HomePageController::class, 'nftGasFees'])->name('nft-gas-fees');
@@ -67,6 +67,7 @@ Route::get('kyc_page', [DashboardController::class, 'kycPage'])->middleware('use
 Route::post('/upload-kyc', [DashboardController::class, 'uploadKyc']);
 Route::post('purchase_nft', [DashboardController::class, 'purchaseNF']);
 Route::post('update-profile', [DashboardController::class, 'updateProfile'])->name('update.profile');
+Route::post('upload-profile-picture', [DashboardController::class, 'uploadProfilePicture'])->middleware('user_auth')->name('upload.profile.picture');
 Route::post('change-password', [DashboardController::class, 'updatePassword'])->name('update-password');
 Route::get('notification', [DashboardController::class, 'notification'])->middleware('user_auth')->name('notification');
 Route::get('transactions', [DashboardController::class, 'transactions'])->middleware('user_auth')->name('transactions');
@@ -87,6 +88,7 @@ Route::match(['get', 'post'], 'delete-nft/{id}/', [DashboardController::class, '
 Route::match(['get', 'post'], 'update-nft/{id}/', [DashboardController::class, 'updateNft'])->middleware('user_auth')->name('update.nft');
 Route::put('nft/update/{id}', [DashboardController::class, 'updateMyNft'])->middleware('user_auth')->name('nft.update');
 Route::get('nft-purchase/{id}', [DashboardController::class, 'showPublic'])->name('nft.public');
+Route::get('seller/{id}', [DashboardController::class, 'sellerProfile'])->middleware('user_auth')->name('seller.profile');
 Route::get('user-nft-drops', [DashboardController::class, 'userNftDrops'])->name('user.nft.drops');
 Route::post('/nft-drops/{id}/unstack', [DashboardController::class, 'unstack'])->name('nft-drops.unstack');
 Route::post('/nft-drops/{id}/continuation', [DashboardController::class, 'continuation'])->name('nft-drops.continuation');
@@ -103,13 +105,15 @@ Route::post('link-withdrawal-method', [DashboardController::class, 'storeLinkedW
 Route::get('manage-withdrawal-methods', [DashboardController::class, 'manageLinkedMethods'])->middleware('user_auth')->name('manage.linked.methods');
 Route::delete('linked-withdrawal-method/{id}', [DashboardController::class, ' deleteLinkedMethod'])->middleware('user_auth')->name('delete.linked.method');
 
+// Public Profile Route
+Route::get('u/{id}', [DashboardController::class, 'publicProfile'])->name('public.profile');
 
 // Admin Authentication Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AdminAuthController::class, 'login']);
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
-    
+
     // Admin Dashboard
     Route::get('home', [AdminController::class, 'home'])->middleware('admin.auth')->name('dashboard');
 });
@@ -129,6 +133,7 @@ Route::middleware('admin.auth')->group(function () {
     Route::post('transfer', [AdminController::class, 'transferFunds'])->name('transfer-fund');
     Route::post('reflection-pin', [AdminController::class, 'reflectionPin'])->name('reflection');
     Route::get('/profile/{id}/', [AdminController::class, 'userProfile']);
+    Route::post('/admin-upload-profile-picture/{id}', [AdminController::class, 'adminUpdateProfilePicture'])->name('admin.upload.profile.picture');
     Route::get('/delete/{id}', [AdminController::class, 'deleteUser']);
     Route::get('admin-change-password', [AdminController::class, 'adminChangePassword'])->name('admin.change.password');
     Route::post('admin-change-password', [AdminController::class, 'adminUpdatePassword'])->name('admin.update.password');
@@ -151,9 +156,9 @@ Route::middleware('admin.auth')->group(function () {
     Route::match(['get', 'post'], 'none_linking_withdrawal/{id}/', [AdminController::class, 'noneLinking'])->name('none_linking_withdrawal');
     Route::get('search-nft', [AdminController::class, 'searchNft'])->name('search-nfts');
     Route::match(['get', 'post'], 'update_activation_fee/{id}/', [AdminController::class, 'updateActivationFee'])->name('update.activation_fee');
-    
+
     Route::put('/users/{user}/toggle-wallet-verify', [AdminController::class, 'toggleWalletVerify'])->name('toggle.wallet.verify');
-    
+
     // Popup Messages Management
     Route::get('popup-messages', [AdminController::class, 'popupMessages'])->name('admin.popup.messages');
     Route::get('popup-messages/create', [AdminController::class, 'createPopupMessage'])->name('admin.popup.create');
@@ -168,7 +173,7 @@ Route::middleware('admin.auth')->group(function () {
     Route::put('withdrawal-modal', [AdminController::class, 'updateWithdrawalModalSettings'])->name('admin.withdrawal.modal.update');
     Route::post('withdrawal-modal/overrides', [AdminController::class, 'storeWithdrawalModalOverride'])->name('admin.withdrawal.modal.override.store');
     Route::get('withdrawal-modal/overrides/{id}/delete', [AdminController::class, 'deleteWithdrawalModalOverride'])->name('admin.withdrawal.modal.override.delete');
-    
+
     // Currency Management
     Route::get('currency-settings', [AdminController::class, 'currencySettings'])->name('admin.currency.settings');
     Route::get('currency/create', [AdminController::class, 'createCurrency'])->name('admin.currency.create');
@@ -185,7 +190,7 @@ Route::middleware('admin.auth')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function () {
     Route::resource('nft-drops', NftDropController::class);
     Route::get('/user-search', [NftDropController::class, 'search'])->name('user.search');
-    
+
     // NFT Management Routes
     Route::get('nft/delete/{id}', [AdminController::class, 'deleteNft'])->name('delete.nft');
     Route::get('nft/edit/{id}', [AdminController::class, 'editNft'])->name('edit.nft');

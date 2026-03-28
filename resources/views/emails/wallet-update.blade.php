@@ -21,11 +21,11 @@
         of security and compliance.</p>
 
     <p>Your what's assistance will give guidance throughout the process you have any questions or require further
-        assistance, please do not hesitate to contact our support team at: support@artsygalley.com</p>
+        assistance, please do not hesitate to contact our support team at: support@artisttocollectors.com</p>
 
     <p>Warm regards,<br>
         CEO.<br>
-        Artsygalley.com</p>
+        artisttocollectors.com</p>
 </body>
 
 </html>

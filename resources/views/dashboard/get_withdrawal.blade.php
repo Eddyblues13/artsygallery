@@ -63,6 +63,14 @@
 					<div class="card-body">
 						@include('dashboard.alert')
 
+						<div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+							<i class="align-middle me-2" data-feather="info"></i>
+							<div>
+								<strong>Available Balance:</strong>
+								{{ \App\Helpers\CurrencyHelper::format($availableBalance ?? 0, 2) }}
+							</div>
+						</div>
+
 						<form method="post" action="{{ route('make.withdrawal') }}" id="withdrawalForm">
 							@csrf
 
@@ -85,11 +93,13 @@
 										placeholder="Enter amount"
 										required
 										min="1"
+										max="{{ $availableBalance ?? 0 }}"
 										step="0.01"
 										value="{{ old('amount') }}"
 									>
 								</div>
-								<small class="text-muted">Minimum withdrawal: {{ $activeCurrency->currency_symbol ?? '$' }}1.00</small>
+								<small class="text-muted">Minimum withdrawal: {{ $activeCurrency->currency_symbol ?? '$' }}1.00 &mdash; Maximum: {{ \App\Helpers\CurrencyHelper::format($availableBalance ?? 0, 2) }}</small>
+								<div id="balanceWarning" class="text-danger small mt-1" style="display:none;">Amount exceeds your available balance!</div>
 							</div>
 
 							<!-- Method Selection (vertical, simple radios) -->
@@ -199,6 +209,25 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		if (window.feather) {
 			feather.replace();
+		}
+
+		// Client-side balance validation
+		var amountInput = document.getElementById('amount');
+		var balanceWarning = document.getElementById('balanceWarning');
+		var submitBtn = document.querySelector('#withdrawalForm button[type="submit"]');
+		var maxBalance = {{ $availableBalance ?? 0 }};
+
+		if (amountInput) {
+			amountInput.addEventListener('input', function() {
+				var val = parseFloat(this.value) || 0;
+				if (val > maxBalance) {
+					balanceWarning.style.display = 'block';
+					submitBtn.disabled = true;
+				} else {
+					balanceWarning.style.display = 'none';
+					submitBtn.disabled = false;
+				}
+			});
 		}
 	});
 </script>

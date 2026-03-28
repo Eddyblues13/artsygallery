@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Artsygalley</title>
+    <title>Artisttocollectors</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -122,45 +122,45 @@
         <div class="rightbar-overlay"></div>
 
         <!-- JAVASCRIPT -->
-        <script src="https://artsygalley.com/assets/libs/jquery/jquery.min.js"></script>
-        <script src="https://artsygalley.com/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="https://artsygalley.com/assets/libs/metismenu/metisMenu.min.js"></script>
-        <script src="https://artsygalley.com/assets/libs/simplebar/simplebar.min.js"></script>
-        <script src="https://artsygalley.com/assets/libs/node-waves/waves.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/libs/jquery/jquery.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/libs/metismenu/metisMenu.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/libs/simplebar/simplebar.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/libs/node-waves/waves.min.js"></script>
 
         <!-- apexcharts -->
-        <script src="https://artsygalley.com/assets/libs/apexcharts/apexcharts.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/libs/apexcharts/apexcharts.min.js"></script>
 
         <!-- dashboard init -->
-        <script src="https://artsygalley.com/assets/js/pages/dashboard.init.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/pages/dashboard.init.js"></script>
 
         <!-- Bootstrap Toasts Js -->
-        <script src="https://artsygalley.com/assets/js/pages/bootstrap-toastr.init.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/pages/bootstrap-toastr.init.js"></script>
 
         <!-- App js -->
-        <script src="https://artsygalley.com/assets/js/app.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/app.js"></script>
 
 
         <!-- Required jQuery first, then Bootstrap Bundle JS -->
-        <script src="https://artsygalley.com/assets/js/jquery.min.js"></script>
-        <script src="https://artsygalley.com/assets/js/bootstrap.bundle.min.js"></script>
-        <script src="https://artsygalley.com/assets/js/modernizr.js"></script>
-        <script src="https://artsygalley.com/assets/js/moment.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/jquery.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/bootstrap.bundle.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/modernizr.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/moment.js"></script>
 
         <!-- *************
 			************ Vendor Js Files *************
 		************* -->
 
         <!-- Overlay Scroll JS -->
-        <script src="https://artsygalley.com/assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
-        <script src="https://artsygalley.com/assets/vendor/overlay-scroll/custom-scrollbar.js"></script>
+        <script src="https://artisttocollectors.com/assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/vendor/overlay-scroll/custom-scrollbar.js"></script>
 
         <!-- News ticker -->
-        <script src="https://artsygalley.com/assets/vendor/newsticker/newsTicker.min.js"></script>
-        <script src="https://artsygalley.com/assets/vendor/newsticker/custom-newsTicker.js"></script>
+        <script src="https://artisttocollectors.com/assets/vendor/newsticker/newsTicker.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/vendor/newsticker/custom-newsTicker.js"></script>
 
         <!-- Main Js Required -->
-        <script src="https://artsygalley.com/assets/js/main.js"></script>
+        <script src="https://artisttocollectors.com/assets/js/main.js"></script>
 </body>
 
 </html>
@@ -169,7 +169,7 @@
     $('#logout_account, #logout_account1').click(function() {
         $.ajax({
             type: 'GET',
-            url: 'https://artsygalley.com/log_out',
+            url: 'https://artisttocollectors.com/log_out',
             dataType: 'json',
             success: function(data) {
                 $('.logout').html(data.content);

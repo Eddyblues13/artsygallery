@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Artsygalley| ACCOUNT</title>
+    <title>Artisttocollectors| ACCOUNT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -100,7 +100,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script> Copyright
-                        <i class="bx bx-check-shield text-success"></i>Artsygalley
+                        <i class="bx bx-check-shield text-success"></i>Artisttocollectors
                     </p>
                 </div>
 

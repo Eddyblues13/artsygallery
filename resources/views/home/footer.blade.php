@@ -1,82 +1,82 @@
 <!-- Footer -->
-<footer class="bg-gray-900 text-white py-16">
-    <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div class="lg:col-span-1">
-                <img class="mb-4 h-12 w-auto" src="images/logoh.png" alt="Artsygalley Logo" />
-                <p class="text-gray-400 leading-relaxed">
-                    The world's premier and largest digital marketplace for crypto collectibles and non-fungible
-                    tokens (NFTs). Explore, buy, and sell unique digital items.
+<footer class="bg-slate-50 border-t border-slate-200 text-slate-600 py-16 md:py-20 mt-auto">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
+            <div class="lg:col-span-4 pr-0 lg:pr-12">
+                <a href="{{route('homepage')}}" class="block mb-6">
+                    <img class="h-10 sm:h-12 w-auto" src="images/logo.png" alt="Artisttocollectors Logo" />
+                </a>
+                <p class="text-slate-500 leading-relaxed text-sm md:text-base">
+                    The world's first and largest digital marketplace for crypto collectibles and non-fungible
+                    tokens (NFTs). Buy, sell, and discover exclusive digital items.
                 </p>
             </div>
-            <div>
-                <h4 class="font-bold text-lg mb-4">Home</h4>
-                <ul class="space-y-2">
-                    <li><a href="{{route('homepage')}}" class="text-gray-400 hover:text-white transition-colors">Homepage</a></li>
-                    <li><a href="{{route('about')}}" class="text-gray-400 hover:text-white transition-colors">About</a></li>
-                    <li><a href="{{route('contact')}}" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+            
+            <div class="lg:col-span-2">
+                <h4 class="font-bold text-slate-900 text-lg mb-6">Marketplace</h4>
+                <ul class="space-y-4">
+                    <li><a href="{{route('homepage')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">All NFTs</a></li>
+                    <li><a href="{{route('homepage')}}#explore" class="text-slate-500 hover:text-primary font-medium transition-colors">New Drops</a></li>
+                    <li><a href="{{route('about')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">About Us</a></li>
+                    <li><a href="{{route('contact')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">Contact</a></li>
                 </ul>
             </div>
-            <div>
-                <h4 class="font-bold text-lg mb-4">Profile</h4>
-                <ul class="space-y-2">
+            
+            <div class="lg:col-span-2">
+                <h4 class="font-bold text-slate-900 text-lg mb-6">My Account</h4>
+                <ul class="space-y-4">
                     @if (auth()->check())
-                        <li><a href="{{route('home')}}" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
-                        <li><a href="{{route('home')}}" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                        <li><a href="{{route('home')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">Profile</a></li>
+                        <li><a href="{{route('home')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">Favorites</a></li>
+                        <li><a href="{{route('home')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">Watchlist</a></li>
                     @else
-                        <li><a href="{{route('register')}}" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
-                        <li><a href="{{route('login')}}" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                        <li><a href="{{route('register')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">Sign Up</a></li>
+                        <li><a href="{{route('login')}}" class="text-slate-500 hover:text-primary font-medium transition-colors">Login</a></li>
                     @endif
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Security</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Activity</a></li>
                 </ul>
             </div>
-            <div class="lg:col-span-1">
-                <h4 class="font-bold text-lg mb-4">Learn</h4>
+            
+            <div class="lg:col-span-4">
+                <h4 class="font-bold text-slate-900 text-lg mb-6">Resources</h4>
                 <div class="grid grid-cols-2 gap-4">
-                    <ul class="space-y-2">
-                        <li><a href="{{route('what')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is an NFT?</a></li>
-                        <li><a href="{{route('how')}}" class="text-gray-400 hover:text-white transition-colors text-sm">How to buy an NFT</a></li>
-                        <li><a href="{{route('drops')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What are NFT drops?</a></li>
-                        <li><a href="{{route('what-is-crypto-wallet')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is a crypto wallet?</a></li>
+                    <ul class="space-y-4">
+                        <li><a href="{{route('what')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">What is an NFT?</a></li>
+                        <li><a href="{{route('how')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">How to buy an NFT</a></li>
+                        <li><a href="{{route('drops')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">What are drops?</a></li>
+                        <li><a href="{{route('what-is-crypto-wallet')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">Crypto wallets</a></li>
                     </ul>
-                    <ul class="space-y-2">
-                        <li><a href="{{route('what-is-cryptocurrency')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is cryptocurrency?</a></li>
-                        <li><a href="{{route('nft-gas-fees')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What are blockchain gas fees?</a></li>
-                        <li><a href="{{route('what-is-web3')}}" class="text-gray-400 hover:text-white transition-colors text-sm">What is web3?</a></li>
+                    <ul class="space-y-4">
+                        <li><a href="{{route('what-is-cryptocurrency')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">Cryptocurrency</a></li>
+                        <li><a href="{{route('nft-gas-fees')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">Gas fees</a></li>
+                        <li><a href="{{route('what-is-web3')}}" class="text-slate-500 hover:text-primary font-medium transition-colors text-sm">What is Web3?</a></li>
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="border-t border-gray-800">
-        <div class="container mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-4 md:mb-0">
-                    <p class="text-gray-400 text-sm">
-                        © Copyright 2024 <a href="#" class="text-white hover:text-primary transition-colors">Artsygalley</a>
-                        All Rights Reserved
-                    </p>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                        <i class="bi bi-facebook"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                        <i class="bi bi-twitter"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                        <i class="bi bi-linkedin"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                        <i class="bi bi-youtube"></i>
-                    </a>
-                </div>
+        
+        <div class="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-slate-500 text-sm font-medium">
+                © Copyright 2024 <a href="#" class="text-primary hover:text-primary-dark font-bold transition-colors">Artisttocollectors</a>
+                All Rights Reserved
+            </div>
+            
+            <div class="flex space-x-3">
+                <a href="#" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-xl flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-1">
+                    <i class="bi bi-twitter"></i>
+                </a>
+                <a href="#" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-xl flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-1">
+                    <i class="bi bi-instagram"></i>
+                </a>
+                <a href="#" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-xl flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-1">
+                    <i class="bi bi-discord"></i>
+                </a>
+                <a href="#" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-xl flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-1">
+                    <i class="bi bi-youtube"></i>
+                </a>
             </div>
         </div>
     </div>
 </footer>
-
 <!-- End Footer -->
 </div>
 

@@ -11,7 +11,7 @@
     <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet'>
     <!--<![endif]-->
 
-    <title>Artsygalley</title>
+    <title>Artisttocollectors</title>
 
     <style type='text/css'>
         body {
@@ -211,13 +211,13 @@
                         <br>
                         <p style='line-height: 24px; margin-bottom:20px;'>
                             Connect with our media personnel if you are running into problems at
-                            <a href='mailto:support@Artsygalley ' style='color: blue; font-size: 20px; font-family: '
-                                Hind Siliguri', Calibri, Sans-serif; font-weight: 400;'>support@Artsygalley </a>
+                            <a href='mailto:support@Artisttocollectors ' style='color: blue; font-size: 20px; font-family: '
+                                Hind Siliguri', Calibri, Sans-serif; font-weight: 400;'>support@Artisttocollectors </a>
                         </p>
                         <br />
                         <p style='line-height: 24px'>
                             Kind Regards,</br>
-                            Artsygalley
+                            Artisttocollectors
                         </p>
 
                     </td>

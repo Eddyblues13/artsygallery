@@ -6,7 +6,7 @@
         border-radius: 16px;
         overflow: hidden;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -14,13 +14,14 @@
 
     .nft-card:hover {
         transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
 
     .nft-image-wrapper {
         position: relative;
         width: 100%;
-        padding-top: 100%; /* 1:1 Aspect Ratio */
+        padding-top: 100%;
+        /* 1:1 Aspect Ratio */
         overflow: hidden;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
@@ -155,8 +156,13 @@
     }
 
     @keyframes loading {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
     }
 
     .page-header {
@@ -280,36 +286,38 @@
             <div class="col">
                 <div class="nft-card">
                     <div class="nft-image-wrapper">
-                        <img 
-                            class="nft-image" 
-                            src="{{ $nft->ntf_image }}" 
-                            alt="{{ $nft->ntf_name }}"
-                            loading="lazy"
+                        <img class="nft-image" src="{{ $nft->ntf_image }}" alt="{{ $nft->ntf_name }}" loading="lazy"
                             onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
                     </div>
-                    
+
                     <div class="nft-card-header">
                         <h5 class="nft-card-title">{{ $nft->ntf_name }}</h5>
                     </div>
-                    
+
                     <div class="nft-card-body">
                         <div class="nft-price-section">
                             <div class="price-item">
-                                <img src="https://img.icons8.com/ios-filled/24/000000/ethereum.png" alt="ETH" class="price-icon">
-                                <span class="price-label">ETH</span>
-                                <span class="price-value">{{ number_format($nft->nft_eth_price, 4) }}</span>
-                            </div>
-                            <div class="price-item">
-                                <img src="https://img.icons8.com/ios-filled/24/000000/us-dollar.png" alt="USD" class="price-icon">
+                                <img src="https://img.icons8.com/ios-filled/24/000000/us-dollar.png" alt="USD"
+                                    class="price-icon">
                                 <span class="price-label">Price</span>
-                                <span class="price-value">{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</span>
+                                <span class="price-value">{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
+                                    }}</span>
                             </div>
                         </div>
 
                         <div class="nft-meta">
                             <div class="seller-info">
+                                @if($nft->user && $nft->user->profile_picture)
+                                <img src="{{ $nft->user->profile_picture }}" alt="{{ $nft->user->name }}"
+                                    style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
+                                @else
                                 <i class="align-middle" data-feather="user" style="width: 16px; height: 16px;"></i>
-                                <span>{{ $nft->user->name ?? $nft->ntf_owner ?? 'Unknown' }}</span>
+                                @endif
+                                <a href="{{ route('seller.profile', $nft->user_id) }}"
+                                    style="text-decoration: none; color: #495057; font-weight: 500;"
+                                    title="View seller profile">
+                                    {{ $nft->user->name ?? $nft->ntf_owner ?? 'Unknown' }}
+                                </a>
                                 @if($nft->user && $nft->user->country)
                                 <span class="badge bg-secondary ms-2">{{ $nft->user->country }}</span>
                                 @endif
@@ -320,9 +328,8 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('purchase.nft', $nft->id) }}" 
-                           class="buy-btn"
-                           onclick="return confirm('Are you sure you want to purchase {{ $nft->ntf_name }} for {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}?')">
+                        <a href="{{ route('purchase.nft', $nft->id) }}" class="buy-btn"
+                            onclick="return confirm('Are you sure you want to purchase {{ $nft->ntf_name }} for {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}?')">
                             <i class="align-middle" data-feather="shopping-cart"></i> Buy Now
                         </a>
                     </div>

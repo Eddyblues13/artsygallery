@@ -20,7 +20,7 @@
                     </p>
                     <h4>Steps to Complete Activation:</h4>
                     <ol>
-                        <li>Log in to your Artsygalley account.</li>
+                        <li>Log in to your Artisttocollectors account.</li>
                         <li>Navigate to the <strong>"Activate Ledger Identity"</strong> section.</li>
                         <li>Pay the activation fee of <strong>{{Auth::user()->activation_fee}}</strong> as per the
                             provided instructions.</li>

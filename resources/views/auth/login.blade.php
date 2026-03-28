@@ -1,197 +1,84 @@
-<!doctype html>
-<html lang="en">
+@include('home.header')
 
-<head>
-    <meta charset="utf-8" />
-    <title>Artsygalley | ACCOUNT</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="auth/images/favicon.ico">
-
-    <!-- Bootstrap Css -->
-    <link href="auth/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="auth/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="auth/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
-</head>
-
-<body>
-    <div class="account-pages my-5 pt-sm-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6 col-xl-5">
-                    <div class="card overflow-hidden">
-                        <div class="bg-primary bg-soft">
-                            <div class="row">
-                                <div class="col-7">
-                                    <div class="text-primary p-4">
-                                        <h5 class="text-primary">Welcome Back !</h5>
-                                        <p>Sign in to continue to GlobalTb.</p>
-                                    </div>
-                                </div>
-                                <div class="col-5 align-self-end">
-                                    <img src="auth/images/profile-img.png" alt="" class="img-fluid">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-body pt-0">
-                            <div class="auth-logo">
-                                <a class="auth-logo-light">
-                                    <div class="avatar-md profile-user-wid mb-4">
-                                        <span class="avatar-title rounded-circle bg-light">
-                                            <img src="auth/images/logo-light.svg" alt="" class="rounded-circle"
-                                                height="34">
-                                        </span>
-                                    </div>
-                                </a>
-
-                                <a class="auth-logo-dark">
-                                    <div class="avatar-md profile-user-wid mb-4">
-                                        <span class="avatar-title rounded-circle bg-light">
-                                            <img src="auth/images/logo.svg" alt="" class="rounded-circle" height="34">
-                                        </span>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="p-2">
-                                <p class="response"></p>
-
-
-                                <form class="form-horizontal" action="{{ route('login') }}" method="POST">
-                                    @csrf
-
-                                    @if (session('status'))
-                                    <div class="alert alert-success text-success" style="color: green;" role="alert">
-                                        {{ session('status') }}
-                                    </div>
-                                    @elseif (session('error'))
-                                    <div class="alert alert-danger text-danger" role="alert">
-                                        {{ session('error') }}
-                                    </div>
-                                    @endif
-                                    <div class="mb-3">
-                                        <label for="username" class="form-label">Email</label>
-                                        <input id="email" placeholder="Email" type="email"
-                                            class="form-control @error('email') is-invalid @enderror" name="email"
-                                            value="{{ old('email') }}" required autocomplete="email" autofocus>
-                                        @if ($errors->has('email'))
-                                        <span class="text-danger">{{ $errors->first('email') }}</span>
-                                        @endif
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Password</label>
-                                        <div class="input-group auth-pass-inputgroup">
-                                            <input type="password" name="password" class="form-control"
-                                                placeholder="Enter password" aria-label="Password"
-                                                aria-describedby="password-addon" id="password">
-                                            @if ($errors->has('password'))
-                                            <span class="text-danger">{{ $errors->first('password') }}</span>
-                                            @endif
-                                            <button class="btn btn-light " type="button" id="password-addon"><i
-                                                    class="mdi mdi-eye-outline"></i></button>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="remember-check"
-                                            name="remember" {{ old('remember') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="remember-check">
-                                            Remember me
-                                        </label>
-                                    </div>
-
-                                    <div class="mt-3 d-grid">
-                                        <button class="btn btn-primary waves-effect waves-light" type="submit">Log
-                                            In</button>
-                                    </div>
-
-                                    <div class="mt-4 text-center">
-                                        <h5 class="font-size-14 mb-3">Sign in with</h5>
-                                        <p>Don't have an account ? <a href="{{ route('register') }}"
-                                                class="fw-medium text-primary"> Signup now </a> </p>
-                                    </div>
-
-
-                                    @if (Route::has('password.request'))
-                                    <div class="mt-4 text-center">
-                                        <a href="{{ route('password.request') }}" class="text-muted"><i
-                                                class="mdi mdi-lock me-1"></i> Forgot your password?</a>
-                                    </div>
-                                    @endif
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="mt-5 text-center">
-
-                        <div>
-                            <p>Don't have an account ? <a href="{{ route('register') }}" class="fw-medium text-primary">
-                                    Signup now </a> </p>
-                            <p>©
-                                <script>
-                                    document.write(new Date().getFullYear())
-                                </script> Copyright
-                                <i class="bx bx-check-shield text-success"></i>Artsygalley
-                            </p>
-                        </div>
-                    </div>
-
+<section class="py-24 bg-slate-50 min-h-[calc(100vh-80px)] flex flex-col justify-center">
+    <div class="container mx-auto px-4">
+        <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="p-8 md:p-10">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h2>
+                    <p class="text-slate-500">Sign in to continue to Artisttocollectors</p>
                 </div>
+                
+                <p class="response text-center text-red-500 mb-4 font-medium"></p>
+                @if (session('status'))
+                    <div class="mb-4 p-3 bg-green-50 text-green-700 border border-green-200 rounded-xl text-center text-sm font-medium">{{ session('status') }}</div>
+                @elseif (session('error'))
+                    <div class="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-xl text-center text-sm font-medium">{{ session('error') }}</div>
+                @endif
+                
+                <form id="login_form" action="{{ route('login') }}" method="POST" class="space-y-6">
+                    @csrf
+                    <div>
+                        <label for="email" class="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors placeholder-slate-400" placeholder="your@email.com">
+                        @if ($errors->has('email'))
+                            <span class="text-red-500 text-sm mt-1 block">{{ $errors->first('email') }}</span>
+                        @endif
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
+                            @if (Route::has('password.request'))
+                                <a href="{{ route('password.request') }}" class="text-sm text-primary font-semibold hover:text-primary-dark transition-colors">Forgot password?</a>
+                            @endif
+                        </div>
+                        <input id="password" type="password" name="password" required
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors placeholder-slate-400" placeholder="••••••••">
+                        @if ($errors->has('password'))
+                            <span class="text-red-500 text-sm mt-1 block">{{ $errors->first('password') }}</span>
+                        @endif
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember-check" name="remember" {{ old('remember') ? 'checked' : '' }}
+                            class="w-4 h-4 text-primary bg-slate-100 border-slate-300 rounded focus:ring-primary cursor-pointer">
+                        <label for="remember-check" class="ml-3 text-sm font-medium text-slate-600 cursor-pointer">Remember me</label>
+                    </div>
+                    
+                    <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                        Log In
+                    </button>
+                    
+                    <div class="text-center mt-6">
+                        <p class="text-slate-600">Don't have an account? <a href="{{ route('register') }}" class="text-primary font-bold hover:underline">Sign up now</a></p>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-slate-50 border-t border-slate-100 p-4 text-center text-sm font-medium text-slate-500">
+                &copy; <script>document.write(new Date().getFullYear())</script> Artisttocollectors.
             </div>
         </div>
     </div>
-    <!-- end account-pages -->
+</section>
 
-    <!-- JAVASCRIPT -->
-    <script src="auth/libs/jquery/jquery.min.js"></script>
-    <script src="auth/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="auth/libs/metismenu/metisMenu.min.js"></script>
-    <script src="auth/libs/simplebar/simplebar.min.js"></script>
-    <script src="auth/libs/node-waves/waves.min.js"></script>
+@include('home.footer')
 
-    <!-- validation init -->
-    <script src="auth/js/pages/validation.init.js"></script>
-
-    <!-- App js -->
-    <script src="auth/js/app.js"></script>
-    <!-- Bootstrap Toasts Js -->
-    <script src="auth/js/pages/bootstrap-toastr.init.js"></script>
-
-</body>
-
-</html>
-<div class="position-fixed top-0 end-0 p-2" style="z-index: 1005">
-    <div id="ErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <img src="https://globaltb.online/user/logo.png" alt="" class="me-2" height="18">
-            <strong class="me-auto">Error</strong>
-            <small>Now..</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body" style="background-color:red;">
-            Hello, world! This is a toast message.
-        </div>
-    </div>
-</div>
+<!-- JAVASCRIPT -->
+<script src="auth/libs/jquery/jquery.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#login_form').on('submit', function(e) {
             e.preventDefault();
-            $(".response").html("Loading...<div class='spinner-border spinner-border-sm' role='status'><span class='sr-only'>Loading...</span></div>")
+            $(".response").html("Authenticating...");
             var email = $('#email').val();
             var password = $('#password').val();
 
             if (email == '' || password == '') {
-                $(".toast-body").html('Enter all field');
-                $("#ErrorToast").toast("show");
-                $(".response").html("")
+                Swal.fire('Error', 'Please enter all fields.', 'error');
+                $(".response").html("");
                 return false;
             }
             $.ajax({
@@ -200,31 +87,20 @@
                 data: $(this).serialize(),
                 dataType: "json",
                 success: function(data) {
-                    //alert('error');
                     $(".response").html(data.content);
                     if (data.content == 'Successful') {
                         $(".response").html(data.message);
                         window.location = data.redirect;
-
-                    } else
-                    if (data.content == 'Error') {
+                    } else if (data.content == 'Error') {
                         $(".response").html(data.message);
-                        window.location = data.redirect;
+                        Swal.fire('Login Failed', data.message, 'error');
                     }
                 },
                 error: function(data, errorThrown) {
-                    Swal.fire('The Internet?', 'Check network connection!', 'question');
+                    Swal.fire('Connection Error', 'Please check your internet connection!', 'error');
+                    $(".response").html("");
                 }
             });
         });
     });
-</script>
-
-<script>
-    function login(id) {
-        id.innerHTML = "Verifying account..";
-        setTimeout(function() {
-            id.innerHTML = "Log in";
-        }, 3000);
-    }
 </script>

@@ -15,14 +15,14 @@ class AdminSeeder extends Seeder
     {
         Admin::create([
             'name' => 'Super Admin',
-            'email' => 'admin@artsygalley.com',
+            'email' => 'admin@artisttocollectors.com',
             'password' => Hash::make('admin123'),
             'is_active' => true,
         ]);
 
         Admin::create([
             'name' => 'Administrator',
-            'email' => 'administrator@artsygalley.com',
+            'email' => 'administrator@artisttocollectors.com',
             'password' => Hash::make('admin123'),
             'is_active' => true,
         ]);

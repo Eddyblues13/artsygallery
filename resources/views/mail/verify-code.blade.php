@@ -11,7 +11,7 @@
     <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet'>
     <!--<![endif]-->
 
-    <title>Artsygalley</title>
+    <title>Artisttocollectors</title>
 
     <style type='text/css'>
         body {
@@ -204,7 +204,7 @@
                         <!-- section text ======-->
                         <p style='line-height: 24px;margin-left:15px;'>Confirm Your Registration</p>
                         <br>
-                        <h2>Welcome to Artsygalley</h2>
+                        <h2>Welcome to Artisttocollectors</h2>
                         <br>
                         <br>
                         <p style='line-height: 24px;margin-bottom:15px;'>
@@ -226,7 +226,7 @@
                         </p>
                         <p style='line-height: 24px'>
                             Kind Regards,</br>
-                            Artsygalley
+                            Artisttocollectors
                         </p>
 
                     </td>
