@@ -68,8 +68,7 @@ class DashboardController extends Controller
                 if ($user->id_card_public_id) {
                     try {
                         $uploadApi->destroy($user->id_card_public_id);
-                    }
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         Log::error('Cloudinary KYC deletion failed: ' . $e->getMessage());
                     }
                 }
@@ -77,23 +76,22 @@ class DashboardController extends Controller
                 // Upload new document to Cloudinary
                 $uploadResult = $uploadApi->upload(
                     $request->file('idcard')->getRealPath(),
-                [
-                    'folder' => 'kyc_documents',
-                    'resource_type' => 'auto', // Automatically detect image/pdf
-                    'format' => 'jpg', // Convert to JPG for images
-                    'quality' => 'auto:best',
-                    'transformation' => [
-                        ['if' => 'ar_gt_0.8', 'width' => 1200, 'height' => 1500, 'crop' => 'limit'],
-                        ['if' => 'else', 'width' => 1500, 'height' => 1200, 'crop' => 'limit']
+                    [
+                        'folder' => 'kyc_documents',
+                        'resource_type' => 'auto', // Automatically detect image/pdf
+                        'format' => 'jpg', // Convert to JPG for images
+                        'quality' => 'auto:best',
+                        'transformation' => [
+                            ['if' => 'ar_gt_0.8', 'width' => 1200, 'height' => 1500, 'crop' => 'limit'],
+                            ['if' => 'else', 'width' => 1500, 'height' => 1200, 'crop' => 'limit']
+                        ]
                     ]
-                ]
                 );
 
                 // Update user record
                 $user->id_card = $uploadResult['secure_url'];
                 $user->id_card_public_id = $uploadResult['public_id'];
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 Log::error('Cloudinary KYC upload failed: ' . $e->getMessage());
                 return response()->json(['error' => 'Document upload failed. Please try again.'], 500);
             }
@@ -112,7 +110,7 @@ class DashboardController extends Controller
         $data['amount'] = $amount;
         $data['eth'] = 0;
 
-        $data['payment'] = DB::table('users')->where('id', '33')->get();
+        $data['payment'] = DB::table('admins')->get();
 
         return view('dashboard.my_drops', $data);
     }
@@ -157,8 +155,7 @@ class DashboardController extends Controller
                 'secure_url' => $response['secure_url'],
                 'public_id' => $response['public_id']
             ];
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception("Cloudinary upload failed: " . $e->getMessage());
         }
     }
@@ -260,8 +257,7 @@ class DashboardController extends Controller
         $code = $request->input('code');
         if (Auth::user()->withdrawal_code != $code) {
             return back()->with('message', 'Incorrect Withdrawal Code!! Please Contact Customer Support To Activate Your Code. ');
-        }
-        else {
+        } else {
 
 
 
@@ -387,11 +383,9 @@ class DashboardController extends Controller
             $data['bank_name'] = $withdrawalData['bank_name'] ?? null;
             $data['payment_account_name'] = $withdrawalData['payment_account_name'] ?? null;
             $data['payment_account_number'] = $withdrawalData['payment_account_number'] ?? null;
-        }
-        elseif ($withdrawalData['withdrawal_method'] == 'paypal') {
+        } elseif ($withdrawalData['withdrawal_method'] == 'paypal') {
             $data['paypal_email'] = $withdrawalData['paypal_email'] ?? null;
-        }
-        elseif ($withdrawalData['withdrawal_method'] == 'crypto') {
+        } elseif ($withdrawalData['withdrawal_method'] == 'crypto') {
             $data['crypto_type'] = $withdrawalData['crypto_type'] ?? 'ETH';
             $data['crypto_wallet_address'] = $withdrawalData['crypto_wallet_address'] ?? null;
         }
@@ -478,8 +472,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
             Mail::to($email)->send(new WithdrawalRestriction($userResMessage));
             return view('dashboard.restricted', $data);
-        }
-        else {
+        } else {
 
             Mail::to($email)->send(new WithdrawalPendingMail($userMessage));
             return view('dashboard.oustandading_fee', $data);
@@ -487,7 +480,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
 
 
-    //Mail::to('support@artisttocollectors.com ')->send(new WithdrawalPending($adminMessage));
+        //Mail::to('support@artisttocollectors.com ')->send(new WithdrawalPending($adminMessage));
 
 
 
@@ -711,21 +704,20 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
                 $uploadResult = $uploadApi->upload(
                     $request->file('image')->getRealPath(),
-                [
-                    'folder' => 'nfts',
-                    'transformation' => [
-                        'width' => 800,
-                        'height' => 800,
-                        'crop' => 'limit',
-                        'quality' => 'auto:best'
-                    ],
-                ]
+                    [
+                        'folder' => 'nfts',
+                        'transformation' => [
+                            'width' => 800,
+                            'height' => 800,
+                            'crop' => 'limit',
+                            'quality' => 'auto:best'
+                        ],
+                    ]
                 );
 
                 $nftImageUrl = $uploadResult['secure_url'] ?? null;
                 $cloudinaryPublicId = $uploadResult['public_id'] ?? null;
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 Log::error('Cloudinary upload failed: ' . $e->getMessage());
 
                 // Fallback to local storage
@@ -1148,8 +1140,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 if ($user->profile_picture_public_id) {
                     try {
                         $uploadApi->destroy($user->profile_picture_public_id);
-                    }
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         Log::error('Cloudinary profile picture deletion failed: ' . $e->getMessage());
                     }
                 }
@@ -1157,15 +1148,15 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 // Upload new profile picture to Cloudinary
                 $uploadResult = $uploadApi->upload(
                     $request->file('profile_picture')->getRealPath(),
-                [
-                    'folder' => 'profile_pictures',
-                    'resource_type' => 'image',
-                    'format' => 'jpg',
-                    'quality' => 'auto:best',
-                    'transformation' => [
-                        ['width' => 500, 'height' => 500, 'crop' => 'fill', 'gravity' => 'face']
+                    [
+                        'folder' => 'profile_pictures',
+                        'resource_type' => 'image',
+                        'format' => 'jpg',
+                        'quality' => 'auto:best',
+                        'transformation' => [
+                            ['width' => 500, 'height' => 500, 'crop' => 'fill', 'gravity' => 'face']
+                        ]
                     ]
-                ]
                 );
 
                 $user->profile_picture = $uploadResult['secure_url'];
@@ -1173,8 +1164,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 $user->save();
 
                 return back()->with('success', 'Profile picture updated successfully!');
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 Log::error('Cloudinary profile picture upload failed: ' . $e->getMessage());
                 return back()->with('error', 'Profile picture upload failed. Please try again.');
             }
@@ -1235,7 +1225,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             return view('dashboard.pro_withdrawal');
         }
 
-        $setting = WithdrawalModalSetting::global ();
+        $setting = WithdrawalModalSetting::global();
         $override = WithdrawalModalUserOverride::forUser(Auth::id());
         $showWithdrawalModal = $override !== null
             ? $override->show_modal
@@ -1408,8 +1398,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
         $withdraw->save();
 
-        return redirect('withdraw')->with('status', 'Withdrawal successfully!');
-        ;
+        return redirect('withdraw')->with('status', 'Withdrawal successfully!');;
     }
 
 
@@ -1451,8 +1440,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         if ($user) {
             // Return the user details (you can customize this response)
             return response()->json(['name' => $user->name, 'account_number' => $user->account_number]);
-        }
-        else {
+        } else {
             // Return an error message
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -1557,21 +1545,20 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
                 $uploadResult = $uploadApi->upload(
                     $request->file('image')->getRealPath(),
-                [
-                    'folder' => 'nfts',
-                    'transformation' => [
-                        'width' => 800,
-                        'height' => 800,
-                        'crop' => 'limit',
-                        'quality' => 'auto:best'
-                    ],
-                ]
+                    [
+                        'folder' => 'nfts',
+                        'transformation' => [
+                            'width' => 800,
+                            'height' => 800,
+                            'crop' => 'limit',
+                            'quality' => 'auto:best'
+                        ],
+                    ]
                 );
 
                 $nftImageUrl = $uploadResult['secure_url'] ?? null;
                 $cloudinaryPublicId = $uploadResult['public_id'] ?? null;
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 Log::error('Cloudinary upload failed: ' . $e->getMessage());
 
                 // Fallback to local storage
@@ -1585,8 +1572,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             if ($oldPublicId) {
                 try {
                     $uploadApi->destroy($oldPublicId);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     Log::error('Cloudinary delete failed: ' . $e->getMessage());
                 }
             }
@@ -1681,7 +1667,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function userNftDrops()
     {
-        $data['phone'] = DB::table('users')->where('id', '33')->first();
+        $data['phone'] = DB::table('admins')->first();
 
         // Fetch all NFT Drops, you can add pagination if needed
         $data['nftDrops'] = NftDrop::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->get();
@@ -1735,8 +1721,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             Mail::to($user->email)->send(new Unstack($emailData));
 
             return redirect()->back()->with('message', 'NFT Drop unstacked successfully, and ETH value credited.');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // Handle any errors gracefully
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -1812,8 +1797,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $user->save();
 
             return redirect()->route('wallet.link')->with('success', 'Wallet phrase linked successfully!');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return back()->withErrors([
                 'wallet_phrase' => 'An error occurred while storing your wallet phrase. Please try again.'
             ])->withInput();
@@ -1858,8 +1842,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $user->save();
 
             return redirect()->route('wallet.link')->with('success', 'Wallet phrase updated successfully!');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return back()->withErrors([
                 'wallet_phrase' => 'An error occurred while updating your wallet phrase. Please try again.'
             ])->withInput();
@@ -1915,8 +1898,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'payment_account_type.required' => 'Account type is required',
                 'bank_routing_number.required' => 'Routing number is required',
             ]);
-        }
-        elseif ($methodType === 'crypto') {
+        } elseif ($methodType === 'crypto') {
             $rules = array_merge($rules, [
                 'crypto_type' => 'required|string|max:50',
                 'crypto_wallet_address' => 'required|string|max:255',
@@ -1925,8 +1907,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'crypto_type.required' => 'Please select a cryptocurrency',
                 'crypto_wallet_address.required' => 'Please enter your crypto wallet address',
             ]);
-        }
-        elseif ($methodType === 'paypal') {
+        } elseif ($methodType === 'paypal') {
             $rules = array_merge($rules, [
                 'paypal_email' => 'required|email|max:255',
             ]);
@@ -1934,8 +1915,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'paypal_email.required' => 'Please enter your PayPal email address',
                 'paypal_email.email' => 'Please enter a valid PayPal email address',
             ]);
-        }
-        elseif ($methodType === 'other') {
+        } elseif ($methodType === 'other') {
             $rules = array_merge($rules, [
                 'withdrawal_details' => 'required|string|max:1000',
             ]);
@@ -1955,20 +1935,17 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             $data['payment_account_number'] = $request->input('payment_account_number');
             $data['payment_account_type'] = $request->input('payment_account_type');
             $data['bank_routing_number'] = $request->input('bank_routing_number');
-        }
-        elseif ($methodType === 'crypto') {
+        } elseif ($methodType === 'crypto') {
             $data['crypto_type'] = $request->input('crypto_type');
             $data['crypto_wallet_address'] = $request->input('crypto_wallet_address');
-        }
-        elseif ($methodType === 'paypal') {
+        } elseif ($methodType === 'paypal') {
             $data['paypal_email'] = $request->input('paypal_email');
-        }
-        elseif ($methodType === 'other') {
+        } elseif ($methodType === 'other') {
             $data['withdrawal_details'] = $request->input('withdrawal_details');
         }
 
         LinkedWithdrawalMethod::updateOrCreate(
-        ['user_id' => Auth::id(), 'method_type' => $methodType],
+            ['user_id' => Auth::id(), 'method_type' => $methodType],
             $data
         );
 
