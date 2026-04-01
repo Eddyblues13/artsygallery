@@ -275,7 +275,31 @@
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Uploading...';
         progressEl.style.display = 'block';
         fill.style.width = '0%';
+        fill.style.transition = 'width 0.15s linear';
         fill.style.background = 'linear-gradient(90deg, #28a745, #34d058)';
+
+        var processingTimer = null;
+        var currentPct = 0;
+
+        function setProgress(pct, text) {
+            currentPct = pct;
+            fill.style.width = pct + '%';
+            pctEl.textContent = pct + '%';
+            if (text) textEl.textContent = text;
+        }
+
+        function startProcessingAnimation() {
+            fill.style.transition = 'width 0.5s ease-out';
+            textEl.textContent = 'Processing on server...';
+            var target = 71;
+            processingTimer = setInterval(function() {
+                if (target < 95) {
+                    target += Math.random() * 2 + 0.5;
+                    if (target > 95) target = 95;
+                    setProgress(Math.round(target));
+                }
+            }, 800);
+        }
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', this.action, true);
@@ -283,18 +307,20 @@
 
         xhr.upload.onprogress = function(evt) {
             if (evt.lengthComputable) {
-                const pct = Math.round((evt.loaded / evt.total) * 100);
-                fill.style.width = pct + '%';
-                pctEl.textContent = pct + '%';
-                textEl.textContent = pct < 100 ? 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')' : 'Processing...';
+                var realPct = evt.loaded / evt.total;
+                var displayPct = Math.round(realPct * 70);
+                setProgress(displayPct, 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')');
+                if (realPct >= 1) {
+                    startProcessingAnimation();
+                }
             }
         };
 
         xhr.onload = function() {
+            clearInterval(processingTimer);
             if (xhr.status >= 200 && xhr.status < 300) {
-                fill.style.width = '100%';
-                textEl.textContent = 'Complete!';
-                pctEl.textContent = '100%';
+                fill.style.transition = 'width 0.3s ease';
+                setProgress(100, 'Complete!');
                 Swal.fire({ title: 'Submitted!', text: 'Your payment proof has been uploaded.', icon: 'success', confirmButtonColor: '#28a745' })
                     .then(() => location.reload());
             } else {
@@ -307,6 +333,7 @@
         };
 
         xhr.onerror = function() {
+            clearInterval(processingTimer);
             fill.style.background = '#dc3545';
             textEl.textContent = 'Connection error';
             btn.disabled = false;

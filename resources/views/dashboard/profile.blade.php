@@ -365,11 +365,14 @@ document.getElementById('profilePicInput').addEventListener('change', function()
     reader.onload = function(e) { avatar.src = e.target.result; };
     reader.readAsDataURL(file);
 
-    // Upload with progress
+    // Upload with two-phase progress
     const formData = new FormData(document.getElementById('profilePicForm'));
     progress.style.display = 'block';
     fill.style.width = '0%';
+    fill.style.transition = 'width 0.15s linear';
     fill.style.background = 'linear-gradient(90deg, #3b7ddd, #5a9cf5)';
+
+    var picTimer = null;
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', document.getElementById('profilePicForm').action, true);
@@ -377,10 +380,24 @@ document.getElementById('profilePicInput').addEventListener('change', function()
 
     xhr.upload.onprogress = function(evt) {
         if (evt.lengthComputable) {
-            fill.style.width = Math.round((evt.loaded / evt.total) * 100) + '%';
+            var realPct = evt.loaded / evt.total;
+            fill.style.width = Math.round(realPct * 70) + '%';
+            if (realPct >= 1) {
+                fill.style.transition = 'width 0.5s ease-out';
+                var target = 71;
+                picTimer = setInterval(function() {
+                    if (target < 95) {
+                        target += Math.random() * 2 + 0.5;
+                        if (target > 95) target = 95;
+                        fill.style.width = Math.round(target) + '%';
+                    }
+                }, 800);
+            }
         }
     };
     xhr.onload = function() {
+        clearInterval(picTimer);
+        fill.style.transition = 'width 0.3s ease';
         fill.style.width = '100%';
         fill.style.background = 'linear-gradient(90deg, #28a745, #34d058)';
         setTimeout(() => { progress.style.display = 'none'; }, 1500);
@@ -389,6 +406,7 @@ document.getElementById('profilePicInput').addEventListener('change', function()
         }
     };
     xhr.onerror = function() {
+        clearInterval(picTimer);
         fill.style.background = '#dc3545';
         setTimeout(() => { progress.style.display = 'none'; }, 2000);
     };
@@ -456,28 +474,49 @@ document.getElementById('profilePicInput').addEventListener('change', function()
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Uploading...';
         progressEl.style.display = 'block';
         fill.style.width = '0%';
+        fill.style.transition = 'width 0.15s linear';
         fill.style.background = 'linear-gradient(90deg, #3b7ddd, #5a9cf5)';
+
+        var kycTimer = null;
+
+        function setKycProgress(p, t) {
+            fill.style.width = p + '%';
+            pct.textContent = p + '%';
+            if (t) text.textContent = t;
+        }
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', this.action, true);
         xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
         xhr.upload.onprogress = function(evt) {
             if (evt.lengthComputable) {
-                const p = Math.round((evt.loaded / evt.total) * 100);
-                fill.style.width = p + '%';
-                pct.textContent = p + '%';
-                text.textContent = p < 100 ? 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')' : 'Processing...';
+                var realPct = evt.loaded / evt.total;
+                var displayPct = Math.round(realPct * 70);
+                setKycProgress(displayPct, 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')');
+                if (realPct >= 1) {
+                    fill.style.transition = 'width 0.5s ease-out';
+                    text.textContent = 'Processing on server...';
+                    var target = 71;
+                    kycTimer = setInterval(function() {
+                        if (target < 95) {
+                            target += Math.random() * 2 + 0.5;
+                            if (target > 95) target = 95;
+                            setKycProgress(Math.round(target));
+                        }
+                    }, 800);
+                }
             }
         };
         xhr.onload = function() {
+            clearInterval(kycTimer);
             if (xhr.status >= 200 && xhr.status < 300) {
-                fill.style.width = '100%';
+                fill.style.transition = 'width 0.3s ease';
+                setKycProgress(100, 'Complete!');
                 fill.style.background = 'linear-gradient(90deg, #28a745, #34d058)';
-                text.textContent = 'Complete!';
-                pct.textContent = '100%';
                 btn.innerHTML = 'Uploaded!';
                 setTimeout(() => location.reload(), 1500);
             } else {
+                clearInterval(kycTimer);
                 fill.style.background = '#dc3545';
                 text.textContent = 'Failed';
                 btn.disabled = false;
@@ -485,6 +524,7 @@ document.getElementById('profilePicInput').addEventListener('change', function()
             }
         };
         xhr.onerror = function() {
+            clearInterval(kycTimer);
             fill.style.background = '#dc3545';
             text.textContent = 'Error';
             btn.disabled = false;

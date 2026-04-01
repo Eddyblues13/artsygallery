@@ -369,7 +369,7 @@
         previewImage.src = '';
     });
 
-    // Form submit with real progress
+    // Form submit with two-phase progress (upload + server processing)
     $('#uploadForm').on('submit', function(e) {
         e.preventDefault();
 
@@ -384,21 +384,45 @@
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Publishing...';
         progressEl.style.display = 'block';
         progressFill.style.width = '0%';
+        progressFill.style.transition = 'width 0.15s linear';
         progressPercent.textContent = '0%';
         progressText.textContent = 'Uploading...';
+
+        var processingTimer = null;
+        var currentPct = 0;
+
+        function setProgress(pct, text) {
+            currentPct = pct;
+            progressFill.style.width = pct + '%';
+            progressPercent.textContent = pct + '%';
+            if (text) progressText.textContent = text;
+        }
+
+        // Phase 2: slow animation from 70% → 95% while server processes
+        function startProcessingAnimation() {
+            progressFill.style.transition = 'width 0.5s ease-out';
+            progressText.textContent = 'Processing on server...';
+            var target = 71;
+            processingTimer = setInterval(function() {
+                if (target < 95) {
+                    target += Math.random() * 2 + 0.5; // slow random increments
+                    if (target > 95) target = 95;
+                    setProgress(Math.round(target));
+                }
+            }, 800);
+        }
 
         $.ajax({
             xhr: function() {
                 var xhr = new window.XMLHttpRequest();
                 xhr.upload.addEventListener('progress', function(evt) {
                     if (evt.lengthComputable) {
-                        var pct = Math.round((evt.loaded / evt.total) * 100);
-                        progressFill.style.width = pct + '%';
-                        progressPercent.textContent = pct + '%';
-                        if (pct < 100) {
-                            progressText.textContent = 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')';
-                        } else {
-                            progressText.textContent = 'Processing on server...';
+                        // Phase 1: map real upload 0-100% → display 0-70%
+                        var realPct = evt.loaded / evt.total;
+                        var displayPct = Math.round(realPct * 70);
+                        setProgress(displayPct, 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')');
+                        if (realPct >= 1) {
+                            startProcessingAnimation();
                         }
                     }
                 }, false);
@@ -410,9 +434,9 @@
             contentType: false,
             processData: false,
             success: function(response) {
-                progressFill.style.width = '100%';
-                progressPercent.textContent = '100%';
-                progressText.textContent = 'Complete!';
+                clearInterval(processingTimer);
+                progressFill.style.transition = 'width 0.3s ease';
+                setProgress(100, 'Complete!');
                 progressFill.style.background = 'linear-gradient(90deg, #28a745, #34d058)';
 
                 Swal.fire({
@@ -426,6 +450,7 @@
                 });
             },
             error: function(response) {
+                clearInterval(processingTimer);
                 progressFill.style.background = '#dc3545';
                 progressText.textContent = 'Upload failed';
                 submitBtn.disabled = false;

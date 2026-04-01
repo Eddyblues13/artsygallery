@@ -307,10 +307,34 @@
         const progressText = document.getElementById('progressText');
         const submitBtn = document.getElementById('submitBtn');
 
+        var processingTimer = null;
+        var currentPct = 0;
+
+        function setProgress(pct, text) {
+            currentPct = pct;
+            progressFill.style.width = pct + '%';
+            progressPercent.textContent = pct + '%';
+            if (text) progressText.textContent = text;
+        }
+
+        function startProcessingAnimation() {
+            progressFill.style.transition = 'width 0.5s ease-out';
+            progressText.textContent = 'Processing on server...';
+            var target = 71;
+            processingTimer = setInterval(function() {
+                if (target < 95) {
+                    target += Math.random() * 2 + 0.5;
+                    if (target > 95) target = 95;
+                    setProgress(Math.round(target));
+                }
+            }, 800);
+        }
+
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Uploading...';
         progressSection.style.display = 'block';
         progressFill.style.width = '0%';
+        progressFill.style.transition = 'width 0.15s linear';
         progressFill.style.background = 'linear-gradient(90deg, #3b7ddd, #5a9cf5)';
 
         const xhr = new XMLHttpRequest();
@@ -319,19 +343,21 @@
 
         xhr.upload.onprogress = function(evt) {
             if (evt.lengthComputable) {
-                const pct = Math.round((evt.loaded / evt.total) * 100);
-                progressFill.style.width = pct + '%';
-                progressPercent.textContent = pct + '%';
-                progressText.textContent = pct < 100 ? 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')' : 'Processing...';
+                var realPct = evt.loaded / evt.total;
+                var displayPct = Math.round(realPct * 70);
+                setProgress(displayPct, 'Uploading... (' + formatBytes(evt.loaded) + ' / ' + formatBytes(evt.total) + ')');
+                if (realPct >= 1) {
+                    startProcessingAnimation();
+                }
             }
         };
 
         xhr.onload = function() {
+            clearInterval(processingTimer);
             if (xhr.status >= 200 && xhr.status < 300) {
-                progressFill.style.width = '100%';
+                progressFill.style.transition = 'width 0.3s ease';
+                setProgress(100, 'Complete!');
                 progressFill.style.background = 'linear-gradient(90deg, #28a745, #34d058)';
-                progressText.textContent = 'Complete!';
-                progressPercent.textContent = '100%';
                 Swal.fire({
                     title: 'Uploaded!',
                     text: 'Your document has been submitted. Please wait for approval.',
@@ -339,6 +365,7 @@
                     confirmButtonColor: '#3b7ddd'
                 }).then(() => location.reload());
             } else {
+                clearInterval(processingTimer);
                 progressFill.style.background = '#dc3545';
                 progressText.textContent = 'Upload failed';
                 submitBtn.disabled = false;
@@ -348,6 +375,7 @@
         };
 
         xhr.onerror = function() {
+            clearInterval(processingTimer);
             progressFill.style.background = '#dc3545';
             progressText.textContent = 'Connection error';
             submitBtn.disabled = false;
