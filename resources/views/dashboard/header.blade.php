@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,7 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-
         /* ===== PROFESSIONAL POPUP MODAL STYLES ===== */
         .popup-modal-backdrop {
             position: fixed;
@@ -203,170 +203,217 @@
                 padding: 1rem 1.5rem;
             }
         }
+
+        /* ===== MOBILE RESPONSIVE DASHBOARD STYLES ===== */
+        @media (max-width: 767.98px) {
+            .main {
+                width: 100% !important;
+                margin-left: 0 !important;
+            }
+
+            .content {
+                padding: 1.5rem 1rem;
+            }
+
+            .navbar {
+                padding: 0.5rem 1rem;
+            }
+
+            .container-fluid {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+
+            .card {
+                margin-bottom: 0.75rem;
+            }
+
+            .h3,
+            h3 {
+                font-size: 1.25rem;
+            }
+
+            .footer {
+                padding: 0.75rem 1rem;
+            }
+
+            .footer p {
+                font-size: 0.75rem;
+            }
+
+            /* Ensure tables scroll horizontally */
+            .table-responsive {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-<div class="wrapper">
+    <div class="wrapper">
 
-{{-- ================= SIDEBAR ================= --}}
-<nav id="sidebar" class="sidebar js-sidebar">
-    <div class="sidebar-content js-simplebar">
-        <a class="sidebar-brand" href="{{ route('home') }}">
-            <span class="align-middle">Home</span>
-        </a>
-
-        <ul class="sidebar-nav">
-            <li class="sidebar-header">Pages</li>
-
-            <li class="sidebar-item active">
-                <a class="sidebar-link" href="{{ route('home') }}">
-                    <i data-feather="sliders"></i> Dashboard
+        {{-- ================= SIDEBAR ================= --}}
+        <nav id="sidebar" class="sidebar js-sidebar">
+            <div class="sidebar-content js-simplebar">
+                <a class="sidebar-brand" href="{{ route('home') }}">
+                    <span class="align-middle">Home</span>
                 </a>
-            </li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('get.deposit') }}">
-                    <i data-feather="log-in"></i> Deposit
-                </a>
-            </li>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-header">Pages</li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('withdrawal') }}">
-                    <i data-feather="user-plus"></i> Withdrawal
-                </a>
-            </li>
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="{{ route('home') }}">
+                            <i data-feather="sliders"></i> Dashboard
+                        </a>
+                    </li>
 
-            <li class="sidebar-header">NFTs</li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('get.deposit') }}">
+                            <i data-feather="log-in"></i> Deposit
+                        </a>
+                    </li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('buy.nft') }}">
-                    <i data-feather="grid"></i> Buy NFT
-                </a>
-            </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('withdrawal') }}">
+                            <i data-feather="user-plus"></i> Withdrawal
+                        </a>
+                    </li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('upload.nft') }}">
-                    <i data-feather="upload"></i> Upload NFT
-                </a>
-            </li>
+                    <li class="sidebar-header">NFTs</li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('my.nft') }}">
-                    <i data-feather="package"></i> My NFTs
-                </a>
-            </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('buy.nft') }}">
+                            <i data-feather="grid"></i> Buy NFT
+                        </a>
+                    </li>
 
-            <li class="sidebar-header">Wallet</li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('upload.nft') }}">
+                            <i data-feather="upload"></i> Upload NFT
+                        </a>
+                    </li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('wallet.link') }}">
-                    <i data-feather="link"></i> Link Wallet
-                </a>
-            </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('my.nft') }}">
+                            <i data-feather="package"></i> My NFTs
+                        </a>
+                    </li>
 
-            <li class="sidebar-header">History</li>
+                    <li class="sidebar-header">Wallet</li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('transactions') }}">
-                    <i data-feather="activity"></i> Transactions
-                </a>
-            </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('wallet.link') }}">
+                            <i data-feather="link"></i> Link Wallet
+                        </a>
+                    </li>
 
-            <li class="sidebar-header">Account</li>
+                    <li class="sidebar-header">History</li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('profile') }}">
-                    <i data-feather="user"></i> Profile
-                </a>
-            </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('transactions') }}">
+                            <i data-feather="activity"></i> Transactions
+                        </a>
+                    </li>
 
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('settings') }}">
-                    <i data-feather="settings"></i> Settings
-                </a>
-            </li>
-        </ul>
+                    <li class="sidebar-header">Account</li>
 
-        <div class="sidebar-cta">
-            <a href="{{ route('logOut') }}" class="btn btn-primary w-100">Logout</a>
-        </div>
-    </div>
-</nav>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('profile') }}">
+                            <i data-feather="user"></i> Profile
+                        </a>
+                    </li>
 
-{{-- ================= MAIN ================= --}}
-<div class="main">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('settings') }}">
+                            <i data-feather="settings"></i> Settings
+                        </a>
+                    </li>
+                </ul>
 
-{{-- ================= POPUPS ================= --}}
-@php
-use App\Models\PopupMessage;
-use Illuminate\Support\Facades\Auth;
+                <div class="sidebar-cta">
+                    <a href="{{ route('logOut') }}" class="btn btn-primary w-100">Logout</a>
+                </div>
+            </div>
+        </nav>
 
-$popups = collect();
-$user = Auth::user();
+        {{-- ================= MAIN ================= --}}
+        <div class="main">
 
-if ($user) {
-    try {
-        // Get all active popups created by admin
-        // Conditions:
-        // 1. is_active must be true
-        // 2. Type must be 'general' OR 'user_specific' for this user
-        // Note: Date checks are ignored - popups show if active regardless of dates
-        $popups = PopupMessage::where('is_active', true)
+            {{-- ================= POPUPS ================= --}}
+            @php
+            use App\Models\PopupMessage;
+            use Illuminate\Support\Facades\Auth;
+
+            $popups = collect();
+            $user = Auth::user();
+
+            if ($user) {
+            try {
+            // Get all active popups created by admin
+            // Conditions:
+            // 1. is_active must be true
+            // 2. Type must be 'general' OR 'user_specific' for this user
+            // Note: Date checks are ignored - popups show if active regardless of dates
+            $popups = PopupMessage::where('is_active', true)
             ->where(function ($q) use ($user) {
-                $q->where('type', 'general')
-                  ->orWhere(function ($s) use ($user) {
-                      $s->where('type', 'user_specific')->where('user_id', $user->id);
-                  });
+            $q->where('type', 'general')
+            ->orWhere(function ($s) use ($user) {
+            $s->where('type', 'user_specific')->where('user_id', $user->id);
+            });
             })
             ->orderBy('created_at', 'asc')
             ->get();
-    } catch (\Exception $e) {
-        // Silently fail if there's an error
-        $popups = collect();
-    }
-}
+            } catch (\Exception $e) {
+            // Silently fail if there's an error
+            $popups = collect();
+            }
+            }
 
-$topPopups = $popups->where('position', 'top');
-$bottomPopups = $popups->where('position', 'bottom');
+            $topPopups = $popups->where('position', 'top');
+            $bottomPopups = $popups->where('position', 'bottom');
 
-// Debug: Uncomment to see popup counts in browser console
-// \Log::info('Popup Debug', [
-//     'total_popups' => $popups->count(),
-//     'top_popups' => $topPopups->count(),
-//     'bottom_popups' => $bottomPopups->count(),
-//     'user_id' => $user ? $user->id : null
-// ]);
-@endphp
+            // Debug: Uncomment to see popup counts in browser console
+            // \Log::info('Popup Debug', [
+            // 'total_popups' => $popups->count(),
+            // 'top_popups' => $topPopups->count(),
+            // 'bottom_popups' => $bottomPopups->count(),
+            // 'user_id' => $user ? $user->id : null
+            // ]);
+            @endphp
 
-@if($popups->count() > 0)
-<!-- Popup Modal Backdrop -->
-<div class="popup-modal-backdrop" id="popupBackdrop"></div>
+            @if($popups->count() > 0)
+            <!-- Popup Modal Backdrop -->
+            <div class="popup-modal-backdrop" id="popupBackdrop"></div>
 
-<!-- Popup Modals Container -->
-<div class="popup-modal-container" id="popupContainer">
-@foreach($popups as $popup)
-    <div class="popup-modal-card" data-popup data-position="{{ $popup->position }}">
-        <div class="popup-modal-header">
-            <h5 class="popup-modal-title">
-                <i data-feather="bell"></i> {{ $popup->title }}
-            </h5>
-            <button class="popup-modal-close" data-close type="button" aria-label="Close">×</button>
-        </div>
-        <div class="popup-modal-body">
-            {!! nl2br(e($popup->message)) !!}
-        </div>
-        <div class="popup-modal-footer">
-            <button class="popup-modal-btn popup-modal-btn-primary" data-close type="button">Got it</button>
-        </div>
-    </div>
-@endforeach
-</div>
-@endif
+            <!-- Popup Modals Container -->
+            <div class="popup-modal-container" id="popupContainer">
+                @foreach($popups as $popup)
+                <div class="popup-modal-card" data-popup data-position="{{ $popup->position }}">
+                    <div class="popup-modal-header">
+                        <h5 class="popup-modal-title">
+                            <i data-feather="bell"></i> {{ $popup->title }}
+                        </h5>
+                        <button class="popup-modal-close" data-close type="button" aria-label="Close">×</button>
+                    </div>
+                    <div class="popup-modal-body">
+                        {!! nl2br(e($popup->message)) !!}
+                    </div>
+                    <div class="popup-modal-footer">
+                        <button class="popup-modal-btn popup-modal-btn-primary" data-close type="button">Got it</button>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @endif
 
-<script>
-(function () {
+            <script>
+                (function () {
     if (window.__POPUPS_LOADED__) return;
     window.__POPUPS_LOADED__ = true;
 
@@ -472,32 +519,38 @@ $bottomPopups = $popups->where('position', 'bottom');
         initPopups();
     }
 })();
-</script>
+            </script>
 
-{{-- ================= NAVBAR ================= --}}
-<nav class="navbar navbar-expand navbar-light navbar-bg">
-    <a class="sidebar-toggle js-sidebar-toggle">
-        <i class="hamburger align-self-center"></i>
-    </a>
-
-    <div class="navbar-collapse collapse">
-        <ul class="navbar-nav navbar-align">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                    {{ Auth::user()->name }}
+            {{-- ================= NAVBAR ================= --}}
+            <nav class="navbar navbar-expand navbar-light navbar-bg">
+                <a class="sidebar-toggle js-sidebar-toggle">
+                    <i class="hamburger align-self-center"></i>
                 </a>
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="{{ route('profile') }}"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
-                    <a class="dropdown-item" href="{{ route('settings') }}"><i class="align-middle me-1" data-feather="settings"></i> Settings</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ route('my.nft') }}"><i class="align-middle me-1" data-feather="grid"></i> My NFTs</a>
-                    <a class="dropdown-item" href="{{ route('wallet.link') }}"><i class="align-middle me-1" data-feather="link"></i> Link Wallet</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ route('transactions') }}"><i class="align-middle me-1" data-feather="activity"></i> Transaction History</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ route('logOut') }}"><i class="align-middle me-1" data-feather="log-out"></i> Logout</a>
+
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav navbar-align">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                {{ Auth::user()->name }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="{{ route('profile') }}"><i class="align-middle me-1"
+                                        data-feather="user"></i> Profile</a>
+                                <a class="dropdown-item" href="{{ route('settings') }}"><i class="align-middle me-1"
+                                        data-feather="settings"></i> Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ route('my.nft') }}"><i class="align-middle me-1"
+                                        data-feather="grid"></i> My NFTs</a>
+                                <a class="dropdown-item" href="{{ route('wallet.link') }}"><i class="align-middle me-1"
+                                        data-feather="link"></i> Link Wallet</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ route('transactions') }}"><i class="align-middle me-1"
+                                        data-feather="activity"></i> Transaction History</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ route('logOut') }}"><i class="align-middle me-1"
+                                        data-feather="log-out"></i> Logout</a>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-            </li>
-        </ul>
-    </div>
-</nav>
+            </nav>

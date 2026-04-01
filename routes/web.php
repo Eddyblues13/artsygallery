@@ -12,7 +12,8 @@ use App\Http\Controllers\Admin\Auth\AdminAuthController;
 
 
 
-Auth::routes();
+// Only register password reset routes from Auth::routes() - login/register handled by CustomAuthController
+Auth::routes(['login' => false, 'register' => false, 'verify' => false]);
 
 
 Route::get('/', [HomePageController::class, 'homepage'])->name('homepage');
@@ -34,6 +35,7 @@ Route::get('what-is-web3', [HomePageController::class, 'whatIsWeb3'])->name('wha
 Route::get('verify', [CustomAuthController::class, 'verify'])->name('verify');
 Route::get('/dashboard', [CustomAuthController::class, 'dashboard'])->middleware('user_auth')->name('dashboard');
 Route::get('home', [CustomAuthController::class, 'dashboard'])->middleware('user_auth')->name('home');
+Route::get('login', [CustomAuthController::class, 'index'])->name('login');
 Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('login.custom');
 Route::get('verify/{id}', [CustomAuthController::class, 'verify'])->name('verify');
 Route::post('email-verify', [CustomAuthController::class, 'emailVerify'])->name('code');

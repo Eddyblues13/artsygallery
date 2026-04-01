@@ -63,17 +63,12 @@
 
                                         <form action="{{ route('code') }}" method="POST">
                                             @csrf
-                                            <input type="text" id="email" name="email" style="display:none;"
-                                                value="{{$email}}">
-
-
-
 
                                             <div class="mb-3">
-                                                <label for="digit4-input" class="visually-hidden">Dight 4</label>
-                                                <input type="text"
-                                                    class="form-control form-control-lg text-center two-step"
-                                                    name="digit">
+                                                <label for="digit" class="form-label">Enter 4-digit code</label>
+                                                <input type="text" class="form-control form-control-lg text-center"
+                                                    name="digit" id="digit" maxlength="4" pattern="\d{4}"
+                                                    placeholder="0000" required autofocus>
                                             </div>
                                     </div>
 

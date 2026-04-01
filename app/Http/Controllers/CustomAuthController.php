@@ -32,21 +32,41 @@ class CustomAuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return response()->json([
-                "content" => "Successful",
-                "message" => "Login Successful",
-                "redirect" => route("homepage"),
-            ]);
+            // If user is not activated, redirect to verify page
+            $user = Auth::user();
+            if ($user->is_activated != '1') {
+                $redirectUrl = url("verify/" . $user->id);
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        "content" => "Successful",
+                        "message" => "Please verify your email first.",
+                        "redirect" => $redirectUrl,
+                    ]);
+                }
+                return redirect($redirectUrl);
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    "content" => "Successful",
+                    "message" => "Login Successful",
+                    "redirect" => route("homepage"),
+                ]);
+            }
+            return redirect()->route('homepage');
         }
 
-        return response()->json([
-            "content" => "Error",
-            "message" => "Invalid credentials",
-            "redirect" => url("login"),
-        ], 401);
+        if ($request->expectsJson()) {
+            return response()->json([
+                "content" => "Error",
+                "message" => "Invalid email or password",
+                "redirect" => url("login"),
+            ]);
+        }
+        return redirect()->back()->withInput($request->only('email', 'remember'))->with('error', 'Invalid email or password');
     }
 
     public function registration()
@@ -74,7 +94,11 @@ class CustomAuthController extends Controller
         $user->token = $token;
         $user->save();
 
-        Mail::to($user->email)->send(new VerificationEmail($token));
+        try {
+            Mail::to($user->email)->send(new VerificationEmail($token));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Verification email failed: ' . $e->getMessage());
+        }
 
         return redirect("verify/" . $user->id);
     }
@@ -90,7 +114,11 @@ class CustomAuthController extends Controller
         $user->token = $token;
         $user->save();
 
-        Mail::to($user->email)->send(new VerificationEmail($token));
+        try {
+            Mail::to($user->email)->send(new VerificationEmail($token));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Verification email resend failed: ' . $e->getMessage());
+        }
 
         return redirect("verify/" . $user->id)
             ->with('message', 'Verification code has been resent to your email');
@@ -104,7 +132,7 @@ class CustomAuthController extends Controller
             'address' => $data['address'],
             'phone' => $data['phone'],
             'country' => $data['country'],
-            'password' => Hash::make($data['password']),
+            'password' => $data['password'],
         ]);
     }
 
@@ -214,35 +242,49 @@ class CustomAuthController extends Controller
 
     public function emailVerify(Request $request)
     {
-        // ✅ combine 4 digits (you were using only digit1 before)
-        $code = trim(
-            ($request->input('digit') ?? '') .
-                ($request->input('digit2') ?? '') .
-                ($request->input('digit3') ?? '') .
-                ($request->input('digit4') ?? '')
-        );
+        // Support both single field "digit" (full code) and split fields "digit"+"digit2"+"digit3"+"digit4"
+        $code = trim($request->input('digit', ''));
+
+        // If the code is only 1 character, try concatenating split fields
+        if (strlen($code) <= 1) {
+            $code = trim(
+                ($request->input('digit') ?? '') .
+                    ($request->input('digit2') ?? '') .
+                    ($request->input('digit3') ?? '') .
+                    ($request->input('digit4') ?? '')
+            );
+        }
 
         if (strlen($code) !== 4 || !ctype_digit($code)) {
-            return back()->with('error', 'Invalid Activation Code format!');
+            return back()->with('error', 'Please enter a valid 4-digit activation code.');
         }
 
         $user = User::where('token', $code)->first();
 
         if (!$user) {
-            return back()->with('error', 'Incorrect Activation Code!');
+            return back()->with('error', 'Incorrect Activation Code! Please try again.');
         }
 
         $user->is_activated = 1;
-        $user->token = null; // ✅ invalidate token after use
+        $user->token = null;
         $user->save();
 
-        Mail::to($user->email)->send(new welcomeEmail([
-            'name' => $user->name,
-            'email' => $user->email,
-            'password' => '*********',
-        ]));
+        // Send welcome email
+        try {
+            Mail::to($user->email)->send(new welcomeEmail([
+                'name' => $user->name,
+                'email' => $user->email,
+                'password' => '********',
+            ]));
+        } catch (\Exception $e) {
+            // Log but don't block verification if email fails
+            \Illuminate\Support\Facades\Log::error('Welcome email failed: ' . $e->getMessage());
+        }
 
-        return redirect()->route("homepage")->with('status', 'Your account has been verified Successfully!');
+        // Log the user in
+        Auth::login($user);
+
+        return redirect()->route("homepage")->with('status', 'Your account has been verified successfully!');
     }
 
     public function supportEmail(Request $request)

@@ -1,5 +1,30 @@
 @include('dashboard.header')
 
+<style>
+	@media (max-width: 575.98px) {
+		.nft-card-grid .card-img-top {
+			height: 200px !important;
+		}
+
+		.nft-card-grid .card-body {
+			padding: 0.75rem;
+		}
+
+		.nft-card-grid .card-body .btn {
+			width: 100%;
+			margin-bottom: 0.5rem;
+		}
+
+		.nft-card-grid .card-title {
+			font-size: 1rem;
+		}
+
+		.nft-card-grid .card-text {
+			font-size: 0.875rem;
+		}
+	}
+</style>
+
 <main class="content">
 	<div class="container-fluid p-0">
 		@if(session('message'))
@@ -12,13 +37,13 @@
 				My NFTs
 			</a>
 		</div>
-		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 nft-card-grid">
 			@foreach($my_nft as $nft)
 
-			<div class="col col-lg-3 col-md-4 col-6">
-				<div class="card">
+			<div class="col">
+				<div class="card h-100">
 					<img class="card-img-top" src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}"
-						alt="{{ $nft->ntf_name }}" style="height: 300px; object-fit: cover;">
+						alt="{{ $nft->ntf_name }}" style="height: 250px; object-fit: cover;">
 					<div class="card-header">
 						<h5 class="card-title mb-0">{{ $nft->ntf_name }}</h5>
 					</div>
@@ -30,17 +55,20 @@
 						<p class="card-text"><strong>Creator:</strong> {{ $nft->ntf_owner }}</p>
 						<p class="card-text"><strong>Status:</strong>
 							@if($nft->status == '1')
-							<button type="button" class="btn btn-success">Approved</button>
+							<span class="badge bg-success">Approved</span>
 							@elseif($nft->status == '0')
-							<button type="button" class="btn btn-danger">Unapproved</button>
+							<span class="badge bg-danger">Unapproved</span>
 							@elseif($nft->status == '2')
-							<button type="button" class="btn btn-success">Sold</button>
+							<span class="badge bg-success">Sold</span>
 							@endif
 						</p>
 
-						<button class="btn btn-secondary" onclick="shareNFT('{{ $nft->id }}')">Share</button>
-						<a href="{{ url('update-nft/' . $nft->id) }}" class="btn btn-warning">Edit</a>
-						<button class="btn btn-danger" onclick="confirmDelete('{{ $nft->id }}')">Delete</button>
+						<div class="d-flex flex-wrap gap-2">
+							<button class="btn btn-sm btn-secondary" onclick="shareNFT('{{ $nft->id }}')">Share</button>
+							<a href="{{ url('update-nft/' . $nft->id) }}" class="btn btn-sm btn-warning">Edit</a>
+							<button class="btn btn-sm btn-danger"
+								onclick="confirmDelete('{{ $nft->id }}')">Delete</button>
+						</div>
 					</div>
 				</div>
 			</div>

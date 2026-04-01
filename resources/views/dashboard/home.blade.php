@@ -1,5 +1,50 @@
 @include('dashboard.header')
 
+<style>
+	@media (max-width: 767.98px) {
+		.content {
+			padding: 1rem 0.75rem !important;
+		}
+
+		.stat-card .card-body {
+			padding: 1rem;
+		}
+
+		.stat-card h3 {
+			font-size: 1.35rem;
+			word-break: break-all;
+		}
+
+		.stat-card .card-title {
+			font-size: 0.85rem;
+		}
+
+		.nft-banner {
+			height: 25vh !important;
+			min-height: 180px;
+		}
+
+		.nft-banner h1 {
+			font-size: 1.25rem !important;
+		}
+
+		.nft-banner .btn-lg {
+			padding: 0.5rem 1.25rem;
+			font-size: 0.9rem;
+		}
+
+		.nft-banner .card-body {
+			padding: 0.5rem !important;
+		}
+	}
+
+	@media (max-width: 575.98px) {
+		.stat-card h3 {
+			font-size: 1.15rem;
+		}
+	}
+</style>
+
 <main class="content">
 	<div class="container-fluid p-0">
 		@include('dashboard.alert')
@@ -9,11 +54,11 @@
 		<h1 class="h3 mb-3"><strong>Welcome</strong> {{Auth::user()->name}}</h1>
 
 		<div class="row">
-			<div class="col-xl-6 col-xxl-5 d-flex">
+			<div class="col-12 col-xl-6 col-xxl-5 d-flex">
 				<div class="w-100">
 					<div class="row">
-						<div class="col-sm-6">
-							<div class="card">
+						<div class="col-6 col-sm-6">
+							<div class="card stat-card">
 								<div class="card-body">
 									<div class="row">
 										<div class="col mt-0">
@@ -26,13 +71,14 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</b>
+									</h3>
 									<div class="mb-0">
 
 									</div>
 								</div>
 							</div>
-							<div class="card">
+							<div class="card stat-card">
 								<div class="card-body">
 									<div class="row">
 										<div class="col mt-0">
@@ -46,15 +92,16 @@
 										</div>
 									</div>
 
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</b>
+									</h3>
 									<div class="mb-0">
 
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-6">
-							<div class="card">
+						<div class="col-6 col-sm-6">
+							<div class="card stat-card">
 								<div class="card-body">
 									<div class="row">
 										<div class="col mt-0">
@@ -67,14 +114,15 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($deposit, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($deposit, 2) }}</b>
+									</h3>
 
 									<div class="mb-0">
 
 									</div>
 								</div>
 							</div>
-							<div class="card">
+							<div class="card stat-card">
 								<div class="card-body">
 									<div class="row">
 										<div class="col mt-0">
@@ -87,7 +135,8 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2)
+											}}</b></h3>
 
 									<div class="mb-0">
 
@@ -99,12 +148,13 @@
 				</div>
 			</div>
 
-			<div class="col-xl-6 col-xxl-7">
+			<div class="col-12 col-xl-6 col-xxl-7">
 				<div class="card flex-fill w-100">
 					<!-- Background image -->
-					<div class="bg-image" style="
+					<div class="bg-image nft-banner" style="
 		background-image: url('https://img.freepik.com/free-vector/digital-nft-non-fungible-token-background_1017-41191.jpg?t=st=1719148257~exp=1719151857~hmac=0bf6528b00dd8cbb2561e7d1dda624493774dd2fd63cfa35700c867985bb1ac4&w=826');
 		height: 30vh;
+		min-height: 220px;
 		background-size: cover;
 		background-position: center;
 	  ">
@@ -115,10 +165,10 @@
 							<div class="card-body text-center">
 								<div class="mb-3">
 									<a href="{{route('buy.nft')}}" class="btn btn-primary btn-lg">NFT Market</a>
-									<a href="{{route('buy.nft')}}" class="text-white mb-0">Learn More</a>
+									<a href="{{route('buy.nft')}}" class="text-white mb-0 ms-2">Learn More</a>
 								</div>
 							</div>
-	
+
 						</div>
 					</div>
 					<!-- Background image -->
