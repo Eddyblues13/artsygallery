@@ -53,7 +53,8 @@
                     <!-- Logo -->
                     <div class="flex-shrink-0 mr-4">
                         <a href="{{route('homepage')}}" class="block">
-                            <img src="images/logo.png" alt="Artisttocollectors Logo" class="h-10 sm:h-12 w-auto" />
+                            <img src="{{ asset('images/logo.png') }}" alt="ArtistToCollectors Logo"
+                                class="h-10 sm:h-12 w-auto" />
                         </a>
                     </div>
 
@@ -75,14 +76,14 @@
 
                     <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center space-x-6 xl:space-x-8">
-                        <a href="{{route('homepage')}}"
+                        <a href="{{ route('explore') }}"
                             class="text-slate-600 hover:text-slate-900 font-bold transition-colors">Explore</a>
                         <a href="{{route('about')}}"
                             class="text-slate-600 hover:text-slate-900 font-bold transition-colors">About</a>
                         @if (auth()->check())
                         <a href="{{route('home')}}"
                             class="text-slate-600 hover:text-slate-900 font-bold transition-colors">Dashboard</a>
-                        <a href="{{route('home')}}"
+                        <a href="{{route('upload.nft')}}"
                             class="px-5 py-2.5 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5 whitespace-nowrap">Create</a>
                         @else
                         <a href="{{route('login')}}"
@@ -116,14 +117,14 @@
                     </div>
 
                     <div class="flex flex-col space-y-3">
-                        <a href="{{route('homepage')}}"
+                        <a href="{{ route('explore') }}"
                             class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">Explore</a>
                         <a href="{{route('about')}}"
                             class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">About</a>
                         @if (auth()->check())
                         <a href="{{route('home')}}"
                             class="text-slate-700 hover:text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-50 transition-colors">Dashboard</a>
-                        <a href="{{route('home')}}"
+                        <a href="{{route('upload.nft')}}"
                             class="mt-4 text-center px-5 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">Create</a>
                         @else
                         <a href="{{route('login')}}"

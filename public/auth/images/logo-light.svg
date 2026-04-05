@@ -1,14 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 225 225" style="enable-background:new 0 0 225 225;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#ffffff;stroke-width:20;stroke-linecap:round;stroke-miterlimit:3;}
-</style>
-<g transform="matrix( 1, 0, 0, 1, 0,0) ">
-	<g>
-		<path id="Layer0_0_1_STROKES" class="st0" d="M173.8,151.5l13.6-13.6 M35.4,89.9l29.1-29 M89.4,34.9v1 M137.4,187.9l-0.6-0.4
-			 M36.6,138.7l0.2-0.2 M56.1,169.1l27.7-27.6 M63.8,111.5l74.3-74.4 M87.1,188.1L187.6,87.6 M110.8,114.5l57.8-57.8"/>
-	</g>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="60" viewBox="0 0 380 60">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b7ddd"/>
+      <stop offset="100%" stop-color="#5a9cf5"/>
+    </linearGradient>
+  </defs>
+  <!-- ArtistToCollectors Logo (Blue Gradient) -->
+  <g transform="translate(26,30)">
+    <path d="M0-22L16 0 0 22-16 0Z" fill="url(#grad)" opacity="0.95"/>
+    <path d="M0-22L16 0 0 0Z" fill="#fff" opacity="0.25"/>
+    <path d="M-16 0L0 0 0 22Z" fill="#000" opacity="0.1"/>
+    <path d="M4-6L10 0 4 6-2 0Z" fill="#fff" opacity="0.3"/>
+    <circle cx="-5" cy="-3" r="2" fill="#fff" opacity="0.2"/>
+  </g>
+  <text x="52" y="24" font-family="Inter,'Segoe UI',system-ui,Arial,sans-serif" font-size="11" fill="#3b7ddd" font-weight="300" letter-spacing="3" opacity="0.6">NFT MARKETPLACE</text>
+  <text x="52" y="44" font-family="Inter,'Segoe UI',system-ui,Arial,sans-serif" font-size="22" fill="#3b7ddd" font-weight="700" letter-spacing="0.5">artist<tspan font-weight="400">to</tspan>collectors</text>
 </svg>

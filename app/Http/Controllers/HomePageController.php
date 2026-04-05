@@ -81,4 +81,67 @@ class HomePageController extends Controller
         $data['phone'] = DB::table('admins')->first();
         return view('home.what-is-web3', $data);
     }
+
+    public function explore(Request $request)
+    {
+        $data['phone'] = DB::table('admins')->first();
+
+        $query = Nft::where('status', 1);
+
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('ntf_name', 'like', "%{$search}%")
+                    ->orWhere('ntf_description', 'like', "%{$search}%")
+                    ->orWhere('ntf_owner', 'like', "%{$search}%");
+            });
+        }
+
+        // Category filter (keyword-based since no category column)
+        if ($request->filled('category')) {
+            $category = $request->input('category');
+            $categoryKeywords = [
+                'art' => ['art', 'painting', 'drawing', 'illustration', 'abstract', 'canvas'],
+                'gaming' => ['game', 'gaming', 'player', 'level', 'quest', 'rpg'],
+                'memberships' => ['membership', 'member', 'access', 'pass', 'exclusive', 'vip'],
+                'pfps' => ['pfp', 'profile', 'avatar', 'portrait', 'character'],
+                'photography' => ['photo', 'photography', 'camera', 'landscape', 'portrait'],
+                'music' => ['music', 'song', 'beat', 'audio', 'sound', 'melody'],
+                'sports' => ['sport', 'athlete', 'football', 'basketball', 'soccer', 'fitness'],
+                'virtual-worlds' => ['virtual', 'metaverse', 'world', '3d', 'vr', 'land'],
+            ];
+
+            $keywords = $categoryKeywords[$category] ?? [];
+            if (!empty($keywords)) {
+                $query->where(function ($q) use ($keywords) {
+                    foreach ($keywords as $keyword) {
+                        $q->orWhere('ntf_name', 'like', "%{$keyword}%")
+                            ->orWhere('ntf_description', 'like', "%{$keyword}%");
+                    }
+                });
+            }
+
+            $data['activeCategory'] = $category;
+        }
+
+        // Sort
+        $sort = $request->input('sort', 'latest');
+        switch ($sort) {
+            case 'price_low':
+                $query->orderBy('nft_price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('nft_price', 'desc');
+                break;
+            default:
+                $query->latest();
+                break;
+        }
+
+        $data['nfts'] = $query->paginate(12)->withQueryString();
+        $data['totalNfts'] = Nft::where('status', 1)->count();
+
+        return view('home.explore', $data);
+    }
 }

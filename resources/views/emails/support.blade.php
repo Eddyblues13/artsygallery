@@ -1,18 +1,7 @@
-<!DOCTYPE html>
-<html>
+@extends('emails.partials.layout')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-</head>
-
-<body>
-    <h1>You have an email from your client</h1>
-    <strong>Details:</strong><br>
-    <strong>Name</strong>{{$data['name']}}<br>
-    <strong>Email:</strong>{{$data['email']}}<br>
-    <strong>Message:</strong>{{$data['message']}}<br>
-</body>
-
-</html>
+@section('content')
+<h1>Support Request</h1>
+<p>You have received a new support request from <strong>{{ $data['name'] }}</strong>.</p>
+<p>Please review and respond via the admin dashboard.</p>
+@endsection

@@ -28,7 +28,7 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <nav class="flex items-center justify-between py-3 sm:py-4">
                 <a href="/" class="block">
-                    <img src="/images/logo.png" alt="Artisttocollectors Logo" class="h-10 sm:h-12 w-auto">
+                    <img src="/images/logo.png" alt="ArtistToCollectors Logo" class="h-10 sm:h-12 w-auto">
                 </a>
                 <a href="/" class="text-slate-600 hover:text-primary font-bold transition-colors">
                     <i class="bi bi-house-door mr-1"></i> Home

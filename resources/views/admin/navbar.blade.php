@@ -8,8 +8,8 @@
           <!-- Sidebar brand starts -->
           <div class="brand">
             <a href="{{url('home')}}" class="logo">
-              <img src="{{asset('images/logo.png')}}" class="d-none d-md-block me-4" alt="Rapid Admin Dashboard" />
-              <img src="{{asset('images/logo.png')}}" class="d-block d-md-none me-4" alt="Rapid Admin Dashboard" />
+              <img src="{{asset('images/logo.png')}}" class="d-none d-md-block me-4" alt="ArtistToCollectors" />
+              <img src="{{asset('images/logo.png')}}" class="d-block d-md-none me-4" alt="ArtistToCollectors" />
             </a>
           </div>
           <!-- Sidebar brand ends -->

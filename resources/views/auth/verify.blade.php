@@ -26,9 +26,9 @@
                 <div class="col-lg-12">
                     <div class="text-center mb-5 text-muted">
                         <a href="index.html" class="d-block auth-logo">
-                            <img src="{{asset('homepage/images/logo-dark.png')}}" alt="" height="20"
+                            <img src="{{asset('homepage/images/logo-dark.png')}}" alt="ArtistToCollectors" height="20"
                                 class="auth-logo-dark mx-auto">
-                            <img src="{{asset('homepage/images/logo-dark.png')}}" alt="" height="20"
+                            <img src="{{asset('homepage/images/logo-dark.png')}}" alt="ArtistToCollectors" height="20"
                                 class="auth-logo-light mx-auto">
                         </a>
                     </div>
@@ -108,7 +108,7 @@
     <div class="position-fixed top-0 end-0 p-2" style="z-index: 1005">
         <div id="ErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <img src="{{asset('homepage/images/logo-dark.png')}}" alt="" class="me-2" height="18">
+                <img src="{{asset('homepage/images/logo-dark.png')}}" alt="ArtistToCollectors" class="me-2" height="18">
                 <strong class="me-auto">Error</strong>
                 <small>Now..</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>

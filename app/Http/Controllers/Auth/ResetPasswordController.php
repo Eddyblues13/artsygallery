@@ -25,5 +25,17 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/login';
+
+    /**
+     * Override to logout and redirect to login with success message.
+     */
+    protected function sendResetResponse(\Illuminate\Http\Request $request, $response)
+    {
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('status', 'Your password has been reset successfully. Please log in with your new password.');
+    }
 }

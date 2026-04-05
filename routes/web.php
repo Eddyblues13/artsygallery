@@ -17,6 +17,7 @@ Auth::routes(['login' => false, 'register' => false, 'verify' => false]);
 
 
 Route::get('/', [HomePageController::class, 'homepage'])->name('homepage');
+Route::get('explore', [HomePageController::class, 'explore'])->name('explore');
 Route::get('about', [HomePageController::class, 'about'])->name('about');
 Route::get('contact', [HomePageController::class, 'contact'])->name('contact');
 Route::get('drop', [HomePageController::class, 'drop'])->name('drop');
