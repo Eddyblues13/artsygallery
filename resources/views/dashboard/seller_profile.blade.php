@@ -355,9 +355,8 @@
                     <img class="nft-item-image" src="{{ $nft->ntf_image }}" alt="{{ $nft->ntf_name }}" loading="lazy"
                         onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
                     @else
-                    <img class="nft-item-image" src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}"
-                        alt="{{ $nft->ntf_name }}" loading="lazy"
-                        onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
+                    <img class="nft-item-image" src="{{ asset($nft->ntf_image) }}" alt="{{ $nft->ntf_name }}"
+                        loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
                     @endif
                 </div>
                 <div class="nft-item-body">

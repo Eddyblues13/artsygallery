@@ -42,8 +42,8 @@
 
 			<div class="col">
 				<div class="card h-100">
-					<img class="card-img-top" src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}"
-						alt="{{ $nft->ntf_name }}" style="height: 250px; object-fit: cover;">
+					<img class="card-img-top" src="{{ asset($nft->ntf_image) }}" alt="{{ $nft->ntf_name }}"
+						style="height: 250px; object-fit: cover;">
 					<div class="card-header">
 						<h5 class="card-title mb-0">{{ $nft->ntf_name }}</h5>
 					</div>

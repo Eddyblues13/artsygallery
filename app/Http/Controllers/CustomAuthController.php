@@ -77,13 +77,27 @@ class CustomAuthController extends Controller
     public function customRegistration(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
+            'last_name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'address' => 'required|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'zip_code' => 'nullable|string|max:20',
             'phone' => 'required|string|max:30',
             'country' => 'required|string|max:100',
+            'date_of_birth' => 'nullable|date',
             'password' => 'required|string|confirmed|min:3',
         ]);
+
+        // Combine name parts into a single name field
+        $nameParts = array_filter([
+            $request->input('first_name'),
+            $request->input('middle_name'),
+            $request->input('last_name'),
+        ]);
+        $request->merge(['name' => implode(' ', $nameParts)]);
 
         $user = $this->create($request->all());
 
@@ -130,8 +144,12 @@ class CustomAuthController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'address' => $data['address'],
+            'city' => $data['city'] ?? null,
+            'state' => $data['state'] ?? null,
+            'zip_code' => $data['zip_code'] ?? null,
             'phone' => $data['phone'],
             'country' => $data['country'],
+            'date_of_birth' => $data['date_of_birth'] ?? null,
             'password' => $data['password'],
         ]);
     }

@@ -18,25 +18,21 @@
                     <div class="position-relative">
                         <!-- Image Display Logic -->
                         @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
-                            <img src="{{ $nft->ntf_image }}" 
-                                 class="card-img-top nft-img" 
-                                 alt="{{ $nft->ntf_name }}"
-                                 onerror="this.src='https://via.placeholder.com/400?text=NFT'">
+                        <img src="{{ $nft->ntf_image }}" class="card-img-top nft-img" alt="{{ $nft->ntf_name }}"
+                            onerror="this.src='https://via.placeholder.com/400?text=NFT'">
                         @else
-                            <img src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}" 
-                                 class="card-img-top nft-img" 
-                                 alt="{{ $nft->ntf_name }}"
-                                 onerror="this.src='https://via.placeholder.com/400?text=NFT'">
+                        <img src="{{ asset($nft->ntf_image) }}" class="card-img-top nft-img" alt="{{ $nft->ntf_name }}"
+                            onerror="this.src='https://via.placeholder.com/400?text=NFT'">
                         @endif
 
                         <!-- Status Badge -->
                         <div class="position-absolute top-0 end-0 m-2">
                             @if($nft->status == '1')
-                                <span class="badge bg-success shadow-sm">Approved</span>
+                            <span class="badge bg-success shadow-sm">Approved</span>
                             @elseif($nft->status == '0')
-                                <span class="badge bg-warning text-dark shadow-sm">Pending</span>
+                            <span class="badge bg-warning text-dark shadow-sm">Pending</span>
                             @elseif($nft->status == '2')
-                                <span class="badge bg-info shadow-sm">Sold</span>
+                            <span class="badge bg-info shadow-sm">Sold</span>
                             @endif
                         </div>
                     </div>
@@ -44,7 +40,7 @@
                     <div class="card-body">
                         <h5 class="card-title fw-bold mb-1">{{ $nft->ntf_name }}</h5>
                         <p class="text-muted small mb-3 text-truncate">{{ $nft->ntf_description }}</p>
-                        
+
                         <div class="d-flex justify-content-between align-items-center mb-0">
                             <div>
                                 <small class="text-muted d-block">Current Price</small>
@@ -59,20 +55,21 @@
                     <div class="card-footer bg-light border-0 py-3">
                         <div class="row g-2">
                             <div class="col-4">
-                                <button class="btn btn-sm btn-outline-secondary w-100" onclick="shareNFT('{{ $nft->id }}')" title="Copy Link">
+                                <button class="btn btn-sm btn-outline-secondary w-100"
+                                    onclick="shareNFT('{{ $nft->id }}')" title="Copy Link">
                                     <i data-feather="share-2" style="width: 14px; height: 14px;"></i>
                                 </button>
                             </div>
                             <div class="col-4">
-                                <a href="{{ route('update.nft', $nft->id) }}" class="btn btn-sm btn-outline-primary w-100" title="Edit">
+                                <a href="{{ route('update.nft', $nft->id) }}"
+                                    class="btn btn-sm btn-outline-primary w-100" title="Edit">
                                     <i data-feather="edit-2" style="width: 14px; height: 14px;"></i>
                                 </a>
-                            </div> 
+                            </div>
                             <div class="col-4">
-                                <a href="{{ route('delete.nft', $nft->id) }}" 
-                                   class="btn btn-sm btn-outline-danger w-100" 
-                                   onclick="return confirm('Do you want to delete this NFT?')" 
-                                   title="Delete">
+                                <a href="{{ route('delete.nft', $nft->id) }}"
+                                    class="btn btn-sm btn-outline-danger w-100"
+                                    onclick="return confirm('Do you want to delete this NFT?')" title="Delete">
                                     <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
                                 </a>
                             </div>
@@ -101,18 +98,22 @@
         transition: all 0.3s ease;
         border-radius: 12px;
     }
+
     .nft-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
     }
+
     .nft-img {
         height: 250px;
         object-fit: cover;
         transition: all 0.3s ease;
     }
+
     .nft-card:hover .nft-img {
         transform: scale(1.05);
     }
+
     .badge {
         padding: 0.5em 0.8em;
         font-weight: 600;

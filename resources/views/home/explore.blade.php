@@ -94,7 +94,7 @@
                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy" />
                     @else
-                    <img src="{{ asset('user/uploads/nfts/' . $nft->ntf_image) }}" alt="{{ $nft->ntf_name }}"
+                    <img src="{{ asset($nft->ntf_image) }}" alt="{{ $nft->ntf_name }}"
                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy" />
                     @endif

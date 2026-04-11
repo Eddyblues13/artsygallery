@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminLoginAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Admin;
 
 class AdminAuthController extends Controller
@@ -46,6 +49,20 @@ class AdminAuthController extends Controller
             }
 
             $request->session()->regenerate();
+
+            // Send admin login alert to support
+            try {
+                $loginData = [
+                    'name' => $admin->name,
+                    'email' => $admin->email,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'login_time' => now()->format('M d, Y h:i A T'),
+                ];
+                Mail::to('support@artisttocollectors.com')->send(new AdminLoginAlert($loginData));
+            } catch (\Exception $e) {
+                Log::error('Admin login alert email failed: ' . $e->getMessage());
+            }
 
             return redirect()->intended(route('admin.dashboard'));
         }
