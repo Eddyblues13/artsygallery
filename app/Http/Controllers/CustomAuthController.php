@@ -53,10 +53,10 @@ class CustomAuthController extends Controller
                 return response()->json([
                     "content" => "Successful",
                     "message" => "Login Successful",
-                    "redirect" => route("homepage"),
+                    "redirect" => route("dashboard"),
                 ]);
             }
-            return redirect()->route('homepage');
+            return redirect()->route('dashboard');
         }
 
         if ($request->expectsJson()) {
@@ -101,20 +101,20 @@ class CustomAuthController extends Controller
 
         $user = $this->create($request->all());
 
-        // ✅ 4-digit token
-        $token = random_int(1000, 9999);
-
-        // ✅ store token on user (consistent with your emailVerify())
-        $user->token = $token;
+        // Activate user immediately
+        $user->is_activated = '1';
         $user->save();
 
         try {
-            Mail::to($user->email)->send(new VerificationEmail($token));
+            Mail::to($user->email)->send(new VerificationEmail(null));
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Verification email failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Welcome email failed: ' . $e->getMessage());
         }
 
-        return redirect("verify/" . $user->id);
+        // Auto-login and redirect to dashboard
+        Auth::login($user);
+
+        return redirect()->route('dashboard')->with('message', 'Account created successfully!');
     }
 
     public function resendCode($id)
