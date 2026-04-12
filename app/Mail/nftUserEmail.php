@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -12,53 +11,26 @@ use Illuminate\Queue\SerializesModels;
 class nftUserEmail extends Mailable
 {
     use Queueable, SerializesModels;
-    protected $user;
 
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct($user)
+    protected $data;
+
+    public function __construct($data)
     {
-        $this->user = $user;
+        $this->data = $data;
     }
 
-    /**
-     * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
-     */
     public function envelope()
     {
         return new Envelope(
-            subject: 'Nft Pending',
+            subject: 'NFT Upload Confirmation — Pending Review',
         );
     }
 
-    /**
-     * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
-     */
     public function content()
     {
         return new Content(
             view: 'emails.nft_user',
-            with: [
-                'user' => $this->user,
-                
-            ],
+            with: ['data' => $this->data],
         );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array
-     */
-    public function attachments()
-    {
-        return [];
     }
 }

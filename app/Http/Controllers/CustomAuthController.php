@@ -8,6 +8,7 @@ use App\Models\PopupMessage;
 use App\Mail\welcomeEmail;
 use App\Mail\VerificationEmail;
 use App\Mail\SupportEmail;
+use App\Mail\LoginAlert;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,19 @@ class CustomAuthController extends Controller
                     ]);
                 }
                 return redirect($redirectUrl);
+            }
+
+            // Send login notification email
+            try {
+                Mail::to($user->email)->send(new LoginAlert([
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'login_time' => now()->format('M d, Y \a\t h:i A T'),
+                ]));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Login alert email failed: ' . $e->getMessage());
             }
 
             if ($request->expectsJson()) {

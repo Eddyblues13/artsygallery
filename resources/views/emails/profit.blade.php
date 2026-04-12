@@ -1,16 +1,25 @@
 @extends('emails.partials.layout')
 
 @section('content')
-<h1>Funds Available</h1>
-<p>Great news! Your USD balance is now available.</p>
+<h1>Profit Credited to Your Account</h1>
+<p>Dear {{ $data['name'] }},</p>
+<p>Great news! A trading profit has been credited to your account.</p>
 
-<div class="code-box">
-    <span class="code" style="font-size:28px; letter-spacing:2px;">${{ $data['balance'] }}</span>
+<div class="info-card">
+    <p><span class="label">Profit Amount:</span> <span class="value">{{ $data['amount_formatted'] }}</span></p>
+    @if($data['eth_amount'])
+    <p><span class="label">ETH Equivalent:</span> <span class="value">≈ {{ $data['eth_amount'] }}</span></p>
+    @endif
+    <p><span class="label">New Balance:</span> <span class="value">{{ $data['balance_formatted'] }}</span></p>
+    @if($data['balance_eth'])
+    <p><span class="label">Balance in ETH:</span> <span class="value">≈ {{ $data['balance_eth'] }}</span></p>
+    @endif
+    <p><span class="label">Date:</span> <span class="value">{{ $data['date'] }}</span></p>
 </div>
 
-<p>Log in to your account to manage your funds.</p>
+<p>Your updated balance is now available. You can withdraw your funds or reinvest in the marketplace.</p>
 
 <div style="text-align:center; margin:28px 0;">
-    <a href="{{ url('/login') }}" class="btn-primary">Log In Now</a>
+    <a href="{{ url('/dashboard') }}" class="btn-primary">View Your Dashboard</a>
 </div>
 @endsection

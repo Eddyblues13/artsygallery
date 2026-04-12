@@ -14,6 +14,9 @@ use App\Mail\nftUserEmail;
 use App\Mail\nftApprovedEmail;
 use App\Mail\sendUserEmail;
 use App\Mail\ApproveKyc;
+use App\Mail\DepositApproved;
+use App\Mail\WithdrawalApprovedMail;
+use App\Mail\profitEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -424,6 +427,32 @@ class AdminController extends Controller
         $deposit = array();
         $deposit['status'] = 1;
         $update = DB::table('transactions')->where('id', $id)->update($deposit);
+
+        // Send deposit approved email
+        try {
+            $transaction = Transaction::find($id);
+            if ($transaction) {
+                $user = User::find($transaction->user_id);
+                if ($user) {
+                    $userId = $user->id;
+                    $depTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+                    $wdTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+                    $profitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+                    $debitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+                    $balance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
+
+                    $emailData = array_merge(
+                        ['name' => $user->name, 'date' => now()->format('M d, Y h:i A')],
+                        \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
+                        \App\Helpers\CurrencyHelper::emailBalanceData($balance)
+                    );
+                    Mail::to($user->email)->send(new DepositApproved($emailData));
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Deposit approved email failed: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('message', 'Deposit Has Been Approved Successfully');
     }
 
@@ -440,6 +469,37 @@ class AdminController extends Controller
         $deposit = array();
         $deposit['status'] = $request->status;
         $update = DB::table('transactions')->where('id', $id)->update($deposit);
+
+        // Send withdrawal approved email
+        try {
+            $transaction = Transaction::find($id);
+            if ($transaction && $request->status == 1) {
+                $user = User::find($transaction->user_id);
+                if ($user) {
+                    $userId = $user->id;
+                    $depTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+                    $wdTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+                    $profitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+                    $debitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+                    $balance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
+
+                    $emailData = array_merge(
+                        [
+                            'name' => $user->name,
+                            'method' => $transaction->withdrawal_method ?? 'crypto',
+                            'reference' => $transaction->transaction_id ?? 'N/A',
+                            'date' => now()->format('M d, Y h:i A'),
+                        ],
+                        \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
+                        \App\Helpers\CurrencyHelper::emailBalanceData(max(0, $balance))
+                    );
+                    Mail::to($user->email)->send(new WithdrawalApprovedMail($emailData));
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Withdrawal approved email failed: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('message', 'Withdrawal Has Been Approved Successfully');
     }
 
@@ -778,11 +838,12 @@ class AdminController extends Controller
 
 
         $user = [
-            'amount' => $request['nft_price'],
-            'name' => $request['nft_name'],
-            'status' => 'Approved',
-            'ref' => $ref,
-            'full_name' => $full_name,
+            'name' => $full_name,
+            'nft_name' => $request['nft_name'],
+            'price_formatted' => \App\Helpers\CurrencyHelper::format($nft_price, 2),
+            'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft_price),
+            'reference' => $ref,
+            'date' => now()->format('M d, Y h:i A'),
         ];
 
 
@@ -839,6 +900,28 @@ class AdminController extends Controller
         $transaction->transaction_id = 'PROFIT_' . time() . '_' . rand(1000, 9999);
         $transaction->status = 1;
         $transaction->save();
+
+        // Send profit email notification
+        try {
+            $user = User::find($request->id);
+            if ($user) {
+                $userId = $user->id;
+                $depTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+                $wdTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+                $profitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+                $debitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+                $balance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
+
+                $emailData = array_merge(
+                    ['name' => $user->name, 'date' => now()->format('M d, Y h:i A')],
+                    \App\Helpers\CurrencyHelper::emailAmountData($request->amount),
+                    \App\Helpers\CurrencyHelper::emailBalanceData($balance)
+                );
+                Mail::to($user->email)->send(new profitEmail($emailData));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Profit email failed: ' . $e->getMessage());
+        }
 
         return back()->with('status', 'Profit added successfully!');
     }

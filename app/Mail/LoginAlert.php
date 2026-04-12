@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DepositPending extends Mailable
+class LoginAlert extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,17 +19,17 @@ class DepositPending extends Mailable
         $this->data = $data;
     }
 
-    public function envelope()
+    public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Deposit Received — Pending Confirmation',
+            subject: 'New Login to Your Account — ' . config('app.name'),
         );
     }
 
-    public function content()
+    public function content(): Content
     {
         return new Content(
-            view: 'emails.deposit_pending',
+            view: 'emails.login_alert',
             with: ['data' => $this->data],
         );
     }

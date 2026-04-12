@@ -1,16 +1,28 @@
 @extends('emails.partials.layout')
 
 @section('content')
-<h1>NFT Creation Confirmation</h1>
-<p>Dear {{ $user['full_name'] }},</p>
-<p>Your NFT has been submitted. Here are the details:</p>
+<h1>NFT Upload Confirmation</h1>
+<p>Dear {{ $data['name'] }},</p>
+<p>Your artwork has been submitted successfully and is now pending review. Here are the details:</p>
 
 <div class="info-card">
-    <p><span class="label">NFT Name:</span> <span class="value">{{ $user['name'] }}</span></p>
-    <p><span class="label">Amount:</span> <span class="value">${{ $user['amount'] }} USD</span></p>
-    <p><span class="label">Reference:</span> <span class="value">{{ $user['ref'] }}</span></p>
-    <p><span class="label">Status:</span> <span class="value">{{ $user['status'] }}</span></p>
+    <p><span class="label">NFT Name:</span> <span class="value">{{ $data['nft_name'] }}</span></p>
+    <p><span class="label">Listed Price:</span> <span class="value">{{ $data['price_formatted'] }}</span></p>
+    @if($data['eth_amount'])
+    <p><span class="label">ETH Equivalent:</span> <span class="value">≈ {{ $data['eth_amount'] }}</span></p>
+    @endif
+    <p><span class="label">Reference:</span> <span class="value">{{ $data['reference'] }}</span></p>
+    <p><span class="label">Date:</span> <span class="value">{{ $data['date'] }}</span></p>
+    <p><span class="label">Status:</span> <span class="value" style="color:#d97706;">Pending Review</span></p>
 </div>
 
-<p>You will be notified when your NFT status is updated.</p>
+<p>Our team will review your submission and you will be notified once your NFT has been approved and listed on the
+    marketplace.</p>
+
+<div style="text-align:center; margin:28px 0;">
+    <a href="{{ url('/my_nft') }}" class="btn-primary">View My NFTs</a>
+</div>
+
+<p style="font-size:13px; color:#9ca3af;">Please ensure your artwork complies with our community guidelines to avoid
+    delays in approval.</p>
 @endsection

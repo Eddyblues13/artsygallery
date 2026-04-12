@@ -74,7 +74,11 @@
 									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</b>
 									</h3>
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($balance))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($balance) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($balance) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -95,7 +99,11 @@
 									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</b>
 									</h3>
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($profit))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($profit) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($profit) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -118,7 +126,11 @@
 									</h3>
 
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($deposit))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($deposit) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($deposit) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -139,7 +151,11 @@
 											}}</b></h3>
 
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($withdrawal))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($withdrawal) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($withdrawal) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -405,6 +421,28 @@
 				defaultDate: defaultDate
 			});
 		});
+</script>
+
+<script>
+	// Live ETH price refresh every 60 seconds
+(function() {
+    function refreshEthPrices() {
+        fetch("{{ route('api.eth.price') }}")
+            .then(r => r.json())
+            .then(data => {
+                if (!data.eth_price_usd) return;
+                document.querySelectorAll('.eth-conversion').forEach(el => {
+                    const usd = parseFloat(el.dataset.usd);
+                    if (isNaN(usd) || usd === 0) return;
+                    const eth = usd / data.eth_price_usd;
+                    const formatted = eth < 0.000001 ? eth.toExponential(2) : parseFloat(eth.toFixed(6));
+                    el.textContent = '≈ ' + formatted + ' ETH';
+                });
+            })
+            .catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
+})();
 </script>
 
 

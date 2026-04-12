@@ -199,3 +199,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
     Route::get('nft/edit/{id}', [AdminController::class, 'editNft'])->name('edit.nft');
     Route::put('nft/update/{id}', [AdminController::class, 'updateNft'])->name('update.nft');
 });
+
+// ETH Price API (accessible to authenticated users and admins)
+Route::get('api/eth-price', function () {
+    $price = \App\Helpers\CurrencyHelper::getEthPrice();
+    return response()->json(['eth_price_usd' => $price]);
+})->name('api.eth.price');

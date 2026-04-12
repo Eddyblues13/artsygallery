@@ -37,7 +37,8 @@
 						<div class="card-body text-center">
 							<div class="mb-3">
 								<a href="{{route('view.users')}}" class="btn btn-primary btn-lg">Manage Users</a>
-								<a href="{{route('admin.approve.nft')}}" class="btn btn-secondary btn-lg">Approve Artworks</a>
+								<a href="{{route('admin.approve.nft')}}" class="btn btn-secondary btn-lg">Approve
+									Artworks</a>
 							</div>
 						</div>
 
@@ -64,9 +65,14 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_balance, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_balance, 2)
+											}}</b></h3>
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($total_balance))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_balance) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($total_balance) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -84,9 +90,14 @@
 										</div>
 									</div>
 
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_profit, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_profit, 2)
+											}}</b></h3>
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($total_profit))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_profit) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($total_profit) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -105,10 +116,15 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_deposits, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_deposits, 2)
+											}}</b></h3>
 
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($total_deposits))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_deposits) }}">≈ {{
+											\App\Helpers\CurrencyHelper::formatEth($total_deposits) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -125,10 +141,15 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_withdrawals, 2) }}</b></h3>
+									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_withdrawals,
+											2) }}</b></h3>
 
 									<div class="mb-0">
-
+										@if(\App\Helpers\CurrencyHelper::formatEth($total_withdrawals))
+										<small class="text-muted eth-conversion"
+											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_withdrawals) }}">≈
+											{{ \App\Helpers\CurrencyHelper::formatEth($total_withdrawals) }}</small>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -231,7 +252,8 @@
 							<div class="pt-1 col-12">
 								<h3>Platform Statistics</h3>
 								<div class="mt-4">
-									<p class="text-muted">General platform usage statistics and trends will appear here.</p>
+									<p class="text-muted">General platform usage statistics and trends will appear here.
+									</p>
 								</div>
 							</div>
 						</div>
@@ -244,5 +266,27 @@
 
 	</div>
 </main>
+
+<script>
+	// Live ETH price refresh every 60 seconds
+(function() {
+    function refreshEthPrices() {
+        fetch("{{ route('api.eth.price') }}")
+            .then(r => r.json())
+            .then(data => {
+                if (!data.eth_price_usd) return;
+                document.querySelectorAll('.eth-conversion').forEach(el => {
+                    const usd = parseFloat(el.dataset.usd);
+                    if (isNaN(usd) || usd === 0) return;
+                    const eth = usd / data.eth_price_usd;
+                    const formatted = eth < 0.000001 ? eth.toExponential(2) : parseFloat(eth.toFixed(6));
+                    el.textContent = '≈ ' + formatted + ' ETH';
+                });
+            })
+            .catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
+})();
+</script>
 
 @include('dashboard.footer')

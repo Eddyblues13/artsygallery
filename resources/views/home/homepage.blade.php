@@ -30,13 +30,13 @@
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-                    <a href="{{ route('explore') }}"
+                    <a href="{{ route('login') }}"
                         class="px-8 py-3.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all duration-300 shadow-lg shadow-primary/30 flex items-center justify-center">
-                        Explore
+                        Login
                     </a>
-                    <a href="{{ auth()->check() ? route('upload.nft') : route('register') }}"
+                    <a href="{{ route('register') }}"
                         class="px-8 py-3.5 bg-white border border-slate-200 text-primary rounded-xl font-semibold hover:shadow-md transition-all duration-300 flex items-center justify-center">
-                        Create
+                        Sign Up
                     </a>
                 </div>
 
