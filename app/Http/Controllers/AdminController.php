@@ -714,7 +714,7 @@ class AdminController extends Controller
         ]);
 
         $price = $request->input('nft_price');
-        $nft_price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+        $nft_price = (float) $price;
 
         // Get the first user ID from the database
         $firstUser = \App\Models\User::orderBy('id')->first();
@@ -822,7 +822,7 @@ class AdminController extends Controller
 
         $price =   $request->input('nft_price');
         $full_name =   $request->input('full_name');
-        $nft_price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+        $nft_price = (float) $price;
         $email = $request->email;
         $nft = array();
         $nft['status'] = $request->status;

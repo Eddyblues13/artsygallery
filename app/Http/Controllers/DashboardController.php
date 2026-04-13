@@ -714,7 +714,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     public function saveNft(Request $request)
     {
         $price = $request->input('nft_price');
-        $nft_price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+        $nft_price = (float) $price;
 
         $nft = new Nft;
         $nft->user_id = Auth::id();
@@ -1571,9 +1571,9 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
-        // Sanitize price input like saveNft
+        // Sanitize price input
         $price = $request->input('ntf_price_usd');
-        $nft_price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+        $nft_price = (float) $price;
 
         $nft->ntf_name = $request->ntf_name;
         $nft->ntf_description = $request->ntf_description;
