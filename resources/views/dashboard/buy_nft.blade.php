@@ -261,6 +261,58 @@
             padding: 0.4rem 0.5rem;
             font-size: 0.875rem;
         }
+
+        .nft-card-header {
+            padding: 0.65rem 0.75rem;
+        }
+
+        .nft-card-title {
+            font-size: 0.85rem;
+        }
+
+        .nft-card-body {
+            padding: 0.75rem;
+        }
+
+        .nft-price-section {
+            gap: 0.4rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .price-item {
+            padding: 0.35rem 0.5rem;
+        }
+
+        .price-label {
+            font-size: 0.7rem;
+        }
+
+        .price-value {
+            font-size: 0.8rem !important;
+        }
+
+        .nft-meta {
+            padding: 0.5rem 0;
+            font-size: 0.75rem;
+        }
+
+        .seller-info {
+            font-size: 0.75rem;
+        }
+
+        .buy-btn {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .page-header {
+            padding: 1.25rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.4rem;
+        }
     }
 </style>
 
@@ -281,7 +333,7 @@
         </div>
 
         @if($buy_nft->count() > 0)
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-sm-4">
             @foreach($buy_nft as $nft)
             <div class="col">
                 <div class="nft-card">
