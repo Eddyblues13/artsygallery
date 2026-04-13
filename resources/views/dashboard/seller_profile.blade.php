@@ -361,7 +361,14 @@
                 </div>
                 <div class="nft-item-body">
                     <div class="nft-item-title">{{ $nft->ntf_name }}</div>
-                    <div class="nft-item-price">{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</div>
+                    <div class="nft-item-price">
+                        <small class="text-muted" style="font-size: 0.75rem;">{{
+                            \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</small>
+                        <br>
+                        <span class="fw-bold eth-conversion" style="color: #6f42c1; font-size: 0.9rem;"
+                            data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
+                            \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
+                    </div>
                 </div>
                 <div class="nft-item-footer">
                     <span class="text-muted" style="font-size: 0.8rem;">{{ $nft->ntf_owner }}</span>
@@ -398,4 +405,21 @@
 
 <script>
     feather.replace();
+
+    function refreshEthPrices() {
+        fetch('{{ route("api.eth.price") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.eth_price_usd) {
+                    document.querySelectorAll('.eth-conversion').forEach(el => {
+                        const usd = parseFloat(el.dataset.usd);
+                        if (usd && data.eth_price_usd > 0) {
+                            const eth = (usd / data.eth_price_usd).toFixed(6);
+                            el.textContent = '≈ ' + eth + ' ETH';
+                        }
+                    });
+                }
+            }).catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
 </script>

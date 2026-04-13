@@ -21,12 +21,12 @@
                                 </div>
                                 <div class="receipt-details">
                                     <div class="mb-3">
-                                        <strong>Amount in Dollar:</strong>
-                                        <span>${{number_format($amount, 2, '.', ',')}}<span>
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong>Amount in ETH:</strong>
-                                        <span>{{$eth}} ETH<span>
+                                        <strong>Amount:</strong>
+                                        <small class="text-muted d-block">${{number_format($amount, 2, '.',
+                                            ',')}}</small>
+                                        <span class="fw-bold eth-conversion" style="color: #6f42c1; font-size: 1.05rem;"
+                                            data-usd="{{ \App\Helpers\CurrencyHelper::convert($amount) }}">≈ {{
+                                            \App\Helpers\CurrencyHelper::formatEth($amount) }}</span>
                                     </div>
                                     <div class="mb-3">
                                         <strong>Wallet Address:</strong>
@@ -61,5 +61,24 @@
         </div>
     </div>
 </main>
+
+<script>
+    function refreshEthPrices() {
+        fetch('{{ route("api.eth.price") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.eth_price_usd) {
+                    document.querySelectorAll('.eth-conversion').forEach(el => {
+                        const usd = parseFloat(el.dataset.usd);
+                        if (usd && data.eth_price_usd > 0) {
+                            const eth = (usd / data.eth_price_usd).toFixed(6);
+                            el.textContent = '≈ ' + eth + ' ETH';
+                        }
+                    });
+                }
+            }).catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
+</script>
 
 @include('dashboard.footer')

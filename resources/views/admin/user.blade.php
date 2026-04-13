@@ -182,7 +182,12 @@
 										<i data-feather="dollar-sign" width="18"></i>
 									</div>
 								</div>
-								<h3 class="mb-0 fw-bold">{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</h3>
+								<h3 class="mb-0 fw-bold"><small class="text-muted" style="font-size: 0.7em;">{{
+										\App\Helpers\CurrencyHelper::format($balance, 2) }}</small>
+									<br><b style="color: #6f42c1;" class="eth-conversion"
+										data-usd="{{ \App\Helpers\CurrencyHelper::convert($balance) }}">≈ {{
+										\App\Helpers\CurrencyHelper::formatEth($balance) }}</b>
+								</h3>
 							</div>
 						</div>
 					</div>
@@ -195,7 +200,12 @@
 										<i data-feather="arrow-down" width="18"></i>
 									</div>
 								</div>
-								<h3 class="mb-0 fw-bold">{{ \App\Helpers\CurrencyHelper::format($deposit, 2) }}</h3>
+								<h3 class="mb-0 fw-bold"><small class="text-muted" style="font-size: 0.7em;">{{
+										\App\Helpers\CurrencyHelper::format($deposit, 2) }}</small>
+									<br><b style="color: #6f42c1;" class="eth-conversion"
+										data-usd="{{ \App\Helpers\CurrencyHelper::convert($deposit) }}">≈ {{
+										\App\Helpers\CurrencyHelper::formatEth($deposit) }}</b>
+								</h3>
 							</div>
 						</div>
 					</div>
@@ -208,7 +218,12 @@
 										<i data-feather="arrow-up" width="18"></i>
 									</div>
 								</div>
-								<h3 class="mb-0 fw-bold">{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2) }}</h3>
+								<h3 class="mb-0 fw-bold"><small class="text-muted" style="font-size: 0.7em;">{{
+										\App\Helpers\CurrencyHelper::format($withdrawal, 2) }}</small>
+									<br><b style="color: #6f42c1;" class="eth-conversion"
+										data-usd="{{ \App\Helpers\CurrencyHelper::convert($withdrawal) }}">≈ {{
+										\App\Helpers\CurrencyHelper::formatEth($withdrawal) }}</b>
+								</h3>
 							</div>
 						</div>
 					</div>
@@ -221,7 +236,12 @@
 										<i data-feather="trending-up" width="18"></i>
 									</div>
 								</div>
-								<h3 class="mb-0 fw-bold">{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</h3>
+								<h3 class="mb-0 fw-bold"><small class="text-muted" style="font-size: 0.7em;">{{
+										\App\Helpers\CurrencyHelper::format($profit, 2) }}</small>
+									<br><b style="color: #6f42c1;" class="eth-conversion"
+										data-usd="{{ \App\Helpers\CurrencyHelper::convert($profit) }}">≈ {{
+										\App\Helpers\CurrencyHelper::formatEth($profit) }}</b>
+								</h3>
 							</div>
 						</div>
 					</div>
@@ -1027,4 +1047,22 @@
 		border-color: #3b7ddd !important;
 	}
 </style>
+<script>
+	function refreshEthPrices() {
+	fetch('{{ route("api.eth.price") }}')
+		.then(r => r.json())
+		.then(data => {
+			if (data.eth_price_usd) {
+				document.querySelectorAll('.eth-conversion').forEach(el => {
+					const usd = parseFloat(el.dataset.usd);
+					if (usd && data.eth_price_usd > 0) {
+						const eth = (usd / data.eth_price_usd).toFixed(6);
+						el.textContent = '≈ ' + eth + ' ETH';
+					}
+				});
+			}
+		}).catch(() => {});
+}
+setInterval(refreshEthPrices, 60000);
+</script>
 @include('admin.footer')

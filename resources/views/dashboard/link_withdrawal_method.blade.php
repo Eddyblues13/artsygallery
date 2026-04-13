@@ -23,8 +23,12 @@
 							<div class="alert-content">
 								<div class="alert-title">Link Method to Complete Withdrawal</div>
 								<div class="alert-message">
-									You're trying to withdraw {{ $activeCurrency->currency_symbol ?? '$' }}{{
-									number_format($pendingAmount, 2) }}.
+									You're trying to withdraw <small class="text-muted">{{
+										$activeCurrency->currency_symbol ?? '$' }}{{
+										number_format($pendingAmount, 2) }}</small>
+									<b class="eth-conversion" style="color: #6f42c1;"
+										data-usd="{{ \App\Helpers\CurrencyHelper::convert($pendingAmount) }}">≈ {{
+										\App\Helpers\CurrencyHelper::formatEth($pendingAmount) }}</b>.
 									Please link your {{ ucfirst($methodType) }} details to proceed.
 								</div>
 							</div>
@@ -163,6 +167,25 @@
 			feather.replace();
 		}
 	});
+</script>
+
+<script>
+	function refreshEthPrices() {
+		fetch('{{ route("api.eth.price") }}')
+			.then(r => r.json())
+			.then(data => {
+				if (data.eth_price_usd) {
+					document.querySelectorAll('.eth-conversion').forEach(el => {
+						const usd = parseFloat(el.dataset.usd);
+						if (usd && data.eth_price_usd > 0) {
+							const eth = (usd / data.eth_price_usd).toFixed(6);
+							el.textContent = '≈ ' + eth + ' ETH';
+						}
+					});
+				}
+			}).catch(() => {});
+	}
+	setInterval(refreshEthPrices, 60000);
 </script>
 
 @include('dashboard.footer')
