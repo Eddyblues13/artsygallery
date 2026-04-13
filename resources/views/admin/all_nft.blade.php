@@ -4,8 +4,9 @@
     <div class="container-fluid p-0">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
             <h1 class="h3 mb-0"><strong>All Artworks</strong></h1>
-            
-            <button class="btn btn-primary d-md-none w-100" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+
+            <button class="btn btn-primary d-md-none w-100" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filtersCollapse">
                 <i class="align-middle" data-feather="filter"></i> Show Filters
             </button>
         </div>
@@ -66,8 +67,9 @@
                         <div class="col-md-4">
                             <label class="form-label small text-muted">Search / Key Words</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i data-feather="search"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" name="search" 
+                                <span class="input-group-text bg-light border-end-0"><i
+                                        data-feather="search"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" name="search"
                                     value="{{ request('search') }}" placeholder="Artwork name, owner...">
                             </div>
                         </div>
@@ -75,19 +77,19 @@
                             <label class="form-label small text-muted">Status</label>
                             <select class="form-select" name="status">
                                 <option value="">All Status</option>
-                                <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Pending</option>
-                                <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Approved</option>
-                                <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Sold</option>
+                                <option value="0" {{ request('status')=='0' ? 'selected' : '' }}>Pending</option>
+                                <option value="1" {{ request('status')=='1' ? 'selected' : '' }}>Approved</option>
+                                <option value="2" {{ request('status')=='2' ? 'selected' : '' }}>Sold</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small text-muted">Min Price</label>
-                            <input type="number" class="form-control" name="price_min" 
+                            <input type="number" class="form-control" name="price_min"
                                 value="{{ request('price_min') }}" placeholder="Min" step="0.01">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small text-muted">Max Price</label>
-                            <input type="number" class="form-control" name="price_max" 
+                            <input type="number" class="form-control" name="price_max"
                                 value="{{ request('price_max') }}" placeholder="Max" step="0.01">
                         </div>
                         <div class="col-md-2 d-flex align-items-end gap-2">
@@ -128,13 +130,15 @@
                                 <td class="ps-4">
                                     <div class="position-relative" style="width: 60px; height: 60px;">
                                         @if(Str::startsWith($artwork->ntf_image, ['http', 'https']))
-                                            <img src="{{ $artwork->ntf_image }}" class="rounded shadow-sm w-100 h-100 object-fit-cover" 
-                                                alt="{{ $artwork->ntf_name }}" 
-                                                onerror="this.src='https://via.placeholder.com/60x60?text=NFT'">
+                                        <img src="{{ $artwork->ntf_image }}"
+                                            class="rounded shadow-sm w-100 h-100 object-fit-cover"
+                                            alt="{{ $artwork->ntf_name }}"
+                                            onerror="this.src='https://via.placeholder.com/60x60?text=NFT'">
                                         @else
-                                            <img src="{{ asset('user/uploads/nfts/' . $artwork->ntf_image) }}" class="rounded shadow-sm w-100 h-100 object-fit-cover" 
-                                                alt="{{ $artwork->ntf_name }}"
-                                                onerror="this.src='https://via.placeholder.com/60x60?text=NFT'">
+                                        <img src="{{ asset('user/uploads/nfts/' . $artwork->ntf_image) }}"
+                                            class="rounded shadow-sm w-100 h-100 object-fit-cover"
+                                            alt="{{ $artwork->ntf_name }}"
+                                            onerror="this.src='https://via.placeholder.com/60x60?text=NFT'">
                                         @endif
                                     </div>
                                 </td>
@@ -153,24 +157,34 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-bold text-dark">${{ number_format($artwork->nft_price, 2) }}</div>
+                                    <div class="fw-bold text-dark">{{
+                                        \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</div>
+                                    <small class="text-muted eth-conversion"
+                                        data-usd="{{ \App\Helpers\CurrencyHelper::convert($artwork->nft_price) }}">≈ {{
+                                        \App\Helpers\CurrencyHelper::formatEth($artwork->nft_price) }}</small>
                                 </td>
                                 <td>
                                     @if($artwork->status == '1')
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">Approved</span>
+                                    <span
+                                        class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">Approved</span>
                                     @elseif($artwork->status == '0')
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">Pending</span>
+                                    <span
+                                        class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">Pending</span>
                                     @elseif($artwork->status == '2')
-                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">Sold</span>
+                                    <span
+                                        class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">Sold</span>
                                     @endif
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group">
-                                        <a href="{{ route('admin.edit.nft', $artwork->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <a href="{{ route('admin.edit.nft', $artwork->id) }}"
+                                            class="btn btn-sm btn-outline-primary" title="Edit">
                                             <i class="align-middle" data-feather="edit-2"></i>
                                         </a>
-                                        <a href="{{ route('admin.delete.nft', $artwork->id) }}" class="btn btn-sm btn-outline-danger" 
-                                            onclick="return confirm('Are you sure you want to delete this NFT?')" title="Delete">
+                                        <a href="{{ route('admin.delete.nft', $artwork->id) }}"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Are you sure you want to delete this NFT?')"
+                                            title="Delete">
                                             <i class="align-middle" data-feather="trash-2"></i>
                                         </a>
                                     </div>
@@ -197,13 +211,13 @@
                         <div class="d-flex">
                             <div class="flex-shrink-0" style="width: 100px;">
                                 @if(Str::startsWith($artwork->ntf_image, ['http', 'https']))
-                                    <img src="{{ $artwork->ntf_image }}" class="h-100 w-100 object-fit-cover" 
-                                        alt="{{ $artwork->ntf_name }}" 
-                                        onerror="this.src='https://via.placeholder.com/100x100?text=NFT'">
+                                <img src="{{ $artwork->ntf_image }}" class="h-100 w-100 object-fit-cover"
+                                    alt="{{ $artwork->ntf_name }}"
+                                    onerror="this.src='https://via.placeholder.com/100x100?text=NFT'">
                                 @else
-                                    <img src="{{ asset('user/uploads/nfts/' . $artwork->ntf_image) }}" class="h-100 w-100 object-fit-cover" 
-                                        alt="{{ $artwork->ntf_name }}"
-                                        onerror="this.src='https://via.placeholder.com/100x100?text=NFT'">
+                                <img src="{{ asset('user/uploads/nfts/' . $artwork->ntf_image) }}"
+                                    class="h-100 w-100 object-fit-cover" alt="{{ $artwork->ntf_name }}"
+                                    onerror="this.src='https://via.placeholder.com/100x100?text=NFT'">
                                 @endif
                             </div>
                             <div class="flex-grow-1 p-3">
@@ -213,19 +227,25 @@
                                         <small class="text-muted">{{ $artwork->ntf_owner }}</small>
                                     </div>
                                     @if($artwork->status == '1')
-                                        <span class="badge bg-success p-1 rounded-circle" title="Approved"> </span>
+                                    <span class="badge bg-success p-1 rounded-circle" title="Approved"> </span>
                                     @elseif($artwork->status == '0')
-                                        <span class="badge bg-warning p-1 rounded-circle" title="Pending"> </span>
+                                    <span class="badge bg-warning p-1 rounded-circle" title="Pending"> </span>
                                     @elseif($artwork->status == '2')
-                                        <span class="badge bg-info p-1 rounded-circle" title="Sold"> </span>
+                                    <span class="badge bg-info p-1 rounded-circle" title="Sold"> </span>
                                     @endif
                                 </div>
                                 <div class="mb-3">
-                                    <span class="h6 text-primary fw-bold">${{ number_format($artwork->nft_price, 2) }}</span>
+                                    <span class="h6 text-primary fw-bold">{{
+                                        \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</span>
+                                    <br><small class="text-muted eth-conversion"
+                                        data-usd="{{ \App\Helpers\CurrencyHelper::convert($artwork->nft_price) }}">≈ {{
+                                        \App\Helpers\CurrencyHelper::formatEth($artwork->nft_price) }}</small>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('admin.edit.nft', $artwork->id) }}" class="btn btn-sm btn-outline-primary flex-fill">Edit</a>
-                                    <a href="{{ route('admin.delete.nft', $artwork->id) }}" class="btn btn-sm btn-outline-danger flex-fill"
+                                    <a href="{{ route('admin.edit.nft', $artwork->id) }}"
+                                        class="btn btn-sm btn-outline-primary flex-fill">Edit</a>
+                                    <a href="{{ route('admin.delete.nft', $artwork->id) }}"
+                                        class="btn btn-sm btn-outline-danger flex-fill"
                                         onclick="return confirm('Delete this NFT?')">Delete</a>
                                 </div>
                             </div>
@@ -255,16 +275,35 @@
     .object-fit-cover {
         object-fit: cover !important;
     }
+
     .badge-subtle {
         font-weight: 500;
         font-size: 0.75rem;
     }
-    .bg-success-subtle { background-color: #d1e7dd !important; }
-    .text-success { color: #0f5132 !important; }
-    .bg-warning-subtle { background-color: #fff3cd !important; }
-    .text-warning { color: #664d03 !important; }
-    .bg-info-subtle { background-color: #cff4fc !important; }
-    .text-info { color: #055160 !important; }
+
+    .bg-success-subtle {
+        background-color: #d1e7dd !important;
+    }
+
+    .text-success {
+        color: #0f5132 !important;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff3cd !important;
+    }
+
+    .text-warning {
+        color: #664d03 !important;
+    }
+
+    .bg-info-subtle {
+        background-color: #cff4fc !important;
+    }
+
+    .text-info {
+        color: #055160 !important;
+    }
 </style>
 
 <script>
@@ -272,6 +311,24 @@
         if (typeof feather !== 'undefined') {
             feather.replace();
         }
+
+        // Live ETH price refresh
+        function refreshEthPrices() {
+            fetch('{{ route("api.eth.price") }}')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.eth_price_usd) {
+                        document.querySelectorAll('.eth-conversion').forEach(el => {
+                            const usd = parseFloat(el.dataset.usd);
+                            if (usd && data.eth_price_usd > 0) {
+                                const eth = (usd / data.eth_price_usd).toFixed(6);
+                                el.textContent = '≈ ' + eth + ' ETH';
+                            }
+                        });
+                    }
+                }).catch(() => {});
+        }
+        setInterval(refreshEthPrices, 60000);
     });
 </script>
 

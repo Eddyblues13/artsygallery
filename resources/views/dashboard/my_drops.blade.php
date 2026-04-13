@@ -1,6 +1,198 @@
 @include('dashboard.header')
 
 <style>
+    .deposit-page {
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .deposit-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .deposit-card-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #fff;
+        padding: 1.75rem 1.5rem 1.5rem;
+        text-align: center;
+    }
+
+    .deposit-card-header h5 {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+        letter-spacing: 0.2px;
+    }
+
+    .deposit-card-header p {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.82rem;
+        margin-bottom: 0;
+    }
+
+    .deposit-card-body {
+        padding: 1.5rem;
+    }
+
+    /* Amount summary row */
+    .amount-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8f9fc;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.65rem;
+        cursor: pointer;
+        transition: border-color 0.15s;
+    }
+
+    .amount-row:hover {
+        border-color: #3b7ddd;
+    }
+
+    .amount-row .label {
+        font-size: 0.78rem;
+        color: #6b7280;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .amount-row .value {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1a1a2e;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .copy-btn {
+        background: none;
+        border: 1px solid #d0d5dd;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.7rem;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+
+    .copy-btn:hover {
+        background: #f0f6ff;
+        border-color: #3b7ddd;
+        color: #3b7ddd;
+    }
+
+    .copy-btn.copied {
+        background: #d1fae5;
+        border-color: #34d399;
+        color: #059669;
+    }
+
+    /* QR code */
+    .qr-wrapper {
+        text-align: center;
+        margin: 1.25rem 0;
+    }
+
+    .qr-wrapper img {
+        width: 180px;
+        height: 180px;
+        border-radius: 12px;
+        border: 4px solid #f0f2f5;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Wallet address */
+    .wallet-box {
+        background: #f8f9fc;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .wallet-box .addr {
+        flex: 1;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        font-size: 0.78rem;
+        color: #374151;
+        word-break: break-all;
+        line-height: 1.45;
+    }
+
+    .divider {
+        height: 1px;
+        background: #eee;
+        margin: 1.25rem 0;
+    }
+
+    /* Steps */
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .steps-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        margin-bottom: 0.65rem;
+        font-size: 0.82rem;
+        color: #4b5563;
+        line-height: 1.45;
+    }
+
+    .step-num {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #3b7ddd;
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    /* CTA Button */
+    .btn-payment {
+        width: 100%;
+        padding: 0.85rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .btn-payment-confirm {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff;
+    }
+
+    .btn-payment-confirm:hover {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        transform: translateY(-1px);
+    }
+
+    /* Upload area */
     .proof-drop-zone {
         border: 2px dashed #d0d5dd;
         border-radius: 12px;
@@ -91,110 +283,169 @@
         color: #6b7280;
         margin-top: 0.35rem;
     }
+
+    .upload-card {
+        display: none;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04);
+        margin-top: 1rem;
+    }
+
+    .badge-network {
+        display: inline-block;
+        background: rgba(59, 125, 221, 0.1);
+        color: #3b7ddd;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+    }
 </style>
 
 <main class="content">
     @if(session('message'))
     <div class="alert alert-success">{{ session('message') }}</div>
     @endif
-    <div class="container d-flex flex-column">
-        <div class="row vh-10">
-            <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto d-table h-100">
-                <div class="d-table-cell align-middle">
 
-                    <div class="text-center mt-4">
-                        <div class="payment-title" style="margin:10px">
-                            <b>you are to send ETH to the wallet address below or simply contact support for barcode for
-                                fast payment</b>
+    <div class="deposit-page">
+        <div class="deposit-card" id="paymentDetails">
+            <div class="deposit-card-header">
+                <h5>Complete Your Deposit</h5>
+                <p>Send the exact amount to the wallet address below</p>
+            </div>
 
-                            <hr>
-                            <p>Amount in Dollar: <b>${{ number_format($amount, 2, '.', ',') }}</b></p>
-                            <p>Amount in ETH: <b>{{ $eth }} ETH</b></P>
-                        </div>
+            <div class="deposit-card-body">
+                <!-- Amount Summary -->
+                <div class="amount-row" onclick="copyValue('{{ number_format($amount, 2, '.', '') }}', this)">
+                    <div>
+                        <div class="label">Amount (USD)</div>
+                        <div class="value">${{ number_format($amount, 2, '.', ',') }}</div>
                     </div>
-
-                    <div class="text-center mt-4" id="paymentDetails">
-                        <div class="payment-title" style="margin:10px">
-                            <div>
-                                @foreach($payment as $payments)
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $payments->wallet_address }}"
-                                    style="width:300px; max-width:100%;">
-                                @endforeach
-                                @foreach($payment as $payments)
-                                <input class='form-control my-3' value="{{ $payments->wallet_address }}" id="myInput1"
-                                    name='image' type='text'>
-                                @endforeach
-                                <button type='submit' onclick="copyAdr1()"
-                                    class='btn btn-primary btn-sm btn-rounded shadow'> Copy Address</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        <button id="paymentButton" class="btn btn-lg btn-success btn-rounded shadow mt-4"
-                            style="width: 100%; max-width: 300px; margin: auto; font-weight: bold;">
-                            I Have Made Payment
-                        </button>
-                    </div>
-
-                    <div class="card mt-4" id="uploadForm"
-                        style="display: none; border:none; border-radius:16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);">
-                        <div class="card-body" style="padding:1.5rem;">
-                            <h6 class="mb-3" style="font-weight:600; color:#344054;">Upload Proof of Payment</h6>
-                            <form id="proofForm" action="{{ route('make.payment') }}" method='POST'
-                                enctype='multipart/form-data'>
-                                @csrf
-                                <input type="hidden" name="amount" value="{{ $amount }}">
-                                <input type="hidden" name="eth" value="{{ $eth }}">
-
-                                <div class="proof-drop-zone" id="proofDropZone">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b7ddd"
-                                        stroke-width="2" class="mb-2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                        <polyline points="17 8 12 3 7 8" />
-                                        <line x1="12" y1="3" x2="12" y2="15" />
-                                    </svg>
-                                    <p class="mb-0 small"><span class="browse-link">Click to browse</span> or drag &
-                                        drop</p>
-                                    <p class="small text-muted mb-0">Screenshot or photo of your payment</p>
-                                    <input type="file" id="proofInput" name="image" accept="image/*" required
-                                        class="d-none">
-                                </div>
-
-                                <div class="proof-preview" id="proofPreview">
-                                    <button type="button" class="remove-btn" id="proofRemove">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18" />
-                                            <line x1="6" y1="6" x2="18" y2="18" />
-                                        </svg>
-                                    </button>
-                                    <img id="proofImg" src="" alt="Proof preview">
-                                    <div class="file-info">
-                                        <span id="proofFileName">—</span>
-                                        <span id="proofFileSize">—</span>
-                                    </div>
-                                </div>
-
-                                <div class="proof-progress" id="proofProgress">
-                                    <div class="track">
-                                        <div class="fill" id="proofFill"></div>
-                                    </div>
-                                    <div class="label">
-                                        <span id="proofProgressText">Uploading...</span>
-                                        <span id="proofProgressPct">0%</span>
-                                    </div>
-                                </div>
-
-                                <button type='submit' id="proofSubmit" class='btn btn-success w-100 mt-3'
-                                    style="border-radius:10px; font-weight:600; padding:0.7rem;">
-                                    Upload Proof
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
+                    <button class="copy-btn" data-copy="{{ number_format($amount, 2, '.', '') }}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="vertical-align:-1px;margin-right:3px;">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
                 </div>
+
+                <div class="amount-row" onclick="copyValue('{{ $eth }}', this)">
+                    <div>
+                        <div class="label">Amount (ETH)</div>
+                        <div class="value">{{ $eth }} ETH</div>
+                    </div>
+                    <button class="copy-btn" data-copy="{{ $eth }}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="vertical-align:-1px;margin-right:3px;">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- QR Code -->
+                <div class="qr-wrapper">
+                    @foreach($payment as $payments)
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $payments->wallet_address }}"
+                        alt="Wallet QR Code">
+                    <div class="badge-network mt-2">ERC-20 Network</div>
+                    @break
+                    @endforeach
+                </div>
+
+                <!-- Wallet Address -->
+                @foreach($payment as $payments)
+                <label
+                    style="font-size:0.75rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.35rem; display:block;">Wallet
+                    Address</label>
+                <div class="wallet-box" onclick="copyValue('{{ $payments->wallet_address }}', this)">
+                    <span class="addr" id="walletAddr">{{ $payments->wallet_address }}</span>
+                    <button class="copy-btn" data-copy="{{ $payments->wallet_address }}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="vertical-align:-1px;margin-right:3px;">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                @break
+                @endforeach
+
+                <div class="divider"></div>
+
+                <!-- Instructions -->
+                <ul class="steps-list">
+                    <li><span class="step-num">1</span> Copy the wallet address or scan the QR code above</li>
+                    <li><span class="step-num">2</span> Send the exact ETH amount from your wallet</li>
+                    <li><span class="step-num">3</span> Click "I Have Made Payment" and upload proof</li>
+                </ul>
+
+                <!-- CTA -->
+                <button id="paymentButton" class="btn-payment btn-payment-confirm mt-2">
+                    I Have Made Payment
+                </button>
+            </div>
+        </div>
+
+        <!-- Upload Proof Card -->
+        <div class="card upload-card" id="uploadForm">
+            <div class="card-body" style="padding:1.5rem;">
+                <h6 class="mb-3" style="font-weight:700; color:#344054;">Upload Proof of Payment</h6>
+                <form id="proofForm" action="{{ route('make.payment') }}" method='POST' enctype='multipart/form-data'>
+                    @csrf
+                    <input type="hidden" name="amount" value="{{ $amount }}">
+                    <input type="hidden" name="eth" value="{{ $eth }}">
+
+                    <div class="proof-drop-zone" id="proofDropZone">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b7ddd" stroke-width="2"
+                            class="mb-2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <p class="mb-0 small"><span class="browse-link">Click to browse</span> or drag & drop</p>
+                        <p class="small text-muted mb-0">Screenshot or photo of your payment</p>
+                        <input type="file" id="proofInput" name="image" accept="image/*" required class="d-none">
+                    </div>
+
+                    <div class="proof-preview" id="proofPreview">
+                        <button type="button" class="remove-btn" id="proofRemove">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                        <img id="proofImg" src="" alt="Proof preview">
+                        <div class="file-info">
+                            <span id="proofFileName">—</span>
+                            <span id="proofFileSize">—</span>
+                        </div>
+                    </div>
+
+                    <div class="proof-progress" id="proofProgress">
+                        <div class="track">
+                            <div class="fill" id="proofFill"></div>
+                        </div>
+                        <div class="label">
+                            <span id="proofProgressText">Uploading...</span>
+                            <span id="proofProgressPct">0%</span>
+                        </div>
+                    </div>
+
+                    <button type='submit' id="proofSubmit" class='btn btn-success w-100 mt-3'
+                        style="border-radius:10px; font-weight:600; padding:0.7rem;">
+                        Upload Proof
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -202,23 +453,32 @@
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Copy helper
+    function copyValue(text, el) {
+        navigator.clipboard.writeText(text).then(function() {
+            var btn = el.querySelector('.copy-btn') || el;
+            var orig = btn.innerHTML;
+            btn.classList.add('copied');
+            btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+            setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
+        });
+    }
+
+    // Make all copy buttons work independently too
+    document.querySelectorAll('.copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            copyValue(this.dataset.copy, this.parentElement);
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
-    // Payment button
+    // Payment button → show upload form
     document.getElementById('paymentButton').addEventListener('click', function () {
         document.getElementById('paymentDetails').style.display = 'none';
         document.getElementById('uploadForm').style.display = 'block';
-        this.disabled = true;
-        this.style.cursor = 'not-allowed';
-        this.textContent = "Processing...";
+        this.style.display = 'none';
     });
-
-    // Copy address
-    window.copyAdr1 = function() {
-        var copyText = document.getElementById("myInput1");
-        copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(copyText.value);
-    };
 
     // Proof upload preview
     const dropZone = document.getElementById('proofDropZone');

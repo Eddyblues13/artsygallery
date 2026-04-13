@@ -47,6 +47,10 @@
                                 <span class="h5 fw-bold text-primary mb-0">
                                     {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}
                                 </span>
+                                <br>
+                                <small class="text-muted eth-conversion"
+                                    data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
+                                    \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
                             </div>
 
                         </div>
@@ -134,6 +138,26 @@
         // Show a quick tooltip or toast instead of a clunky alert if possible
         alert('NFT Purchase link copied to clipboard!');
     }
+</script>
+
+<script>
+    // Live ETH price refresh
+    function refreshEthPrices() {
+        fetch('{{ route("api.eth.price") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.eth_price_usd) {
+                    document.querySelectorAll('.eth-conversion').forEach(el => {
+                        const usd = parseFloat(el.dataset.usd);
+                        if (usd && data.eth_price_usd > 0) {
+                            const eth = (usd / data.eth_price_usd).toFixed(6);
+                            el.textContent = '≈ ' + eth + ' ETH';
+                        }
+                    });
+                }
+            }).catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
 </script>
 
 @include('dashboard.footer')

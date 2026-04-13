@@ -11,7 +11,8 @@
                             Enter amount in {{ $activeCurrency->currency_name ?? 'USD' }}
                         </p>
                         @if($activeCurrency ?? null)
-                        <p class="text-muted small mb-0">Display currency: {{ $activeCurrency->currency_code }} ({{ $activeCurrency->currency_symbol }})</p>
+                        <p class="text-muted small mb-0">Display currency: {{ $activeCurrency->currency_code }} ({{
+                            $activeCurrency->currency_symbol }})</p>
                         @endif
                     </div>
 
@@ -21,11 +22,17 @@
                                 <form method="post" action="{{route('make.deposit')}}">
                                     {{csrf_field()}}
                                     <div class="mb-3">
-                                        <label class="form-label">Amount ({{ $activeCurrency->currency_code ?? 'USD' }})</label>
+                                        <label class="form-label">Amount ({{ $activeCurrency->currency_code ?? 'USD'
+                                            }})</label>
                                         <div class="input-group input-group-lg">
-                                            <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$' }}</span>
-                                            <input class="form-control" type="number" name="amount"
+                                            <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$'
+                                                }}</span>
+                                            <input class="form-control" type="number" name="amount" id="deposit-amount"
                                                 placeholder="Enter Amount" step="0.01" min="0" />
+                                        </div>
+                                        <div id="eth-conversion" class="text-muted small mt-2" style="display:none;">
+                                            ≈ <span id="eth-value">0</span> ETH
+                                            <span class="text-muted" style="font-size:0.75rem;">(live rate)</span>
                                         </div>
                                     </div>
                                     <div>
@@ -46,6 +53,32 @@
 </main>
 
 <script src="js/app.js"></script>
+
+<script>
+    (function() {
+    let ethPrice = null;
+    const amountInput = document.getElementById('deposit-amount');
+    const ethDiv = document.getElementById('eth-conversion');
+    const ethSpan = document.getElementById('eth-value');
+    const rate = {{ $activeCurrency->exchange_rate ?? 1 }};
+
+    fetch("{{ route('api.eth.price') }}")
+        .then(r => r.json())
+        .then(d => { ethPrice = d.eth_price_usd; updateEth(); })
+        .catch(() => {});
+
+    function updateEth() {
+        const val = parseFloat(amountInput.value);
+        if (!ethPrice || !val || val <= 0) { ethDiv.style.display = 'none'; return; }
+        const converted = val * rate;
+        const eth = converted / ethPrice;
+        ethSpan.textContent = eth < 0.000001 ? eth.toExponential(2) : parseFloat(eth.toFixed(6));
+        ethDiv.style.display = 'block';
+    }
+
+    amountInput.addEventListener('input', updateEth);
+})();
+</script>
 
 </body>
 

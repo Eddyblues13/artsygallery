@@ -5,7 +5,8 @@
 		<div class="d-flex justify-content-between align-items-center mb-4">
 			<h1 class="h3 mb-0"><strong>All Transactions</strong></h1>
 			<div>
-				<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+				<button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+					data-bs-target="#filtersCollapse">
 					<i class="align-middle" data-feather="filter"></i> Filters
 				</button>
 			</div>
@@ -59,7 +60,8 @@
 						</div>
 						<h3 class="mt-1 mb-3"><b>{{ number_format($stats['pending']) }}</b></h3>
 						<div class="mb-0">
-							<span class="text-warning">{{ \App\Helpers\CurrencyHelper::format($stats['pending_amount'], 2) }}</span>
+							<span class="text-warning">{{ \App\Helpers\CurrencyHelper::format($stats['pending_amount'],
+								2) }}</span>
 						</div>
 					</div>
 				</div>
@@ -79,7 +81,8 @@
 						</div>
 						<h3 class="mt-1 mb-3"><b>{{ number_format($stats['approved']) }}</b></h3>
 						<div class="mb-0">
-							<span class="text-success">{{ \App\Helpers\CurrencyHelper::format($stats['total_amount'], 2) }}</span>
+							<span class="text-success">{{ \App\Helpers\CurrencyHelper::format($stats['total_amount'], 2)
+								}}</span>
 						</div>
 					</div>
 				</div>
@@ -110,35 +113,40 @@
 					<form method="GET" action="{{ route('user.transaction') }}" class="row g-3">
 						<div class="col-md-3">
 							<label for="search" class="form-label">Search</label>
-							<input type="text" class="form-control" id="search" name="search" 
+							<input type="text" class="form-control" id="search" name="search"
 								value="{{ request('search') }}" placeholder="User, amount, type...">
 						</div>
 						<div class="col-md-2">
 							<label for="type" class="form-label">Type</label>
 							<select class="form-select" id="type" name="type">
 								<option value="">All Types</option>
-								<option value="Deposit" {{ request('type') == 'Deposit' ? 'selected' : '' }}>Deposit</option>
-								<option value="Withdrawal" {{ request('type') == 'Withdrawal' ? 'selected' : '' }}>Withdrawal</option>
-								<option value="Profit" {{ request('type') == 'Profit' ? 'selected' : '' }}>Profit</option>
-								<option value="DebitProfit" {{ request('type') == 'DebitProfit' ? 'selected' : '' }}>Debit Profit</option>
+								<option value="Deposit" {{ request('type')=='Deposit' ? 'selected' : '' }}>Deposit
+								</option>
+								<option value="Withdrawal" {{ request('type')=='Withdrawal' ? 'selected' : '' }}>
+									Withdrawal</option>
+								<option value="Profit" {{ request('type')=='Profit' ? 'selected' : '' }}>Profit</option>
+								<option value="DebitProfit" {{ request('type')=='DebitProfit' ? 'selected' : '' }}>Debit
+									Profit</option>
 							</select>
 						</div>
 						<div class="col-md-2">
 							<label for="status" class="form-label">Status</label>
 							<select class="form-select" id="status" name="status">
 								<option value="">All Status</option>
-								<option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Pending</option>
-								<option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Approved</option>
-								<option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Declined</option>
+								<option value="0" {{ request('status')=='0' ? 'selected' : '' }}>Pending</option>
+								<option value="1" {{ request('status')=='1' ? 'selected' : '' }}>Approved</option>
+								<option value="2" {{ request('status')=='2' ? 'selected' : '' }}>Declined</option>
 							</select>
 						</div>
 						<div class="col-md-2">
 							<label for="date_from" class="form-label">From Date</label>
-							<input type="date" class="form-control" id="date_from" name="date_from" value="{{ request('date_from') }}">
+							<input type="date" class="form-control" id="date_from" name="date_from"
+								value="{{ request('date_from') }}">
 						</div>
 						<div class="col-md-2">
 							<label for="date_to" class="form-label">To Date</label>
-							<input type="date" class="form-control" id="date_to" name="date_to" value="{{ request('date_to') }}">
+							<input type="date" class="form-control" id="date_to" name="date_to"
+								value="{{ request('date_to') }}">
 						</div>
 						<div class="col-md-1 d-flex align-items-end">
 							<button type="submit" class="btn btn-primary w-100">
@@ -188,7 +196,8 @@
 											@if($transaction->user)
 											<div class="d-flex align-items-center">
 												<div>
-													<a href="{{ url('profile/' . $transaction->user->id) }}" class="text-decoration-none">
+													<a href="{{ url('profile/' . $transaction->user->id) }}"
+														class="text-decoration-none">
 														<strong>{{ $transaction->user->name }}</strong>
 													</a>
 													<br>
@@ -213,13 +222,14 @@
 												<br>
 												<small class="text-muted mt-1 d-block">
 													@if($transaction->withdrawal_method == 'bank')
-														<i class="align-middle" data-feather="building"></i> Bank Transfer
+													<i class="align-middle" data-feather="building"></i> Bank Transfer
 													@elseif($transaction->withdrawal_method == 'account')
-														<i class="align-middle" data-feather="user"></i> Account Transfer
+													<i class="align-middle" data-feather="user"></i> Account Transfer
 													@elseif($transaction->withdrawal_method == 'paypal')
-														<i class="align-middle" data-feather="mail"></i> PayPal
+													<i class="align-middle" data-feather="mail"></i> PayPal
 													@elseif($transaction->withdrawal_method == 'crypto')
-														<i class="align-middle" data-feather="bitcoin"></i> {{ $transaction->crypto_type ?? 'Crypto' }}
+													<i class="align-middle" data-feather="bitcoin"></i> {{
+													$transaction->crypto_type ?? 'Crypto' }}
 													@endif
 												</small>
 												@endif
@@ -237,7 +247,16 @@
 											@endif
 										</td>
 										<td>
-											<strong class="text-primary">{{ \App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2) }}</strong>
+											<strong class="text-primary">{{
+												\App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2)
+												}}</strong>
+											@if(\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount))
+											<br><small class="text-muted eth-conversion"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($transaction->transaction_amount) }}">≈
+												{{
+												\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount)
+												}}</small>
+											@endif
 										</td>
 										<td>
 											@if($transaction->status == '0')
@@ -256,37 +275,43 @@
 										</td>
 										<td>
 											<div>{{ $transaction->created_at->format('M d, Y') }}</div>
-											<small class="text-muted">{{ $transaction->created_at->format('H:i A') }}</small>
+											<small class="text-muted">{{ $transaction->created_at->format('H:i A')
+												}}</small>
 										</td>
 										<td>
 											<div class="btn-group" role="group">
-												@if($transaction->transaction_type == 'Withdrawal' && $transaction->withdrawal_method)
-												<button type="button" class="btn btn-outline-info" 
-													data-bs-toggle="modal" 
+												@if($transaction->transaction_type == 'Withdrawal' &&
+												$transaction->withdrawal_method)
+												<button type="button" class="btn btn-outline-info"
+													data-bs-toggle="modal"
 													data-bs-target="#detailsModal{{ $transaction->id }}"
 													title="View Withdrawal Details">
 													<i class="align-middle" data-feather="info"></i> Details
 												</button>
 												@endif
 												@if($transaction->transaction_proof)
-												<button type="button" class="btn btn-outline-primary" 
-													data-bs-toggle="modal" 
+												<button type="button" class="btn btn-outline-primary"
+													data-bs-toggle="modal"
 													data-bs-target="#proofModal{{ $transaction->id }}">
 													<i class="align-middle" data-feather="eye"></i> Proof
 												</button>
 												@endif
 											</div>
-											
+
 											<!-- Withdrawal Details Modal -->
-											@if($transaction->transaction_type == 'Withdrawal' && $transaction->withdrawal_method)
-											<div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
+											@if($transaction->transaction_type == 'Withdrawal' &&
+											$transaction->withdrawal_method)
+											<div class="modal fade" id="detailsModal{{ $transaction->id }}"
+												tabindex="-1">
 												<div class="modal-dialog modal-lg">
 													<div class="modal-content">
 														<div class="modal-header bg-primary text-white">
 															<h5 class="modal-title">
-																<i class="align-middle" data-feather="info"></i> Withdrawal Details - #{{ $transaction->id }}
+																<i class="align-middle" data-feather="info"></i>
+																Withdrawal Details - #{{ $transaction->id }}
 															</h5>
-															<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+															<button type="button" class="btn-close btn-close-white"
+																data-bs-dismiss="modal"></button>
 														</div>
 														<div class="modal-body">
 															<div class="row g-3">
@@ -294,122 +319,164 @@
 																	<strong>Withdrawal Method:</strong>
 																	<p class="mb-0">
 																		@if($transaction->withdrawal_method == 'bank')
-																			<span class="badge bg-primary"><i class="align-middle" data-feather="building"></i> Bank Transfer</span>
-																		@elseif($transaction->withdrawal_method == 'account')
-																			<span class="badge bg-info"><i class="align-middle" data-feather="user"></i> Account Transfer</span>
-																		@elseif($transaction->withdrawal_method == 'paypal')
-																			<span class="badge bg-warning text-dark"><i class="align-middle" data-feather="mail"></i> PayPal</span>
-																		@elseif($transaction->withdrawal_method == 'crypto')
-																			<span class="badge bg-success"><i class="align-middle" data-feather="bitcoin"></i> {{ $transaction->crypto_type ?? 'Cryptocurrency' }}</span>
+																		<span class="badge bg-primary"><i
+																				class="align-middle"
+																				data-feather="building"></i> Bank
+																			Transfer</span>
+																		@elseif($transaction->withdrawal_method ==
+																		'account')
+																		<span class="badge bg-info"><i
+																				class="align-middle"
+																				data-feather="user"></i> Account
+																			Transfer</span>
+																		@elseif($transaction->withdrawal_method ==
+																		'paypal')
+																		<span class="badge bg-warning text-dark"><i
+																				class="align-middle"
+																				data-feather="mail"></i> PayPal</span>
+																		@elseif($transaction->withdrawal_method ==
+																		'crypto')
+																		<span class="badge bg-success"><i
+																				class="align-middle"
+																				data-feather="bitcoin"></i> {{
+																			$transaction->crypto_type ??
+																			'Cryptocurrency' }}</span>
 																		@endif
 																	</p>
 																</div>
 																<div class="col-md-6">
 																	<strong>Amount:</strong>
-																	<p class="mb-0">{{ \App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2) }}</p>
+																	<p class="mb-0">{{
+																		\App\Helpers\CurrencyHelper::format($transaction->transaction_amount,
+																		2) }}</p>
+																	@if(\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount))
+																	<small class="text-muted">≈ {{
+																		\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount)
+																		}}</small>
+																	@endif
 																</div>
-																
+
 																@if($transaction->withdrawal_method == 'bank')
-																	@if($transaction->bank_name)
-																	<div class="col-md-6">
-																		<strong>Bank Name:</strong>
-																		<p class="mb-0">{{ $transaction->bank_name }}</p>
-																	</div>
-																	@endif
-																	@if($transaction->payment_account_name)
-																	<div class="col-md-6">
-																		<strong>Account Holder:</strong>
-																		<p class="mb-0">{{ $transaction->payment_account_name }}</p>
-																	</div>
-																	@endif
-																	@if($transaction->payment_account_number)
-																	<div class="col-md-6">
-																		<strong>Account Number:</strong>
-																		<p class="mb-0"><code>{{ $transaction->payment_account_number }}</code></p>
-																	</div>
-																	@endif
-																	@if($transaction->payment_account_type)
-																	<div class="col-md-6">
-																		<strong>Account Type:</strong>
-																		<p class="mb-0">{{ ucfirst($transaction->payment_account_type) }}</p>
-																	</div>
-																	@endif
-																	@if($transaction->bank_routing_number)
-																	<div class="col-md-6">
-																		<strong>Routing Number:</strong>
-																		<p class="mb-0"><code>{{ $transaction->bank_routing_number }}</code></p>
-																	</div>
-																	@endif
-																@elseif($transaction->withdrawal_method == 'account')
-																	@if($transaction->payment_account_name)
-																	<div class="col-md-6">
-																		<strong>Account Holder:</strong>
-																		<p class="mb-0">{{ $transaction->payment_account_name }}</p>
-																	</div>
-																	@endif
-																	@if($transaction->payment_account_number)
-																	<div class="col-md-6">
-																		<strong>Account Number:</strong>
-																		<p class="mb-0"><code>{{ $transaction->payment_account_number }}</code></p>
-																	</div>
-																	@endif
-																	@if($transaction->payment_account_type)
-																	<div class="col-md-6">
-																		<strong>Account Type:</strong>
-																		<p class="mb-0">{{ ucfirst($transaction->payment_account_type) }}</p>
-																	</div>
-																	@endif
-																@elseif($transaction->withdrawal_method == 'paypal')
-																	@if($transaction->paypal_email)
-																	<div class="col-md-12">
-																		<strong>PayPal Email:</strong>
-																		<p class="mb-0"><a href="mailto:{{ $transaction->paypal_email }}">{{ $transaction->paypal_email }}</a></p>
-																	</div>
-																	@endif
-																@elseif($transaction->withdrawal_method == 'crypto')
-																	@if($transaction->crypto_type)
-																	<div class="col-md-6">
-																		<strong>Cryptocurrency:</strong>
-																		<p class="mb-0"><span class="badge bg-success">{{ $transaction->crypto_type }}</span></p>
-																	</div>
-																	@endif
-																	@if($transaction->crypto_wallet_address)
-																	<div class="col-md-12">
-																		<strong>Wallet Address:</strong>
-																		<p class="mb-0"><code class="text-break">{{ $transaction->crypto_wallet_address }}</code></p>
-																	</div>
-																	@endif
+																@if($transaction->bank_name)
+																<div class="col-md-6">
+																	<strong>Bank Name:</strong>
+																	<p class="mb-0">{{ $transaction->bank_name }}</p>
+																</div>
 																@endif
-																
+																@if($transaction->payment_account_name)
+																<div class="col-md-6">
+																	<strong>Account Holder:</strong>
+																	<p class="mb-0">{{
+																		$transaction->payment_account_name }}</p>
+																</div>
+																@endif
+																@if($transaction->payment_account_number)
+																<div class="col-md-6">
+																	<strong>Account Number:</strong>
+																	<p class="mb-0">
+																		<code>{{ $transaction->payment_account_number }}</code>
+																	</p>
+																</div>
+																@endif
+																@if($transaction->payment_account_type)
+																<div class="col-md-6">
+																	<strong>Account Type:</strong>
+																	<p class="mb-0">{{
+																		ucfirst($transaction->payment_account_type) }}
+																	</p>
+																</div>
+																@endif
+																@if($transaction->bank_routing_number)
+																<div class="col-md-6">
+																	<strong>Routing Number:</strong>
+																	<p class="mb-0">
+																		<code>{{ $transaction->bank_routing_number }}</code>
+																	</p>
+																</div>
+																@endif
+																@elseif($transaction->withdrawal_method == 'account')
+																@if($transaction->payment_account_name)
+																<div class="col-md-6">
+																	<strong>Account Holder:</strong>
+																	<p class="mb-0">{{
+																		$transaction->payment_account_name }}</p>
+																</div>
+																@endif
+																@if($transaction->payment_account_number)
+																<div class="col-md-6">
+																	<strong>Account Number:</strong>
+																	<p class="mb-0">
+																		<code>{{ $transaction->payment_account_number }}</code>
+																	</p>
+																</div>
+																@endif
+																@if($transaction->payment_account_type)
+																<div class="col-md-6">
+																	<strong>Account Type:</strong>
+																	<p class="mb-0">{{
+																		ucfirst($transaction->payment_account_type) }}
+																	</p>
+																</div>
+																@endif
+																@elseif($transaction->withdrawal_method == 'paypal')
+																@if($transaction->paypal_email)
+																<div class="col-md-12">
+																	<strong>PayPal Email:</strong>
+																	<p class="mb-0"><a
+																			href="mailto:{{ $transaction->paypal_email }}">{{
+																			$transaction->paypal_email }}</a></p>
+																</div>
+																@endif
+																@elseif($transaction->withdrawal_method == 'crypto')
+																@if($transaction->crypto_type)
+																<div class="col-md-6">
+																	<strong>Cryptocurrency:</strong>
+																	<p class="mb-0"><span class="badge bg-success">{{
+																			$transaction->crypto_type }}</span></p>
+																</div>
+																@endif
+																@if($transaction->crypto_wallet_address)
+																<div class="col-md-12">
+																	<strong>Wallet Address:</strong>
+																	<p class="mb-0"><code
+																			class="text-break">{{ $transaction->crypto_wallet_address }}</code>
+																	</p>
+																</div>
+																@endif
+																@endif
+
 																@if($transaction->additional_notes)
 																<div class="col-md-12">
 																	<strong>Additional Notes:</strong>
-																	<p class="mb-0">{{ $transaction->additional_notes }}</p>
+																	<p class="mb-0">{{ $transaction->additional_notes }}
+																	</p>
 																</div>
 																@endif
 															</div>
 														</div>
 														<div class="modal-footer">
-															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+															<button type="button" class="btn btn-secondary"
+																data-bs-dismiss="modal">Close</button>
 														</div>
 													</div>
 												</div>
 											</div>
 											@endif
-											
+
 											<!-- Proof Modal -->
 											@if($transaction->transaction_proof)
 											<div class="modal fade" id="proofModal{{ $transaction->id }}" tabindex="-1">
 												<div class="modal-dialog modal-lg">
 													<div class="modal-content">
 														<div class="modal-header">
-															<h5 class="modal-title">Transaction Proof - #{{ $transaction->id }}</h5>
-															<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+															<h5 class="modal-title">Transaction Proof - #{{
+																$transaction->id }}</h5>
+															<button type="button" class="btn-close"
+																data-bs-dismiss="modal"></button>
 														</div>
 														<div class="modal-body text-center">
-															<img src="{{ $transaction->transaction_proof }}" 
-																alt="Transaction Proof" 
-																class="img-fluid rounded">
+															<img src="{{ $transaction->transaction_proof }}"
+																alt="Transaction Proof" class="img-fluid rounded">
 														</div>
 													</div>
 												</div>
@@ -418,43 +485,47 @@
 										</td>
 										<td>
 											@if($transaction->status == '0')
-												@if($transaction->transaction_type == 'Deposit')
-												<div class="btn-group" role="group">
-													<form action="{{ url('approve-deposit/' . $transaction->id) }}" method="POST" class="d-inline">
-														@csrf
-														<button type="submit" class="btn btn-success" 
-															onclick="return confirm('Are you sure you want to approve this deposit?')">
-															<i class="align-middle" data-feather="check"></i> Approve
-														</button>
-													</form>
-													<form action="{{ url('decline-deposit/' . $transaction->id) }}" method="POST" class="d-inline">
-														@csrf
-														<button type="submit" class="btn btn-danger"
-															onclick="return confirm('Are you sure you want to decline this deposit?')">
-															<i class="align-middle" data-feather="x"></i> Decline
-														</button>
-													</form>
-												</div>
-												@elseif($transaction->transaction_type == 'Withdrawal')
-												<div class="btn-group" role="group">
-													<form action="{{ url('approve-withdrawal/' . $transaction->id) }}" method="POST" class="d-inline">
-														@csrf
-														<input type="hidden" name="status" value="1">
-														<button type="submit" class="btn btn-success"
-															onclick="return confirm('Are you sure you want to approve this withdrawal?')">
-															<i class="align-middle" data-feather="check"></i> Approve
-														</button>
-													</form>
-													<form action="{{ url('decline-withdrawal/' . $transaction->id) }}" method="POST" class="d-inline">
-														@csrf
-														<input type="hidden" name="status" value="2">
-														<button type="submit" class="btn btn-danger"
-															onclick="return confirm('Are you sure you want to decline this withdrawal?')">
-															<i class="align-middle" data-feather="x"></i> Decline
-														</button>
-													</form>
-												</div>
-												@endif
+											@if($transaction->transaction_type == 'Deposit')
+											<div class="btn-group" role="group">
+												<form action="{{ url('approve-deposit/' . $transaction->id) }}"
+													method="POST" class="d-inline">
+													@csrf
+													<button type="submit" class="btn btn-success"
+														onclick="return confirm('Are you sure you want to approve this deposit?')">
+														<i class="align-middle" data-feather="check"></i> Approve
+													</button>
+												</form>
+												<form action="{{ url('decline-deposit/' . $transaction->id) }}"
+													method="POST" class="d-inline">
+													@csrf
+													<button type="submit" class="btn btn-danger"
+														onclick="return confirm('Are you sure you want to decline this deposit?')">
+														<i class="align-middle" data-feather="x"></i> Decline
+													</button>
+												</form>
+											</div>
+											@elseif($transaction->transaction_type == 'Withdrawal')
+											<div class="btn-group" role="group">
+												<form action="{{ url('approve-withdrawal/' . $transaction->id) }}"
+													method="POST" class="d-inline">
+													@csrf
+													<input type="hidden" name="status" value="1">
+													<button type="submit" class="btn btn-success"
+														onclick="return confirm('Are you sure you want to approve this withdrawal?')">
+														<i class="align-middle" data-feather="check"></i> Approve
+													</button>
+												</form>
+												<form action="{{ url('decline-withdrawal/' . $transaction->id) }}"
+													method="POST" class="d-inline">
+													@csrf
+													<input type="hidden" name="status" value="2">
+													<button type="submit" class="btn btn-danger"
+														onclick="return confirm('Are you sure you want to decline this withdrawal?')">
+														<i class="align-middle" data-feather="x"></i> Decline
+													</button>
+												</form>
+											</div>
+											@endif
 											@else
 											<span class="text-muted small">No actions</span>
 											@endif
@@ -463,7 +534,8 @@
 									@empty
 									<tr>
 										<td colspan="8" class="text-center py-5">
-											<i class="align-middle" data-feather="inbox" style="width: 48px; height: 48px; opacity: 0.3;"></i>
+											<i class="align-middle" data-feather="inbox"
+												style="width: 48px; height: 48px; opacity: 0.3;"></i>
 											<p class="mt-3 text-muted">No transactions found</p>
 											@if(request()->hasAny(['search', 'type', 'status', 'date_from', 'date_to']))
 											<a href="{{ route('user.transaction') }}" class="btn btn-outline-primary">
@@ -486,27 +558,44 @@
 										<div>
 											<h6 class="mb-1">
 												@if($transaction->transaction_type == 'Deposit')
-													<span class="badge bg-info"><i class="align-middle" data-feather="arrow-down"></i> Deposit</span>
+												<span class="badge bg-info"><i class="align-middle"
+														data-feather="arrow-down"></i> Deposit</span>
 												@elseif($transaction->transaction_type == 'Withdrawal')
-													<span class="badge bg-warning text-dark"><i class="align-middle" data-feather="arrow-up"></i> Withdrawal</span>
+												<span class="badge bg-warning text-dark"><i class="align-middle"
+														data-feather="arrow-up"></i> Withdrawal</span>
 												@elseif($transaction->transaction_type == 'Profit')
-													<span class="badge bg-success"><i class="align-middle" data-feather="trending-up"></i> Profit</span>
+												<span class="badge bg-success"><i class="align-middle"
+														data-feather="trending-up"></i> Profit</span>
 												@elseif($transaction->transaction_type == 'DebitProfit')
-													<span class="badge bg-danger"><i class="align-middle" data-feather="trending-down"></i> Debit Profit</span>
+												<span class="badge bg-danger"><i class="align-middle"
+														data-feather="trending-down"></i> Debit Profit</span>
 												@else
-													<span class="badge bg-secondary">{{ $transaction->transaction_type }}</span>
+												<span class="badge bg-secondary">{{ $transaction->transaction_type
+													}}</span>
 												@endif
 											</h6>
 											<small class="text-muted">#{{ $transaction->id }}</small>
 										</div>
 										<div class="text-end">
-											<strong class="text-primary d-block">{{ \App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2) }}</strong>
+											<strong class="text-primary d-block">{{
+												\App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2)
+												}}</strong>
+											@if(\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount))
+											<small class="text-muted eth-conversion"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($transaction->transaction_amount) }}">≈
+												{{
+												\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount)
+												}}</small>
+											@endif
 											@if($transaction->status == '0')
-												<span class="badge bg-warning text-dark"><i class="align-middle" data-feather="clock"></i> Pending</span>
+											<span class="badge bg-warning text-dark"><i class="align-middle"
+													data-feather="clock"></i> Pending</span>
 											@elseif($transaction->status == '1')
-												<span class="badge bg-success"><i class="align-middle" data-feather="check-circle"></i> Approved</span>
+											<span class="badge bg-success"><i class="align-middle"
+													data-feather="check-circle"></i> Approved</span>
 											@elseif($transaction->status == '2')
-												<span class="badge bg-danger"><i class="align-middle" data-feather="x-circle"></i> Declined</span>
+											<span class="badge bg-danger"><i class="align-middle"
+													data-feather="x-circle"></i> Declined</span>
 											@endif
 										</div>
 									</div>
@@ -514,11 +603,12 @@
 									<div class="mb-2">
 										<small class="text-muted d-block">User:</small>
 										@if($transaction->user)
-											<a href="{{ url('profile/' . $transaction->user->id) }}" class="text-decoration-none">
-												{{ $transaction->user->name }}
-											</a>
+										<a href="{{ url('profile/' . $transaction->user->id) }}"
+											class="text-decoration-none">
+											{{ $transaction->user->name }}
+										</a>
 										@else
-											<span class="text-muted">User Deleted</span>
+										<span class="text-muted">User Deleted</span>
 										@endif
 									</div>
 
@@ -527,30 +617,38 @@
 										{{ $transaction->created_at->format('M d, Y H:i A') }}
 									</div>
 
-									@if($transaction->transaction_type == 'Withdrawal' && $transaction->withdrawal_method)
+									@if($transaction->transaction_type == 'Withdrawal' &&
+									$transaction->withdrawal_method)
 									<div class="mb-3">
-										<button type="button" class="btn btn-outline-info btn-sm w-100" 
-											data-bs-toggle="modal" 
+										<button type="button" class="btn btn-outline-info btn-sm w-100"
+											data-bs-toggle="modal"
 											data-bs-target="#mobileDetailsModal{{ $transaction->id }}">
 											<i class="align-middle" data-feather="info"></i> View Details
 										</button>
-										
+
 										<!-- Duplicate Modal for Mobile with unique ID -->
-										<div class="modal fade" id="mobileDetailsModal{{ $transaction->id }}" tabindex="-1">
+										<div class="modal fade" id="mobileDetailsModal{{ $transaction->id }}"
+											tabindex="-1">
 											<div class="modal-dialog">
 												<div class="modal-content">
 													<div class="modal-header bg-primary text-white">
 														<h5 class="modal-title">Withdrawal Details</h5>
-														<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+														<button type="button" class="btn-close btn-close-white"
+															data-bs-dismiss="modal"></button>
 													</div>
 													<div class="modal-body">
 														<!-- Same content as desktop modal, simplified -->
-														<p><strong>Method:</strong> {{ ucfirst($transaction->withdrawal_method) }}</p>
+														<p><strong>Method:</strong> {{
+															ucfirst($transaction->withdrawal_method) }}</p>
 														@if($transaction->withdrawal_method == 'bank')
-															<p><strong>Bank:</strong> {{ $transaction->bank_name ?? 'N/A' }}</p>
-															<p><strong>Account:</strong> {{ $transaction->payment_account_number ?? 'N/A' }}</p>
+														<p><strong>Bank:</strong> {{ $transaction->bank_name ?? 'N/A' }}
+														</p>
+														<p><strong>Account:</strong> {{
+															$transaction->payment_account_number ?? 'N/A' }}</p>
 														@elseif($transaction->withdrawal_method == 'crypto')
-															<p><strong>Address:</strong> <span class="text-break">{{ $transaction->crypto_wallet_address ?? 'N/A' }}</span></p>
+														<p><strong>Address:</strong> <span class="text-break">{{
+																$transaction->crypto_wallet_address ?? 'N/A' }}</span>
+														</p>
 														@endif
 													</div>
 												</div>
@@ -561,21 +659,24 @@
 
 									@if($transaction->transaction_proof)
 									<div class="mb-3">
-										<button type="button" class="btn btn-outline-primary btn-sm w-100" 
-											data-bs-toggle="modal" 
+										<button type="button" class="btn btn-outline-primary btn-sm w-100"
+											data-bs-toggle="modal"
 											data-bs-target="#mobileProofModal{{ $transaction->id }}">
 											<i class="align-middle" data-feather="eye"></i> View Proof
 										</button>
-										
-										<div class="modal fade" id="mobileProofModal{{ $transaction->id }}" tabindex="-1">
+
+										<div class="modal fade" id="mobileProofModal{{ $transaction->id }}"
+											tabindex="-1">
 											<div class="modal-dialog">
 												<div class="modal-content">
 													<div class="modal-header">
 														<h5 class="modal-title">Proof</h5>
-														<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+														<button type="button" class="btn-close"
+															data-bs-dismiss="modal"></button>
 													</div>
 													<div class="modal-body text-center">
-														<img src="{{ $transaction->transaction_proof }}" class="img-fluid rounded" alt="Proof">
+														<img src="{{ $transaction->transaction_proof }}"
+															class="img-fluid rounded" alt="Proof">
 													</div>
 												</div>
 											</div>
@@ -586,25 +687,33 @@
 									@if($transaction->status == '0')
 									<div class="d-grid gap-2 d-flex">
 										@if($transaction->transaction_type == 'Deposit')
-											<form action="{{ url('approve-deposit/' . $transaction->id) }}" method="POST" class="flex-fill">
-												@csrf
-												<button type="submit" class="btn btn-success w-100" onclick="return confirm('Approve deposit?')">Approve</button>
-											</form>
-											<form action="{{ url('decline-deposit/' . $transaction->id) }}" method="POST" class="flex-fill">
-												@csrf
-												<button type="submit" class="btn btn-danger w-100" onclick="return confirm('Decline deposit?')">Decline</button>
-											</form>
+										<form action="{{ url('approve-deposit/' . $transaction->id) }}" method="POST"
+											class="flex-fill">
+											@csrf
+											<button type="submit" class="btn btn-success w-100"
+												onclick="return confirm('Approve deposit?')">Approve</button>
+										</form>
+										<form action="{{ url('decline-deposit/' . $transaction->id) }}" method="POST"
+											class="flex-fill">
+											@csrf
+											<button type="submit" class="btn btn-danger w-100"
+												onclick="return confirm('Decline deposit?')">Decline</button>
+										</form>
 										@elseif($transaction->transaction_type == 'Withdrawal')
-											<form action="{{ url('approve-withdrawal/' . $transaction->id) }}" method="POST" class="flex-fill">
-												@csrf
-												<input type="hidden" name="status" value="1">
-												<button type="submit" class="btn btn-success w-100" onclick="return confirm('Approve withdrawal?')">Approve</button>
-											</form>
-											<form action="{{ url('decline-withdrawal/' . $transaction->id) }}" method="POST" class="flex-fill">
-												@csrf
-												<input type="hidden" name="status" value="2">
-												<button type="submit" class="btn btn-danger w-100" onclick="return confirm('Decline withdrawal?')">Decline</button>
-											</form>
+										<form action="{{ url('approve-withdrawal/' . $transaction->id) }}" method="POST"
+											class="flex-fill">
+											@csrf
+											<input type="hidden" name="status" value="1">
+											<button type="submit" class="btn btn-success w-100"
+												onclick="return confirm('Approve withdrawal?')">Approve</button>
+										</form>
+										<form action="{{ url('decline-withdrawal/' . $transaction->id) }}" method="POST"
+											class="flex-fill">
+											@csrf
+											<input type="hidden" name="status" value="2">
+											<button type="submit" class="btn btn-danger w-100"
+												onclick="return confirm('Decline withdrawal?')">Decline</button>
+										</form>
 										@endif
 									</div>
 									@endif
@@ -616,11 +725,14 @@
 							</div>
 							@endforelse
 						</div>
-						
+
 						<!-- Pagination -->
-						<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+						<div
+							class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
 							<div class="text-muted text-center text-md-start">
-								Showing <strong>{{ $transactions->firstItem() ?? 0 }}</strong> to <strong>{{ $transactions->lastItem() ?? 0 }}</strong> of <strong>{{ $transactions->total() }}</strong> transactions
+								Showing <strong>{{ $transactions->firstItem() ?? 0 }}</strong> to <strong>{{
+									$transactions->lastItem() ?? 0 }}</strong> of <strong>{{ $transactions->total()
+									}}</strong> transactions
 							</div>
 							<div class="pagination-wrapper">
 								{{ $transactions->links('pagination::bootstrap-4') }}
@@ -656,14 +768,14 @@
 		font-size: 2rem;
 		opacity: 0.8;
 	}
-	
+
 	/* Enhanced Pagination Styles */
 	.pagination-wrapper .pagination {
 		margin-bottom: 0;
 		flex-wrap: wrap;
 		justify-content: center;
 	}
-	
+
 	.pagination-wrapper .page-item .page-link {
 		color: #495057;
 		background-color: #fff;
@@ -673,19 +785,20 @@
 		padding: 0.5rem 0.75rem;
 		transition: all 0.2s;
 	}
-	
+
 	.pagination-wrapper .page-item.active .page-link {
-		background-color: #3b7ddd; /* Sidebar Blue */
+		background-color: #3b7ddd;
+		/* Sidebar Blue */
 		border-color: #3b7ddd;
 		color: white;
 	}
-	
+
 	.pagination-wrapper .page-item .page-link:hover {
 		background-color: #e2e6ea;
 		color: #212529;
 		text-decoration: none;
 	}
-	
+
 	.pagination-wrapper .page-item.disabled .page-link {
 		color: #6c757d;
 		background-color: #fff;
@@ -696,12 +809,13 @@
 		.table-responsive {
 			font-size: 0.875rem;
 		}
-		
+
 		/* Mobile specific adjustments */
 		.d-md-none .card {
-			border-left: 4px solid #3b7ddd; /* Sidebar color accent */
+			border-left: 4px solid #3b7ddd;
+			/* Sidebar color accent */
 		}
-		
+
 		.d-md-none .card .badge {
 			font-size: 0.8rem;
 		}
@@ -724,6 +838,25 @@
 			});
 		});
 	});
+</script>
+
+<script>
+	(function() {
+    function refreshEthPrices() {
+        fetch("/api/eth-price")
+            .then(r => r.json())
+            .then(data => {
+                if (!data.eth_price_usd) return;
+                document.querySelectorAll('.eth-conversion').forEach(el => {
+                    const usd = parseFloat(el.dataset.usd);
+                    if (!usd) return;
+                    const eth = usd / data.eth_price_usd;
+                    el.textContent = '≈ ' + (eth < 0.000001 ? eth.toExponential(2) : parseFloat(eth.toFixed(6))) + ' ETH';
+                });
+            });
+    }
+    setInterval(refreshEthPrices, 60000);
+})();
 </script>
 
 

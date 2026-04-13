@@ -108,7 +108,15 @@ class DashboardController extends Controller
     {
         $amount = $request->input('amount');
         $data['amount'] = $amount;
-        $data['eth'] = 0;
+
+        $ethPrice = \App\Helpers\CurrencyHelper::getEthPrice();
+        if ($ethPrice && $ethPrice > 0) {
+            $convertedAmount = \App\Helpers\CurrencyHelper::convert($amount);
+            $eth = $convertedAmount / $ethPrice;
+            $data['eth'] = $eth < 0.000001 ? number_format($eth, 10, '.', '') : rtrim(rtrim(number_format($eth, 8, '.', ''), '0'), '.');
+        } else {
+            $data['eth'] = 0;
+        }
 
         $data['payment'] = DB::table('admins')->get();
 

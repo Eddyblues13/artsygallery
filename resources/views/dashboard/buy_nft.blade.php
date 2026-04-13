@@ -303,6 +303,14 @@
                                 <span class="price-value">{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
                                     }}</span>
                             </div>
+                            <div class="price-item">
+                                <img src="https://img.icons8.com/ios-filled/24/764ba2/ethereum.png" alt="ETH"
+                                    class="price-icon">
+                                <span class="price-label">ETH</span>
+                                <span class="price-value eth-conversion"
+                                    data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
+                                    \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
+                            </div>
                         </div>
 
                         <div class="nft-meta">
@@ -329,7 +337,7 @@
                         </div>
 
                         <a href="{{ route('purchase.nft', $nft->id) }}" class="buy-btn"
-                            onclick="return confirm('Are you sure you want to purchase {{ $nft->ntf_name }} for {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}?')">
+                            onclick="return confirm('Are you sure you want to purchase {{ $nft->ntf_name }} for {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }} (≈ {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }})?')">
                             <i class="align-middle" data-feather="shopping-cart"></i> Buy Now
                         </a>
                     </div>
@@ -355,4 +363,22 @@
 
 <script>
     feather.replace();
+
+    // Live ETH price refresh
+    function refreshEthPrices() {
+        fetch('{{ route("api.eth.price") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.eth_price_usd) {
+                    document.querySelectorAll('.eth-conversion').forEach(el => {
+                        const usd = parseFloat(el.dataset.usd);
+                        if (usd && data.eth_price_usd > 0) {
+                            const eth = (usd / data.eth_price_usd).toFixed(6);
+                            el.textContent = '≈ ' + eth + ' ETH';
+                        }
+                    });
+                }
+            }).catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
 </script>

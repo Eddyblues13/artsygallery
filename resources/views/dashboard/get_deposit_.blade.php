@@ -94,6 +94,10 @@
                                             oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                             type="number" maxlength="15" required>
                                         <p id="txtHint"> &nbsp; .</p>
+                                        <div id="eth-conversion" class="text-muted small" style="display:none;">
+                                            ≈ <span id="eth-value">0</span> ETH
+                                            <span class="text-muted" style="font-size:0.75rem;">(live rate)</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row justify-content-end">
@@ -152,7 +156,8 @@
 		************* -->
 
         <!-- Overlay Scroll JS -->
-        <script src="https://artisttocollectors.com/assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
+        <script src="https://artisttocollectors.com/assets/vendor/overlay-scroll/jquery.overlayScrollbars.min.js">
+        </script>
         <script src="https://artisttocollectors.com/assets/vendor/overlay-scroll/custom-scrollbar.js"></script>
 
         <!-- News ticker -->
@@ -195,4 +200,29 @@
     setInterval(function() {
         $("#someDiv").fadeIn(1000).fadeOut(2500);
     }, 0)
+</script>
+
+<script>
+    (function() {
+    let ethPrice = null;
+    const amountInput = document.getElementById('amount');
+    const ethDiv = document.getElementById('eth-conversion');
+    const ethSpan = document.getElementById('eth-value');
+
+    fetch("/api/eth-price")
+        .then(r => r.json())
+        .then(d => { ethPrice = d.eth_price_usd; updateEth(); })
+        .catch(() => {});
+
+    function updateEth() {
+        const val = parseFloat(amountInput.value);
+        if (!ethPrice || !val || val <= 0) { ethDiv.style.display = 'none'; return; }
+        const eth = val / ethPrice;
+        ethSpan.textContent = eth < 0.000001 ? eth.toExponential(2) : parseFloat(eth.toFixed(6));
+        ethDiv.style.display = 'block';
+    }
+
+    amountInput.addEventListener('input', updateEth);
+    amountInput.addEventListener('keyup', updateEth);
+})();
 </script>

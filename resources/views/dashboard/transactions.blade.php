@@ -261,6 +261,11 @@
                                     stripos($item->transaction_type, 'profit') !== false ? '+' : '-' }}
                                     {{ \App\Helpers\CurrencyHelper::format($item->transaction_amount, 2) }}
                                 </span>
+                                @if(\App\Helpers\CurrencyHelper::formatEth($item->transaction_amount))
+                                <br><small class="text-muted eth-conversion"
+                                    data-usd="{{ \App\Helpers\CurrencyHelper::convert($item->transaction_amount) }}">≈
+                                    {{ \App\Helpers\CurrencyHelper::formatEth($item->transaction_amount) }}</small>
+                                @endif
                             </td>
                             <td>
                                 @if($item->status == '1')
@@ -292,12 +297,20 @@
                             </div>
                             <span class="fw-bold">{{ ucfirst($item->transaction_type) }}</span>
                         </div>
-                        <span
-                            class="fw-bold {{ stripos($item->transaction_type, 'deposit') !== false || stripos($item->transaction_type, 'profit') !== false ? 'text-success' : 'text-danger' }} mobile-amount">
-                            {{ stripos($item->transaction_type, 'deposit') !== false || stripos($item->transaction_type,
-                            'profit') !== false ? '+' : '-' }}
-                            {{ \App\Helpers\CurrencyHelper::format($item->transaction_amount, 2) }}
-                        </span>
+                        <div class="text-end">
+                            <span
+                                class="fw-bold {{ stripos($item->transaction_type, 'deposit') !== false || stripos($item->transaction_type, 'profit') !== false ? 'text-success' : 'text-danger' }} mobile-amount">
+                                {{ stripos($item->transaction_type, 'deposit') !== false ||
+                                stripos($item->transaction_type,
+                                'profit') !== false ? '+' : '-' }}
+                                {{ \App\Helpers\CurrencyHelper::format($item->transaction_amount, 2) }}
+                            </span>
+                            @if(\App\Helpers\CurrencyHelper::formatEth($item->transaction_amount))
+                            <br><small class="text-muted eth-conversion"
+                                data-usd="{{ \App\Helpers\CurrencyHelper::convert($item->transaction_amount) }}">≈ {{
+                                \App\Helpers\CurrencyHelper::formatEth($item->transaction_amount) }}</small>
+                            @endif
+                        </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <div>
@@ -335,6 +348,25 @@
             feather.replace();
         }
     });
+</script>
+
+<script>
+    (function() {
+    function refreshEthPrices() {
+        fetch("{{ route('api.eth.price') }}")
+            .then(r => r.json())
+            .then(data => {
+                if (!data.eth_price_usd) return;
+                document.querySelectorAll('.eth-conversion').forEach(el => {
+                    const usd = parseFloat(el.dataset.usd);
+                    if (!usd) return;
+                    const eth = usd / data.eth_price_usd;
+                    el.textContent = '≈ ' + (eth < 0.000001 ? eth.toExponential(2) : parseFloat(eth.toFixed(6))) + ' ETH';
+                });
+            });
+    }
+    setInterval(refreshEthPrices, 60000);
+})();
 </script>
 
 @include('dashboard.footer')

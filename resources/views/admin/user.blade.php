@@ -449,7 +449,8 @@
 												</div>
 												<div class="mb-2"><span class="text-muted small">Account Name:</span>
 													<span class="fw-medium text-dark">{{ $method->payment_account_name
-														}}</span></div>
+														}}</span>
+												</div>
 												<div class="mb-2"><span class="text-muted small">Account No:</span>
 													<code
 														class="text-dark bg-light px-2 rounded">{{ $method->payment_account_number }}</code>
@@ -513,7 +514,13 @@
 												<td class="px-4">#{{ $depositHistory->id }}</td>
 												<td class="px-4 fw-bold text-success">{{
 													\App\Helpers\CurrencyHelper::format($depositHistory->transaction_amount,
-													2) }}</td>
+													2) }}
+													@if(\App\Helpers\CurrencyHelper::formatEth($depositHistory->transaction_amount))
+													<br><small class="text-muted fw-normal">≈ {{
+														\App\Helpers\CurrencyHelper::formatEth($depositHistory->transaction_amount)
+														}}</small>
+													@endif
+												</td>
 												<td class="px-4">
 													@if($depositHistory->status == '0')
 													<span
@@ -587,7 +594,13 @@
 												<td class="px-4">#{{ $withdrawalHistory->id }}</td>
 												<td class="px-4 fw-bold text-danger">{{
 													\App\Helpers\CurrencyHelper::format($withdrawalHistory->transaction_amount,
-													2) }}</td>
+													2) }}
+													@if(\App\Helpers\CurrencyHelper::formatEth($withdrawalHistory->transaction_amount))
+													<br><small class="text-muted fw-normal">≈ {{
+														\App\Helpers\CurrencyHelper::formatEth($withdrawalHistory->transaction_amount)
+														}}</small>
+													@endif
+												</td>
 												<td class="px-4">
 													@if($withdrawalHistory->withdrawal_method)
 													<span class="badge bg-light text-dark border fw-normal">
@@ -665,7 +678,14 @@
 																			<span class="text-muted">Amount</span>
 																			<span class="fw-bold">{{
 																				\App\Helpers\CurrencyHelper::format($withdrawalHistory->transaction_amount,
-																				2) }}</span>
+																				2) }}
+																				@if(\App\Helpers\CurrencyHelper::formatEth($withdrawalHistory->transaction_amount))
+																				<br><small
+																					class="text-muted fw-normal">≈ {{
+																					\App\Helpers\CurrencyHelper::formatEth($withdrawalHistory->transaction_amount)
+																					}}</small>
+																				@endif
+																			</span>
 																		</div>
 																		<div
 																			class="d-flex justify-content-between mb-2">
@@ -686,7 +706,8 @@
 																	<div class="mb-2"><small
 																			class="text-muted d-block">Bank Name</small>
 																		<strong>{{ $withdrawalHistory->bank_name
-																			}}</strong></div>
+																			}}</strong>
+																	</div>
 																	<div class="mb-2"><small
 																			class="text-muted d-block">Account
 																			Name</small> <strong>{{
@@ -706,7 +727,8 @@
 																	<div class="mb-2"><small
 																			class="text-muted d-block">Currency</small>
 																		<strong>{{ $withdrawalHistory->crypto_type
-																			}}</strong></div>
+																			}}</strong>
+																	</div>
 																	<div class="mb-2"><small
 																			class="text-muted d-block">Address</small>
 																		<code

@@ -22,15 +22,15 @@
 <!-- Content wrapper scroll start -->
 <div class="content-wrapper-scroll">
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Error!</strong> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @elseif (session('status'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Success!</strong> {{ session('status') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> {{ session('status') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
 
     <!-- Main header starts -->
@@ -55,10 +55,12 @@
                 <h4 class="mb-4">Manage NFTs</h4>
 
                 <div class="card">
-                    <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                    <div
+                        class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                         <div class="card-title mb-0">NFT List</div>
                         <form method="GET" action="{{ url('search-nft') }}" class="d-flex w-100 w-md-auto">
-                            <input type="text" name="search" class="form-control me-2" placeholder="Search..." value="{{ request()->get('search') }}">
+                            <input type="text" name="search" class="form-control me-2" placeholder="Search..."
+                                value="{{ request()->get('search') }}">
                             <button type="submit" class="btn btn-primary">Search</button>
                         </form>
                     </div>
@@ -79,53 +81,65 @@
                                 </thead>
                                 <tbody>
                                     @foreach($users_nfts as $index => $nft)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>
-                                                @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
-                                                    <img src="{{ $nft->ntf_image }}" class="img-thumbnail" style="max-height: 80px;" alt="NFT" />
-                                                @else
-                                                    <img src="{{ asset('user/uploads/nfts/'.$nft->ntf_image) }}" class="img-thumbnail" style="max-height: 80px;" alt="NFT" />
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
+                                            <img src="{{ $nft->ntf_image }}" class="img-thumbnail"
+                                                style="max-height: 80px;" alt="NFT" />
+                                            @else
+                                            <img src="{{ asset('user/uploads/nfts/'.$nft->ntf_image) }}"
+                                                class="img-thumbnail" style="max-height: 80px;" alt="NFT" />
+                                            @endif
+                                        </td>
+                                        <td>{{ $nft->ntf_name }}</td>
+                                        <td>{{ $nft->ntf_owner }}</td>
+                                        <td>{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}<br><small
+                                                class="text-muted eth-conversion"
+                                                data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈
+                                                {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
+                                        </td>
+                                        <td>
+                                            @if($nft->status == '1')
+                                            <span class="badge bg-success">Approved</span>
+                                            @elseif($nft->status == '2')
+                                            <span class="badge bg-info">Sold</span>
+                                            @else
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                @if($nft->status == '0')
+                                                <form class="approve-nft-form m-0" data-id="{{ $nft->id }}"
+                                                    data-url="{{ url('approve-nft/'.$nft->id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="1">
+                                                    <input type="hidden" name="email" value="{{ $nft->email }}">
+                                                    <input type="hidden" name="nft_price" value="{{ $nft->nft_price }}">
+                                                    <input type="hidden" name="name" value="{{ $nft->ntf_name }}">
+                                                    <input type="hidden" name="full_name" value="{{ $nft->ntf_owner }}">
+                                                    <button type="submit" class="btn btn-sm btn-success"
+                                                        title="Approve">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                </form>
                                                 @endif
-                                            </td>
-                                            <td>{{ $nft->ntf_name }}</td>
-                                            <td>{{ $nft->ntf_owner }}</td>
-                                            <td>${{ number_format($nft->nft_price, 2) }}</td>
-                                            <td>
-                                                @if($nft->status == '1')
-                                                    <span class="badge bg-success">Approved</span>
-                                                @elseif($nft->status == '2')
-                                                    <span class="badge bg-info">Sold</span>
-                                                @else
-                                                    <span class="badge bg-warning text-dark">Pending</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    @if($nft->status == '0')
-                                                    <form class="approve-nft-form m-0" data-id="{{ $nft->id }}" data-url="{{ url('approve-nft/'.$nft->id) }}">
-                                                        @csrf
-                                                        <input type="hidden" name="status" value="1">
-                                                        <input type="hidden" name="email" value="{{ $nft->email }}">
-                                                        <input type="hidden" name="nft_price" value="{{ $nft->nft_price }}">
-                                                        <input type="hidden" name="name" value="{{ $nft->ntf_name }}">
-                                                        <input type="hidden" name="full_name" value="{{ $nft->ntf_owner }}">
-                                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
-                                                            <i class="bi bi-check-lg"></i>
-                                                        </button>
-                                                    </form>
-                                                    @endif
-                                                    
-                                                    <a href="{{ route('admin.edit.nft', $nft->id) }}" class="btn btn-sm btn-primary" title="Edit">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    
-                                                    <a href="{{ route('admin.delete.nft', $nft->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this NFT?')" title="Delete">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+
+                                                <a href="{{ route('admin.edit.nft', $nft->id) }}"
+                                                    class="btn btn-sm btn-primary" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+
+                                                <a href="{{ route('admin.delete.nft', $nft->id) }}"
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this NFT?')"
+                                                    title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -134,53 +148,65 @@
                         <!-- Mobile Card View -->
                         <div class="d-md-none">
                             @foreach($users_nfts as $nft)
-                                <div class="card mb-3 border shadow-sm">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex align-items-center mb-3">
-                                            @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
-                                                <img src="{{ $nft->ntf_image }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="NFT">
-                                            @else
-                                                <img src="{{ asset('user/uploads/nfts/'.$nft->ntf_image) }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="NFT">
-                                            @endif
-                                            <div>
-                                                <h6 class="mb-1 fw-bold">{{ $nft->ntf_name }}</h6>
-                                                <small class="text-muted">{{ $nft->ntf_owner }}</small>
-                                            </div>
-                                            <div class="ms-auto text-end">
-                                                <div class="fw-bold text-primary">${{ number_format($nft->nft_price, 2) }}</div>
-                                            </div>
+                            <div class="card mb-3 border shadow-sm">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center mb-3">
+                                        @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
+                                        <img src="{{ $nft->ntf_image }}" class="rounded me-3"
+                                            style="width: 60px; height: 60px; object-fit: cover;" alt="NFT">
+                                        @else
+                                        <img src="{{ asset('user/uploads/nfts/'.$nft->ntf_image) }}"
+                                            class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;"
+                                            alt="NFT">
+                                        @endif
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">{{ $nft->ntf_name }}</h6>
+                                            <small class="text-muted">{{ $nft->ntf_owner }}</small>
                                         </div>
-                                        
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <small class="text-muted">
-                                                <i class="bi bi-calendar"></i> {{ \Carbon\Carbon::parse($nft->created_at)->format('M d, Y') }}
-                                            </small>
-                                            @if($nft->status == '1')
-                                                <span class="badge bg-success">Approved</span>
-                                            @elseif($nft->status == '2')
-                                                <span class="badge bg-info">Sold</span>
-                                            @else
-                                                <span class="badge bg-warning text-dark">Pending</span>
-                                            @endif
-                                        </div>
-
-                                        <div class="d-grid gap-2 d-flex justify-content-end">
-                                            @if($nft->status == '0')
-                                                <form class="approve-nft-form m-0 flex-fill" data-id="{{ $nft->id }}" data-url="{{ url('approve-nft/'.$nft->id) }}">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="1">
-                                                    <input type="hidden" name="email" value="{{ $nft->email }}">
-                                                    <input type="hidden" name="nft_price" value="{{ $nft->nft_price }}">
-                                                    <input type="hidden" name="name" value="{{ $nft->ntf_name }}">
-                                                    <input type="hidden" name="full_name" value="{{ $nft->ntf_owner }}">
-                                                    <button type="submit" class="btn btn-success btn-sm w-100">Approve</button>
-                                                </form>
-                                            @endif
-                                            <a href="{{ route('admin.edit.nft', $nft->id) }}" class="btn btn-primary btn-sm flex-fill">Edit</a>
-                                            <a href="{{ route('admin.delete.nft', $nft->id) }}" class="btn btn-danger btn-sm flex-fill" onclick="return confirm('Delete NFT?')">Delete</a>
+                                        <div class="ms-auto text-end">
+                                            <div class="fw-bold text-primary">{{
+                                                \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</div>
+                                            <small class="text-muted eth-conversion"
+                                                data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈
+                                                {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
                                         </div>
                                     </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar"></i> {{
+                                            \Carbon\Carbon::parse($nft->created_at)->format('M d, Y') }}
+                                        </small>
+                                        @if($nft->status == '1')
+                                        <span class="badge bg-success">Approved</span>
+                                        @elseif($nft->status == '2')
+                                        <span class="badge bg-info">Sold</span>
+                                        @else
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="d-grid gap-2 d-flex justify-content-end">
+                                        @if($nft->status == '0')
+                                        <form class="approve-nft-form m-0 flex-fill" data-id="{{ $nft->id }}"
+                                            data-url="{{ url('approve-nft/'.$nft->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="status" value="1">
+                                            <input type="hidden" name="email" value="{{ $nft->email }}">
+                                            <input type="hidden" name="nft_price" value="{{ $nft->nft_price }}">
+                                            <input type="hidden" name="name" value="{{ $nft->ntf_name }}">
+                                            <input type="hidden" name="full_name" value="{{ $nft->ntf_owner }}">
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Approve</button>
+                                        </form>
+                                        @endif
+                                        <a href="{{ route('admin.edit.nft', $nft->id) }}"
+                                            class="btn btn-primary btn-sm flex-fill">Edit</a>
+                                        <a href="{{ route('admin.delete.nft', $nft->id) }}"
+                                            class="btn btn-danger btn-sm flex-fill"
+                                            onclick="return confirm('Delete NFT?')">Delete</a>
+                                    </div>
                                 </div>
+                            </div>
                             @endforeach
                         </div>
 
@@ -201,10 +227,10 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.5.8/sweetalert2.all.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.5.8/sweetalert2.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.5.8/sweetalert2.min.css" />
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
     $('.approve-nft-form').on('submit', function(e) {
         e.preventDefault();
         var form = $(this);
@@ -249,6 +275,25 @@ $(document).ready(function() {
         });
     });
 });
+</script>
+
+<script>
+    function refreshEthPrices() {
+        fetch('{{ route("api.eth.price") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.eth_price_usd) {
+                    document.querySelectorAll('.eth-conversion').forEach(el => {
+                        const usd = parseFloat(el.dataset.usd);
+                        if (usd && data.eth_price_usd > 0) {
+                            const eth = (usd / data.eth_price_usd).toFixed(6);
+                            el.textContent = '≈ ' + eth + ' ETH';
+                        }
+                    });
+                }
+            }).catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
 </script>
 
 @include('dashboard.footer')

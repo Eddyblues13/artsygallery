@@ -370,6 +370,21 @@
                                         @csrf
                                         <div class="login-box rounded-2 p-5">
 
+                                            <div class="mb-3 p-3" style="background: #f8f9fa; border-radius: 10px;">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted">Price (USD)</span>
+                                                    <span class="fw-bold text-primary h5 mb-0">{{
+                                                        \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
+                                                        }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted">Price (ETH)</span>
+                                                    <span class="fw-bold text-dark eth-conversion"
+                                                        data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈
+                                                        {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price)
+                                                        }}</span>
+                                                </div>
+                                            </div>
 
                                             <input type="hidden" name="price" value="{{$nft->nft_price}}" />
                                             <input type="hidden" name="user" value="{{$nft->user_id}}" />
@@ -517,4 +532,23 @@
     setInterval(function() {
         $("#someDiv").fadeIn(1000).fadeOut(2500);
     }, 0)
+</script>
+
+<script>
+    function refreshEthPrices() {
+        fetch('{{ route("api.eth.price") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.eth_price_usd) {
+                    document.querySelectorAll('.eth-conversion').forEach(el => {
+                        const usd = parseFloat(el.dataset.usd);
+                        if (usd && data.eth_price_usd > 0) {
+                            const eth = (usd / data.eth_price_usd).toFixed(6);
+                            el.textContent = '≈ ' + eth + ' ETH';
+                        }
+                    });
+                }
+            }).catch(() => {});
+    }
+    setInterval(refreshEthPrices, 60000);
 </script>
