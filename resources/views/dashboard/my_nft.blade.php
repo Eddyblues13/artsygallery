@@ -44,13 +44,13 @@
                         <div class="d-flex justify-content-between align-items-center mb-0">
                             <div>
                                 <small class="text-muted d-block">Current Price</small>
-                                <span class="h5 fw-bold text-primary mb-0">
+                                <small class="text-muted">
                                     {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}
-                                </span>
+                                </small>
                                 <br>
-                                <small class="text-muted eth-conversion"
+                                <span class="fw-bold eth-conversion" style="color: #6f42c1; font-size: 1.05rem;"
                                     data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
-                                    \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
+                                    \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
                             </div>
 
                         </div>

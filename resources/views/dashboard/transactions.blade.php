@@ -255,16 +255,15 @@
                                 </div>
                             </td>
                             <td>
-                                <span
-                                    class="fw-bold {{ stripos($item->transaction_type, 'deposit') !== false || stripos($item->transaction_type, 'profit') !== false ? 'text-success' : 'text-danger' }}">
+                                <small class="text-muted">
                                     {{ stripos($item->transaction_type, 'deposit') !== false ||
                                     stripos($item->transaction_type, 'profit') !== false ? '+' : '-' }}
                                     {{ \App\Helpers\CurrencyHelper::format($item->transaction_amount, 2) }}
-                                </span>
+                                </small>
                                 @if(\App\Helpers\CurrencyHelper::formatEth($item->transaction_amount))
-                                <br><small class="text-muted eth-conversion"
+                                <br><span class="fw-bold eth-conversion" style="color: #6f42c1;"
                                     data-usd="{{ \App\Helpers\CurrencyHelper::convert($item->transaction_amount) }}">≈
-                                    {{ \App\Helpers\CurrencyHelper::formatEth($item->transaction_amount) }}</small>
+                                    {{ \App\Helpers\CurrencyHelper::formatEth($item->transaction_amount) }}</span>
                                 @endif
                             </td>
                             <td>
@@ -298,17 +297,16 @@
                             <span class="fw-bold">{{ ucfirst($item->transaction_type) }}</span>
                         </div>
                         <div class="text-end">
-                            <span
-                                class="fw-bold {{ stripos($item->transaction_type, 'deposit') !== false || stripos($item->transaction_type, 'profit') !== false ? 'text-success' : 'text-danger' }} mobile-amount">
+                            <small class="text-muted">
                                 {{ stripos($item->transaction_type, 'deposit') !== false ||
                                 stripos($item->transaction_type,
                                 'profit') !== false ? '+' : '-' }}
                                 {{ \App\Helpers\CurrencyHelper::format($item->transaction_amount, 2) }}
-                            </span>
+                            </small>
                             @if(\App\Helpers\CurrencyHelper::formatEth($item->transaction_amount))
-                            <br><small class="text-muted eth-conversion"
+                            <br><span class="fw-bold eth-conversion" style="color: #6f42c1;"
                                 data-usd="{{ \App\Helpers\CurrencyHelper::convert($item->transaction_amount) }}">≈ {{
-                                \App\Helpers\CurrencyHelper::formatEth($item->transaction_amount) }}</small>
+                                \App\Helpers\CurrencyHelper::formatEth($item->transaction_amount) }}</span>
                             @endif
                         </div>
                     </div>

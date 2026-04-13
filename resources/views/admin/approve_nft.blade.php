@@ -94,10 +94,12 @@
                                         </td>
                                         <td>{{ $nft->ntf_name }}</td>
                                         <td>{{ $nft->ntf_owner }}</td>
-                                        <td>{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}<br><small
-                                                class="text-muted eth-conversion"
+                                        <td><small class="text-muted">{{
+                                                \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
+                                                }}</small><br><span class="fw-bold eth-conversion"
+                                                style="color: #6f42c1;"
                                                 data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈
-                                                {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
+                                                {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
                                         </td>
                                         <td>
                                             @if($nft->status == '1')
@@ -164,11 +166,11 @@
                                             <small class="text-muted">{{ $nft->ntf_owner }}</small>
                                         </div>
                                         <div class="ms-auto text-end">
-                                            <div class="fw-bold text-primary">{{
-                                                \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</div>
-                                            <small class="text-muted eth-conversion"
+                                            <small class="text-muted d-block">{{
+                                                \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</small>
+                                            <span class="fw-bold eth-conversion" style="color: #6f42c1;"
                                                 data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈
-                                                {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
+                                                {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
                                         </div>
                                     </div>
 

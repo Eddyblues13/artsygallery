@@ -247,15 +247,15 @@
 											@endif
 										</td>
 										<td>
-											<strong class="text-primary">{{
+											<small class="text-muted">{{
 												\App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2)
-												}}</strong>
+												}}</small>
 											@if(\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount))
-											<br><small class="text-muted eth-conversion"
+											<br><span class="fw-bold eth-conversion" style="color: #6f42c1;"
 												data-usd="{{ \App\Helpers\CurrencyHelper::convert($transaction->transaction_amount) }}">≈
 												{{
 												\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount)
-												}}</small>
+												}}</span>
 											@endif
 										</td>
 										<td>
@@ -577,15 +577,15 @@
 											<small class="text-muted">#{{ $transaction->id }}</small>
 										</div>
 										<div class="text-end">
-											<strong class="text-primary d-block">{{
+											<small class="text-muted d-block">{{
 												\App\Helpers\CurrencyHelper::format($transaction->transaction_amount, 2)
-												}}</strong>
+												}}</small>
 											@if(\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount))
-											<small class="text-muted eth-conversion"
+											<span class="fw-bold eth-conversion" style="color: #6f42c1;"
 												data-usd="{{ \App\Helpers\CurrencyHelper::convert($transaction->transaction_amount) }}">≈
 												{{
 												\App\Helpers\CurrencyHelper::formatEth($transaction->transaction_amount)
-												}}</small>
+												}}</span>
 											@endif
 											@if($transaction->status == '0')
 											<span class="badge bg-warning text-dark"><i class="align-middle"

@@ -29,10 +29,11 @@
 						</div>
 
 						<div class="d-inline-flex gap-3">
-							<b>Price: {{ \App\Helpers\CurrencyHelper::format($my_nft->nft_price, 2) }}</b>
+							<span class="text-muted">Price: {{ \App\Helpers\CurrencyHelper::format($my_nft->nft_price,
+								2) }}</span>
 						</div>
 						<div>
-							<small class="text-muted eth-conversion"
+							<span class="fw-bold eth-conversion" style="color: #6f42c1;"
 								data-usd="{{ \App\Helpers\CurrencyHelper::convert($my_nft->nft_price) }}">≈ {{
 								\App\Helpers\CurrencyHelper::formatEth($my_nft->nft_price) }}</small>
 						</div>

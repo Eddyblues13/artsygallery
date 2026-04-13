@@ -300,14 +300,16 @@
                                 <img src="https://img.icons8.com/ios-filled/24/000000/us-dollar.png" alt="USD"
                                     class="price-icon">
                                 <span class="price-label">Price</span>
-                                <span class="price-value">{{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
+                                <span class="price-value"
+                                    style="font-weight: 400; color: #6c757d; font-size: 0.85rem;">{{
+                                    \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
                                     }}</span>
                             </div>
-                            <div class="price-item">
+                            <div class="price-item" style="background: #f3f0ff;">
                                 <img src="https://img.icons8.com/ios-filled/24/764ba2/ethereum.png" alt="ETH"
                                     class="price-icon">
-                                <span class="price-label">ETH</span>
-                                <span class="price-value eth-conversion"
+                                <span class="price-label" style="font-weight: 600;">ETH</span>
+                                <span class="price-value eth-conversion" style="font-size: 1.1rem; color: #6f42c1;"
                                     data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
                                     \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
                             </div>

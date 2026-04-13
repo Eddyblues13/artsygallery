@@ -157,11 +157,11 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-bold text-dark">{{
-                                        \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</div>
-                                    <small class="text-muted eth-conversion"
+                                    <small class="text-muted">{{
+                                        \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</small>
+                                    <br><span class="fw-bold eth-conversion" style="color: #6f42c1;"
                                         data-usd="{{ \App\Helpers\CurrencyHelper::convert($artwork->nft_price) }}">≈ {{
-                                        \App\Helpers\CurrencyHelper::formatEth($artwork->nft_price) }}</small>
+                                        \App\Helpers\CurrencyHelper::formatEth($artwork->nft_price) }}</span>
                                 </td>
                                 <td>
                                     @if($artwork->status == '1')
@@ -235,11 +235,11 @@
                                     @endif
                                 </div>
                                 <div class="mb-3">
-                                    <span class="h6 text-primary fw-bold">{{
-                                        \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</span>
-                                    <br><small class="text-muted eth-conversion"
+                                    <small class="text-muted">{{
+                                        \App\Helpers\CurrencyHelper::format($artwork->nft_price, 2) }}</small>
+                                    <br><span class="fw-bold eth-conversion" style="color: #6f42c1;"
                                         data-usd="{{ \App\Helpers\CurrencyHelper::convert($artwork->nft_price) }}">≈ {{
-                                        \App\Helpers\CurrencyHelper::formatEth($artwork->nft_price) }}</small>
+                                        \App\Helpers\CurrencyHelper::formatEth($artwork->nft_price) }}</span>
                                 </div>
                                 <div class="d-flex gap-2">
                                     <a href="{{ route('admin.edit.nft', $artwork->id) }}"

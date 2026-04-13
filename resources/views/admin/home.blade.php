@@ -65,13 +65,16 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_balance, 2)
-											}}</b></h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{ \App\Helpers\CurrencyHelper::format($total_balance,
+											2) }}</small>
+									</div>
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($total_balance))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_balance) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($total_balance) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_balance) }}">≈
+												{{
+												\App\Helpers\CurrencyHelper::formatEth($total_balance) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -90,13 +93,16 @@
 										</div>
 									</div>
 
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_profit, 2)
-											}}</b></h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{ \App\Helpers\CurrencyHelper::format($total_profit,
+											2) }}</small>
+									</div>
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($total_profit))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_profit) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($total_profit) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_profit) }}">≈
+												{{
+												\App\Helpers\CurrencyHelper::formatEth($total_profit) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -116,14 +122,17 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_deposits, 2)
-											}}</b></h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{
+											\App\Helpers\CurrencyHelper::format($total_deposits, 2) }}</small>
+									</div>
 
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($total_deposits))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_deposits) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($total_deposits) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_deposits) }}">≈
+												{{
+												\App\Helpers\CurrencyHelper::formatEth($total_deposits) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -141,14 +150,17 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($total_withdrawals,
-											2) }}</b></h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{
+											\App\Helpers\CurrencyHelper::format($total_withdrawals, 2) }}</small>
+									</div>
 
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($total_withdrawals))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_withdrawals) }}">≈
-											{{ \App\Helpers\CurrencyHelper::formatEth($total_withdrawals) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($total_withdrawals) }}">≈
+												{{ \App\Helpers\CurrencyHelper::formatEth($total_withdrawals) }}</b>
+										</h3>
 										@endif
 									</div>
 								</div>

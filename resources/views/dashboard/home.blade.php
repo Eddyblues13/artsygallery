@@ -71,13 +71,15 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($balance, 2) }}</b>
-									</h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{ \App\Helpers\CurrencyHelper::format($balance, 2)
+											}}</small>
+									</div>
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($balance))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($balance) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($balance) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($balance) }}">≈ {{
+												\App\Helpers\CurrencyHelper::formatEth($balance) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -96,13 +98,15 @@
 										</div>
 									</div>
 
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($profit, 2) }}</b>
-									</h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{ \App\Helpers\CurrencyHelper::format($profit, 2)
+											}}</small>
+									</div>
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($profit))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($profit) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($profit) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($profit) }}">≈ {{
+												\App\Helpers\CurrencyHelper::formatEth($profit) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -122,14 +126,16 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($deposit, 2) }}</b>
-									</h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{ \App\Helpers\CurrencyHelper::format($deposit, 2)
+											}}</small>
+									</div>
 
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($deposit))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($deposit) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($deposit) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($deposit) }}">≈ {{
+												\App\Helpers\CurrencyHelper::formatEth($deposit) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -147,14 +153,16 @@
 											</div>
 										</div>
 									</div>
-									<h3 class="mt-1 mb-3"><b>{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2)
-											}}</b></h3>
+									<div class="mt-1 mb-1">
+										<small class="text-muted">{{ \App\Helpers\CurrencyHelper::format($withdrawal, 2)
+											}}</small>
+									</div>
 
 									<div class="mb-0">
 										@if(\App\Helpers\CurrencyHelper::formatEth($withdrawal))
-										<small class="text-muted eth-conversion"
-											data-usd="{{ \App\Helpers\CurrencyHelper::convert($withdrawal) }}">≈ {{
-											\App\Helpers\CurrencyHelper::formatEth($withdrawal) }}</small>
+										<h3 class="mb-0"><b class="eth-conversion" style="color: #6f42c1;"
+												data-usd="{{ \App\Helpers\CurrencyHelper::convert($withdrawal) }}">≈ {{
+												\App\Helpers\CurrencyHelper::formatEth($withdrawal) }}</b></h3>
 										@endif
 									</div>
 								</div>
@@ -188,6 +196,93 @@
 						</div>
 					</div>
 					<!-- Background image -->
+				</div>
+			</div>
+		</div>
+
+		<!-- ETH Price Charts Section -->
+		<div class="row mt-4">
+			<!-- Chart 1: ETH Price History (7 Days) - Area Chart -->
+			<div class="col-12 col-lg-7">
+				<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+					<div class="card-body p-0">
+						<div class="p-4 pb-0">
+							<div class="d-flex justify-content-between align-items-start">
+								<div>
+									<h5 class="fw-bold mb-1" style="color: #333;">ETH Price History</h5>
+									<div class="d-flex align-items-center gap-2">
+										<span id="ethCurrentPrice" class="h3 fw-bold mb-0"
+											style="color: #6f42c1;">Loading...</span>
+										<span id="ethPriceChange" class="badge rounded-pill px-3 py-2"
+											style="font-size: 0.8rem;">--</span>
+									</div>
+									<small class="text-muted">Last 7 days</small>
+								</div>
+								<div class="d-flex gap-2">
+									<button class="btn btn-sm eth-range-btn active" data-days="1"
+										style="border-radius: 8px;">24H</button>
+									<button class="btn btn-sm eth-range-btn" data-days="7"
+										style="border-radius: 8px;">7D</button>
+									<button class="btn btn-sm eth-range-btn" data-days="30"
+										style="border-radius: 8px;">30D</button>
+								</div>
+							</div>
+						</div>
+						<div style="height: 300px; padding: 0 1rem 1rem;">
+							<canvas id="ethPriceChart"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Chart 2: ETH Market Stats - Doughnut + Live Stats -->
+			<div class="col-12 col-lg-5">
+				<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+					<div class="card-body p-4">
+						<h5 class="fw-bold mb-3" style="color: #333;">ETH Market Overview</h5>
+						<div style="height: 200px; position: relative;">
+							<canvas id="ethMarketChart"></canvas>
+							<div
+								style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+								<img src="https://img.icons8.com/ios-filled/36/764ba2/ethereum.png" alt="ETH"
+									style="opacity: 0.7;">
+								<div class="fw-bold" style="color: #6f42c1; font-size: 0.85rem;" id="ethDoughnutCenter">
+									ETH</div>
+							</div>
+						</div>
+						<div class="mt-3">
+							<div class="row g-3">
+								<div class="col-6">
+									<div class="p-3 rounded-3"
+										style="background: linear-gradient(135deg, #f3f0ff 0%, #e8e0ff 100%);">
+										<small class="text-muted d-block">24h High</small>
+										<span class="fw-bold" style="color: #6f42c1;" id="eth24hHigh">--</span>
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="p-3 rounded-3"
+										style="background: linear-gradient(135deg, #fff0f0 0%, #ffe0e0 100%);">
+										<small class="text-muted d-block">24h Low</small>
+										<span class="fw-bold" style="color: #dc3545;" id="eth24hLow">--</span>
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="p-3 rounded-3"
+										style="background: linear-gradient(135deg, #f0fff4 0%, #e0ffe8 100%);">
+										<small class="text-muted d-block">Market Cap</small>
+										<span class="fw-bold" style="color: #198754;" id="ethMarketCap">--</span>
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="p-3 rounded-3"
+										style="background: linear-gradient(135deg, #f0f8ff 0%, #e0f0ff 100%);">
+										<small class="text-muted d-block">24h Volume</small>
+										<span class="fw-bold" style="color: #0d6efd;" id="eth24hVolume">--</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -445,7 +540,178 @@
 })();
 </script>
 
+<!-- Chart.js 4.x CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
+<style>
+	.eth-range-btn {
+		background: #f0f0f0;
+		border: none;
+		color: #666;
+		font-weight: 600;
+		font-size: 0.75rem;
+		padding: 0.35rem 0.75rem;
+		transition: all 0.2s;
+	}
+
+	.eth-range-btn:hover,
+	.eth-range-btn.active {
+		background: linear-gradient(135deg, #6f42c1 0%, #9b59b6 100%);
+		color: #fff;
+	}
+</style>
+
+<script>
+	(function() {
+	// ====== Chart 1: ETH Price History (Area/Line Chart) ======
+	const priceCtx = document.getElementById('ethPriceChart');
+	if (!priceCtx) return;
+
+	let priceChart = new Chart(priceCtx.getContext('2d'), {
+		type: 'line',
+		data: { labels: [], datasets: [{ label: 'ETH Price (USD)', data: [], fill: true, borderColor: '#6f42c1', backgroundColor: 'rgba(111,66,193,0.08)', borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#6f42c1', tension: 0.4 }] },
+		options: {
+			responsive: true, maintainAspectRatio: false,
+			interaction: { mode: 'index', intersect: false },
+			plugins: {
+				legend: { display: false },
+				tooltip: {
+					backgroundColor: '#1a1a2e', titleColor: '#fff', bodyColor: '#fff',
+					padding: 12, cornerRadius: 10, displayColors: false,
+					callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+				}
+			},
+			scales: {
+				x: { grid: { display: false }, ticks: { maxTicksLimit: 8, color: '#999', font: { size: 11 } } },
+				y: { grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false }, ticks: { color: '#999', font: { size: 11 }, callback: v => '$' + v.toLocaleString() } }
+			}
+		}
+	});
+
+	function loadPriceHistory(days) {
+		fetch(`https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=${days}`)
+			.then(r => r.json())
+			.then(data => {
+				if (!data.prices) return;
+				const prices = data.prices;
+				const labels = prices.map(p => {
+					const d = new Date(p[0]);
+					return days <= 1 ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+						: days <= 7 ? d.toLocaleDateString([], { weekday: 'short', day: 'numeric' })
+						: d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+				});
+				const values = prices.map(p => p[1]);
+
+				priceChart.data.labels = labels;
+				priceChart.data.datasets[0].data = values;
+				priceChart.update('none');
+
+				// Update current price & change
+				const current = values[values.length - 1];
+				const first = values[0];
+				const change = ((current - first) / first * 100).toFixed(2);
+				document.getElementById('ethCurrentPrice').textContent = '$' + current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+				const changeEl = document.getElementById('ethPriceChange');
+				changeEl.textContent = (change >= 0 ? '+' : '') + change + '%';
+				changeEl.style.background = change >= 0 ? '#d4edda' : '#f8d7da';
+				changeEl.style.color = change >= 0 ? '#155724' : '#721c24';
+
+				// Update label
+				const rangeLabels = { 1: 'Last 24 hours', 7: 'Last 7 days', 30: 'Last 30 days' };
+				const label = priceCtx.closest('.card').querySelector('small.text-muted');
+				if (label) label.textContent = rangeLabels[days] || '';
+			})
+			.catch(() => {
+				document.getElementById('ethCurrentPrice').textContent = 'Unavailable';
+			});
+	}
+
+	// Range buttons
+	document.querySelectorAll('.eth-range-btn').forEach(btn => {
+		btn.addEventListener('click', function() {
+			document.querySelectorAll('.eth-range-btn').forEach(b => b.classList.remove('active'));
+			this.classList.add('active');
+			loadPriceHistory(parseInt(this.dataset.days));
+		});
+	});
+
+	loadPriceHistory(1);
+
+	// ====== Chart 2: ETH Market Overview (Doughnut + Stats) ======
+	const marketCtx = document.getElementById('ethMarketChart');
+	if (!marketCtx) return;
+
+	let marketChart = new Chart(marketCtx.getContext('2d'), {
+		type: 'doughnut',
+		data: {
+			labels: ['Market Cap', '24h Volume', 'Circulating vs Max'],
+			datasets: [{
+				data: [33, 33, 34],
+				backgroundColor: ['rgba(111,66,193,0.8)', 'rgba(13,110,253,0.8)', 'rgba(25,135,84,0.6)'],
+				borderWidth: 0,
+				hoverOffset: 8
+			}]
+		},
+		options: {
+			responsive: true, maintainAspectRatio: false, cutout: '70%',
+			plugins: {
+				legend: { display: true, position: 'bottom', labels: { padding: 15, usePointStyle: true, pointStyle: 'circle', font: { size: 11 } } },
+				tooltip: {
+					backgroundColor: '#1a1a2e', titleColor: '#fff', bodyColor: '#fff', padding: 10, cornerRadius: 8
+				}
+			}
+		}
+	});
+
+	function formatBigNumber(n) {
+		if (n >= 1e12) return '$' + (n / 1e12).toFixed(2) + 'T';
+		if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+		if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+		return '$' + n.toLocaleString();
+	}
+
+	function loadMarketData() {
+		fetch('https://api.coingecko.com/api/v3/coins/ethereum?localization=false&tickers=false&community_data=false&developer_data=false')
+			.then(r => r.json())
+			.then(data => {
+				const md = data.market_data;
+				if (!md) return;
+
+				const mcap = md.market_cap?.usd || 0;
+				const vol = md.total_volume?.usd || 0;
+				const circulating = md.circulating_supply || 0;
+				const maxSupply = md.max_supply || circulating * 1.2;
+
+				// Update doughnut proportions
+				const total = mcap + vol;
+				marketChart.data.datasets[0].data = [
+					((mcap / total) * 100).toFixed(1),
+					((vol / total) * 100).toFixed(1),
+					((circulating / maxSupply) * 100).toFixed(1)
+				];
+				marketChart.data.labels = [
+					`Market Cap (${formatBigNumber(mcap)})`,
+					`24h Volume (${formatBigNumber(vol)})`,
+					`Supply: ${(circulating / 1e6).toFixed(1)}M ETH`
+				];
+				marketChart.update('none');
+
+				// Fill stat boxes
+				document.getElementById('eth24hHigh').textContent = '$' + (md.high_24h?.usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+				document.getElementById('eth24hLow').textContent = '$' + (md.low_24h?.usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+				document.getElementById('ethMarketCap').textContent = formatBigNumber(mcap);
+				document.getElementById('eth24hVolume').textContent = formatBigNumber(vol);
+			})
+			.catch(() => {});
+	}
+
+	loadMarketData();
+
+	// Refresh market data every 2 minutes
+	setInterval(loadMarketData, 120000);
+	setInterval(() => loadPriceHistory(parseInt(document.querySelector('.eth-range-btn.active')?.dataset.days || 1)), 120000);
+})();
+</script>
 
 
 </body>

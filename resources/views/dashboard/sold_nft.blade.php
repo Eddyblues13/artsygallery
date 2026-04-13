@@ -49,11 +49,11 @@
 					</div>
 					<div class="card-body">
 						<p class="card-text">{{ $nft->ntf_description }}</p>
-						<p class="card-text"><strong>Price:</strong> {{
-							\App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}
-							<br><small class="text-muted eth-conversion"
+						<p class="card-text"><span class="text-muted">Price:</span> <small class="text-muted">{{
+								\App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }}</small>
+							<br><span class="fw-bold eth-conversion" style="color: #6f42c1;"
 								data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
-								\App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</small>
+								\App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
 						</p>
 
 						<p class="card-text"><strong>Creator:</strong> {{ $nft->ntf_owner }}</p>

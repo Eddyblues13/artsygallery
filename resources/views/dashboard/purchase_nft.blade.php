@@ -373,13 +373,15 @@
                                             <div class="mb-3 p-3" style="background: #f8f9fa; border-radius: 10px;">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <span class="text-muted">Price (USD)</span>
-                                                    <span class="fw-bold text-primary h5 mb-0">{{
+                                                    <small class="text-muted">{{
                                                         \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
-                                                        }}</span>
+                                                        }}</small>
                                                 </div>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-muted">Price (ETH)</span>
-                                                    <span class="fw-bold text-dark eth-conversion"
+                                                <div class="d-flex justify-content-between align-items-center"
+                                                    style="background: #f3f0ff; border-radius: 8px; padding: 0.5rem;">
+                                                    <span class="fw-bold" style="color: #6f42c1;">Price (ETH)</span>
+                                                    <span class="fw-bold eth-conversion"
+                                                        style="color: #6f42c1; font-size: 1.15rem;"
                                                         data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈
                                                         {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price)
                                                         }}</span>
