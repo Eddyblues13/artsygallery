@@ -1470,7 +1470,7 @@ class AdminController extends Controller
         // Delete from Cloudinary if applicable
         if ($nft->cloudinary_public_id) {
             try {
-                $cloudinary = new Cloudinary();
+                $cloudinary = new \Cloudinary\Cloudinary();
                 $uploadApi = $cloudinary->uploadApi();
                 $uploadApi->destroy($nft->cloudinary_public_id);
             } catch (\Exception $e) {

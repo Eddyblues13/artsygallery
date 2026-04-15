@@ -722,7 +722,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $nft->nft_price = $nft_price;
         $nft->ntf_description = $request->input('ntf_description');
         $nft->ntf_owner = Auth::user()->name;
-        $nft->status = 1; // Auto-approve newly uploaded NFTs
+        $nft->status = 0; // Pending admin approval
 
         // Cloudinary upload using the recommended method
         $nftImageUrl = null;

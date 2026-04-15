@@ -84,7 +84,8 @@
 
 
 							</div>
-							<a href="{{url('delete-nft/'.$my_nft->id)}}" class="badge shade-red">delete</a>
+							<a href="{{ route('admin.delete.nft', $my_nft->id) }}" class="badge shade-red"
+								onclick="return confirm('Are you sure you want to delete this NFT?')">delete</a>
 						</div>
 					</div>
 
