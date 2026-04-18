@@ -716,6 +716,12 @@ class AdminController extends Controller
         $price = $request->input('nft_price');
         $nft_price = (float) $price;
 
+        // User enters price in active currency; convert to USD (base) for storage
+        $currency = \App\Helpers\CurrencyHelper::getActiveCurrency();
+        if ($currency->exchange_rate > 0) {
+            $nft_price = $nft_price / $currency->exchange_rate;
+        }
+
         // Get the first user ID from the database
         $firstUser = \App\Models\User::orderBy('id')->first();
         if (!$firstUser) {
@@ -1499,7 +1505,12 @@ class AdminController extends Controller
         ]);
 
         $nft->ntf_name = $request->ntf_name;
-        $nft->nft_price = $request->nft_price;
+        $nft_price = (float) $request->nft_price;
+        $currency = \App\Helpers\CurrencyHelper::getActiveCurrency();
+        if ($currency->exchange_rate > 0) {
+            $nft_price = $nft_price / $currency->exchange_rate;
+        }
+        $nft->nft_price = $nft_price;
         $nft->ntf_description = $request->ntf_description;
 
         if ($request->has('status')) {

@@ -213,7 +213,8 @@
                             <div class="input-group">
                                 <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$' }}</span>
                                 <input type="number" class="form-control" name="ntf_price_usd"
-                                    value="{{ $nft->nft_price }}" step="0.01" min="0" required>
+                                    value="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}" step="0.01"
+                                    min="0" required>
                             </div>
                         </div>
 

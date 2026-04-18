@@ -716,6 +716,12 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $price = $request->input('nft_price');
         $nft_price = (float) $price;
 
+        // User enters price in active currency; convert to USD (base) for storage
+        $currency = \App\Helpers\CurrencyHelper::getActiveCurrency();
+        if ($currency->exchange_rate > 0) {
+            $nft_price = $nft_price / $currency->exchange_rate;
+        }
+
         $nft = new Nft;
         $nft->user_id = Auth::id();
         $nft->ntf_name = $request->input('nft_name');
@@ -1571,9 +1577,13 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
-        // Sanitize price input
+        // Sanitize price input and convert from active currency to USD for storage
         $price = $request->input('ntf_price_usd');
         $nft_price = (float) $price;
+        $currency = \App\Helpers\CurrencyHelper::getActiveCurrency();
+        if ($currency->exchange_rate > 0) {
+            $nft_price = $nft_price / $currency->exchange_rate;
+        }
 
         $nft->ntf_name = $request->ntf_name;
         $nft->ntf_description = $request->ntf_description;
