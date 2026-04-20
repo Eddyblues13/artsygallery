@@ -1497,6 +1497,7 @@ class AdminController extends Controller
     public function updateNft(Request $request, $id)
     {
         $nft = Nft::findOrFail($id);
+        $oldStatus = $nft->status;
 
         $request->validate([
             'ntf_name' => 'required|string|max:255',
@@ -1513,6 +1514,7 @@ class AdminController extends Controller
         $nft->nft_price = $nft_price;
         $nft->ntf_description = $request->ntf_description;
 
+        $newStatus = $request->has('status') ? (int) $request->status : $oldStatus;
         if ($request->has('status')) {
             $nft->status = $request->status;
         }
@@ -1539,6 +1541,38 @@ class AdminController extends Controller
         }
 
         $nft->save();
+
+        // Send email notifications when status changes
+        if ($oldStatus != $newStatus && $nft->user) {
+            $owner = $nft->user;
+            try {
+                if ($newStatus == 1) {
+                    // Artwork approved
+                    $ref = rand(76503737, 12344994);
+                    $emailData = [
+                        'name' => $owner->name,
+                        'nft_name' => $nft->ntf_name,
+                        'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+                        'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+                        'reference' => $ref,
+                        'date' => now()->format('M d, Y h:i A'),
+                    ];
+                    Mail::to($owner->email)->send(new \App\Mail\nftApprovedEmail($emailData));
+                } elseif ($newStatus == 2) {
+                    // Artwork marked as sold
+                    $emailData = [
+                        'name' => $owner->name,
+                        'nft_name' => $nft->ntf_name,
+                        'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+                        'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+                        'date' => now()->format('M d, Y h:i A'),
+                    ];
+                    Mail::to($owner->email)->send(new \App\Mail\ArtworkSoldEmail($emailData));
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('NFT status change email failed: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->route('users.uploaded.nft')->with('status', 'NFT updated successfully');
     }

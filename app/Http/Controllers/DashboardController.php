@@ -713,6 +713,12 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function saveNft(Request $request)
     {
+        $gas_fee = $request->input('gas_fee');
+
+        if ($gas_fee == 1) {
+            return back()->with('error', 'Your account balance is insufficient, please fund your account or contact our administrator for more info!');
+        }
+
         $price = $request->input('nft_price');
         $nft_price = (float) $price;
 
@@ -1724,11 +1730,28 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             'date' => now()->format('M d, Y h:i A'),
         ];
 
-        // Send the email
+        // Send the email to the buyer
         try {
             Mail::to($currentUser->email)->send(new PurchaseNft($data));
         } catch (\Exception $e) {
             Log::error('NFT purchase email failed: ' . $e->getMessage());
+        }
+
+        // Send email notification to the seller
+        if ($user) {
+            try {
+                $sellerData = [
+                    'name' => $user->name,
+                    'nft_name' => $nft_details->ntf_name,
+                    'price_formatted' => \App\Helpers\CurrencyHelper::format($nft_details->nft_price, 2),
+                    'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft_details->nft_price),
+                    'buyer' => $currentUser->name,
+                    'date' => now()->format('M d, Y h:i A'),
+                ];
+                Mail::to($user->email)->send(new \App\Mail\ArtworkPurchasedEmail($sellerData));
+            } catch (\Exception $e) {
+                Log::error('NFT purchase seller notification email failed: ' . $e->getMessage());
+            }
         }
 
         return back()->with('status', 'NFT has been purchased successfully');

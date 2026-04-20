@@ -280,6 +280,21 @@
                                 placeholder="Describe your artwork..." required></textarea>
                         </div>
 
+                        <!-- Gas Fee Option -->
+                        <div class="mb-4">
+                            <label class="form-label-styled">Gas Fee <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gas_fee" id="gasFeeNo" value="0" checked>
+                                    <label class="form-check-label" for="gasFeeNo">Without Gas Fee</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gas_fee" id="gasFeeYes" value="1">
+                                    <label class="form-check-label" for="gasFeeYes">With Gas Fee</label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Progress Bar -->
                         <div class="upload-progress" id="uploadProgress">
                             <div class="progress-track">
