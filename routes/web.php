@@ -131,6 +131,7 @@ Route::middleware('admin.auth')->group(function () {
     Route::post('admin_save_nft', [AdminController::class, 'adminSaveNft'])->name('admin.save.nft');
     Route::get('user_transactions', [AdminController::class, 'usersTransaction'])->name('user.transaction');
     Route::get('admin_nft_market', [AdminController::class, 'nftMarket'])->name('admin.buy.nft');
+    Route::get('admin_purchase_nft/{id}/', [AdminController::class, 'adminPurchaseNft'])->name('admin.purchase.nft');
     Route::post('admin_update_wallet', [AdminController::class, 'updateWallet'])->name('admin.save.wallet');
     Route::post('admin_update_whatsapp', [AdminController::class, 'updateWhatsapp'])->name('admin.save.whatsapp');
     Route::post('transfer', [AdminController::class, 'transferFunds'])->name('transfer-fund');

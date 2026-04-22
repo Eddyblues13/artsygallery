@@ -14,6 +14,8 @@ use App\Mail\nftUserEmail;
 use App\Mail\nftApprovedEmail;
 use App\Mail\sendUserEmail;
 use App\Mail\ApproveKyc;
+use App\Mail\PurchaseNft;
+use App\Mail\ArtworkPurchasedEmail;
 use App\Mail\DepositApproved;
 use App\Mail\WithdrawalApprovedMail;
 use App\Mail\profitEmail;
@@ -351,6 +353,11 @@ class AdminController extends Controller
         $buy_nft = $query->paginate(12)->appends($request->query());
         $nft = $buy_nft;
         $eth = $nft;
+        $selectedBuyerUserId = $request->input('buyer_user_id');
+
+        $buyerUsers = User::orderBy('name', 'asc')
+            ->select('id', 'name', 'email')
+            ->get();
 
         // Statistics
         $stats = [
@@ -359,7 +366,136 @@ class AdminController extends Controller
             'average_price' => Nft::where('status', '1')->avg('nft_price'),
         ];
 
-        return view('admin.nftmarkets', ['buy_nft' => $eth, 'stats' => $stats]);
+        return view('admin.nftmarkets', [
+            'buy_nft' => $eth,
+            'stats' => $stats,
+            'buyerUsers' => $buyerUsers,
+            'selectedBuyerUserId' => $selectedBuyerUserId,
+        ]);
+    }
+
+    public function adminPurchaseNft(Request $request, $nftId)
+    {
+        $nft = Nft::findOrFail($nftId);
+        $admin = $this->admin();
+
+        if (!$admin) {
+            return redirect()->route('admin.login')->with('error', 'Please login as admin to continue.');
+        }
+
+        // Prefer explicitly selected buyer account; fallback to same-email mapping.
+        $buyerUserId = $request->input('buyer_user_id');
+        $buyer = null;
+        if (!empty($buyerUserId)) {
+            $buyer = User::find($buyerUserId);
+            if (!$buyer) {
+                return back()->with('error', 'Selected buyer user was not found.');
+            }
+        }
+
+        if (!$buyer) {
+            $buyer = User::where('email', $admin->email)->first();
+        }
+
+        if (!$buyer) {
+            return back()->with('error', 'No buyer user account found. Select a buyer user from marketplace filter or create a matching user account for this admin email.');
+        }
+
+        if ($nft->user_id == $buyer->id) {
+            return back()->with('error', 'You cannot purchase your own NFT.');
+        }
+
+        $deposit = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'Deposit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $withdrawal = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'Withdrawal')
+            ->whereIn('status', ['0', '1'])
+            ->sum('transaction_amount');
+
+        $addProfit = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'Profit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $debitProfit = Transaction::where('user_id', $buyer->id)
+            ->where('transaction_type', 'DebitProfit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $balance = $deposit + ($addProfit - $debitProfit) - $withdrawal;
+        if ($balance < $nft->nft_price) {
+            return back()->with('error', 'Insufficient balance! Your balance: ' . \App\Helpers\CurrencyHelper::format($balance, 2) . ', NFT Price: ' . \App\Helpers\CurrencyHelper::format($nft->nft_price, 2));
+        }
+
+        $seller = User::find($nft->user_id);
+
+        DB::transaction(function () use ($buyer, $seller, $nft) {
+            $buyerTransaction = new Transaction;
+            $buyerTransaction->user_id = $buyer->id;
+            $buyerTransaction->transaction_amount = $nft->nft_price;
+            $buyerTransaction->transaction_type = 'DebitProfit';
+            $buyerTransaction->status = 1;
+            $buyerTransaction->transaction_id = 'NFT_PURCHASE_' . time();
+            $buyerTransaction->save();
+
+            if ($seller) {
+                $sellerTransaction = new Transaction;
+                $sellerTransaction->user_id = $seller->id;
+                $sellerTransaction->transaction_amount = $nft->nft_price;
+                $sellerTransaction->transaction_type = 'Profit';
+                $sellerTransaction->status = 1;
+                $sellerTransaction->transaction_id = 'NFT_SALE_' . time();
+                $sellerTransaction->save();
+            }
+
+            $nft->user_id = $buyer->id;
+            $nft->ntf_owner = $buyer->name;
+            $nft->save();
+        });
+
+        $depTotal = Transaction::where('user_id', $buyer->id)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
+        $wdTotal = Transaction::where('user_id', $buyer->id)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
+        $profitTotal = Transaction::where('user_id', $buyer->id)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
+        $debitTotal = Transaction::where('user_id', $buyer->id)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
+        $buyerBalance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
+
+        try {
+            $buyerData = [
+                'name' => $buyer->name,
+                'nft_name' => $nft->ntf_name,
+                'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+                'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+                'seller' => $seller->name ?? 'Unknown',
+                'balance_formatted' => \App\Helpers\CurrencyHelper::format($buyerBalance, 2),
+                'balance_eth' => \App\Helpers\CurrencyHelper::formatEth($buyerBalance),
+                'date' => now()->format('M d, Y h:i A'),
+            ];
+            Mail::to($buyer->email)->send(new PurchaseNft($buyerData));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Admin NFT purchase buyer email failed: ' . $e->getMessage());
+        }
+
+        // Notify seller when admin completes a purchase.
+        if ($seller && $seller->email) {
+            try {
+                $sellerData = [
+                    'name' => $seller->name,
+                    'nft_name' => $nft->ntf_name,
+                    'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+                    'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+                    'buyer' => $buyer->name,
+                    'date' => now()->format('M d, Y h:i A'),
+                ];
+                Mail::to($seller->email)->send(new ArtworkPurchasedEmail($sellerData));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Admin NFT purchase seller email failed: ' . $e->getMessage());
+            }
+        }
+
+        return redirect()->route('admin.buy.nft')->with('status', 'NFT purchased successfully!');
     }
 
 
