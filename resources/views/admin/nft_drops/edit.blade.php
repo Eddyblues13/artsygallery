@@ -2,25 +2,25 @@
 
 @section('content')
 @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
 @endif
 
 @if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
+<div class="alert alert-danger">
+    {{ session('error') }}
+</div>
 @endif
 
 @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
+<div class="alert alert-success">
+    {{ session('success') }}
+</div>
 @endif
 <!-- Include Select2 CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
@@ -35,12 +35,12 @@
             <i class="bi bi-pencil-square"></i>
         </div>
         <div class="page-title d-none d-md-block">
-            <h5>Edit NFT Drop</h5>
+            <h5>Edit Notable Drop</h5>
         </div>
     </div>
     <div>
         <a href="{{ route('admin.nft-drops.index') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to NFT Drops
+            <i class="bi bi-arrow-left"></i> Back to Notable Drops
         </a>
     </div>
 </div>
@@ -53,47 +53,32 @@
             @csrf
             @method('PUT')
 
-            <!-- NFT Name Field -->
+            <!-- Drop Name Field -->
             <div class="mb-3">
-                <label for="name" class="form-label">NFT Name</label>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                    name="name" value="{{ old('name', $nftDrop->name) }}" required>
+                <label for="name" class="form-label">Drop Name</label>
+                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name"
+                    value="{{ old('name', $nftDrop->name) }}" required>
                 @error('name')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
-                                 <!-- User Search -->
+
+            <!-- Drop Image Field -->
             <div class="mb-3">
-                <label for="user_search" class="form-label">Search for Owner</label>
-                <input type="text" class="form-control" id="user_search" placeholder="Search by name or email">
-                <input type="hidden" name="user_id" id="user_id">
-
-                <div id="user_results" class="dropdown-menu show" style="display: none; width: 100%; max-height: 200px; overflow-y: auto;">
-                    <!-- Search results will be inserted here -->
-                </div>
-
-                @error('user_id')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-
-            <!-- NFT Image Field -->
-            <div class="mb-3">
-                <label for="image_url" class="form-label">NFT Image</label>
+                <label for="image_url" class="form-label">Drop Image</label>
                 <input type="file" class="form-control @error('image_url') is-invalid @enderror" id="image_url"
                     name="image_url" accept="image/*">
                 @error('image_url')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="form-text text-muted">Leave blank to keep the current image.</small>
-                
+
                 <!-- Display Current Image -->
                 @if($nftDrop->image_url)
                 <div class="mt-2">
                     <p>Current Image:</p>
-                    <img src="{{ asset($nftDrop->image_url) }}" alt="Current NFT Image" class="img-thumbnail" width="150">
+                    <img src="{{ Illuminate\Support\Str::startsWith($nftDrop->image_url, ['http', 'https']) ? $nftDrop->image_url : asset($nftDrop->image_url) }}"
+                        alt="Current notable drop image" class="img-thumbnail" width="150">
                 </div>
                 @endif
             </div>
@@ -111,18 +96,18 @@
             <!-- Change Field -->
             <div class="mb-3">
                 <label for="change" class="form-label">Change</label>
-                <input type="number" step="0.01" class="form-control @error('change') is-invalid @enderror"
-                    id="change" name="change" value="{{ old('change', $nftDrop->change) }}" required>
+                <input type="number" step="0.01" class="form-control @error('change') is-invalid @enderror" id="change"
+                    name="change" value="{{ old('change', $nftDrop->change) }}" required>
                 @error('change')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <!-- Duration Field (Number of Days) -->
             <div class="mb-3">
                 <label for="duration" class="form-label">Duration (Number of Days)</label>
-                <input type="number" class="form-control @error('duration') is-invalid @enderror"
-                    id="duration" name="duration" value="{{ old('duration', $nftDrop->duration) }}" required>
+                <input type="number" class="form-control @error('duration') is-invalid @enderror" id="duration"
+                    name="duration" value="{{ old('duration', $nftDrop->duration) }}" required>
                 @error('duration')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -131,8 +116,10 @@
             <!-- Is Positive Field -->
             <div class="mb-3">
                 <label for="is_positive" class="form-label">Is Positive</label>
-                <select class="form-select @error('is_positive') is-invalid @enderror" id="is_positive" name="is_positive" required>
-                    <option value="1" {{ old('is_positive', $nftDrop->is_positive) == 1 ? 'selected' : '' }}>Yes</option>
+                <select class="form-select @error('is_positive') is-invalid @enderror" id="is_positive"
+                    name="is_positive" required>
+                    <option value="1" {{ old('is_positive', $nftDrop->is_positive) == 1 ? 'selected' : '' }}>Yes
+                    </option>
                     <option value="0" {{ old('is_positive', $nftDrop->is_positive) == 0 ? 'selected' : '' }}>No</option>
                 </select>
                 @error('is_positive')
@@ -141,46 +128,10 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Update NFT Drop</button>
+            <button type="submit" class="btn btn-primary">Update Notable Drop</button>
         </form>
     </div>
 </div>
 <!-- Form End -->
-
-<script>
-// JavaScript for handling the search input and results
-document.getElementById('user_search').addEventListener('input', function () {
-    const query = this.value;
-    if (query.length < 2) return; // Start search after 2 characters
-
-    fetch(`{{ route('admin.user.search') }}?query=${query}`, {
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const resultsContainer = document.getElementById('user_results');
-        resultsContainer.innerHTML = ''; // Clear previous results
-
-        data.forEach(user => {
-            const userOption = document.createElement('a');
-            userOption.classList.add('dropdown-item');
-            userOption.href = '#';
-            userOption.textContent = `${user.name} (${user.email})`;
-            userOption.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.getElementById('user_search').value = `${user.name} (${user.email})`;
-                document.getElementById('user_id').value = user.id;
-                resultsContainer.style.display = 'none'; // Hide the dropdown
-            });
-            resultsContainer.appendChild(userOption);
-        });
-
-        resultsContainer.style.display = data.length ? 'block' : 'none';
-    })
-    .catch(error => console.error('Error fetching user search:', error));
-});
-</script>
 
 @endsection

@@ -92,9 +92,9 @@ Route::match(['get', 'post'], 'update-nft/{id}/', [DashboardController::class, '
 Route::put('nft/update/{id}', [DashboardController::class, 'updateMyNft'])->middleware('user_auth')->name('nft.update');
 Route::get('nft-purchase/{id}', [DashboardController::class, 'showPublic'])->name('nft.public');
 Route::get('seller/{id}', [DashboardController::class, 'sellerProfile'])->middleware('user_auth')->name('seller.profile');
-Route::get('user-nft-drops', [DashboardController::class, 'userNftDrops'])->name('user.nft.drops');
-Route::post('/nft-drops/{id}/unstack', [DashboardController::class, 'unstack'])->name('nft-drops.unstack');
-Route::post('/nft-drops/{id}/continuation', [DashboardController::class, 'continuation'])->name('nft-drops.continuation');
+Route::get('user-nft-drops', [DashboardController::class, 'userNftDrops'])->middleware('user_auth')->name('user.nft.drops');
+Route::post('/nft-drops/{id}/unstack', [DashboardController::class, 'unstack'])->middleware('user_auth')->name('nft-drops.unstack');
+Route::post('/nft-drops/{id}/continuation', [DashboardController::class, 'continuation'])->middleware('user_auth')->name('nft-drops.continuation');
 Route::get('account-functionality', [DashboardController::class, 'accountFunctionality'])->name('account.functionality');
 Route::get('/wallet/update', [WalletController::class, 'edit'])->name('wallet.edit');
 Route::put('/wallet/update', [WalletController::class, 'update'])->name('wallet.update');

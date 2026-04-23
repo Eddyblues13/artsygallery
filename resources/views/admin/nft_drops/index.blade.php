@@ -10,12 +10,12 @@
             <i class="bi bi-collection"></i>
         </div>
         <div class="page-title d-none d-md-block">
-            <h5>NFT Drops Management</h5>
+            <h5>Manage Notable Drops</h5>
         </div>
     </div>
     <div>
         <a href="{{ route('admin.nft-drops.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Add New NFT Drop
+            <i class="bi bi-plus-lg"></i> Add Notable Drop
         </a>
     </div>
 </div>
@@ -50,12 +50,8 @@
                     </a>
                     <b>{{ $my_nft->name }}</b>
 
-                    <p class="mt-2">Owned by: @if($my_nft->name && $my_nft->email)
-                        {{ $my_nft->name }} ({{ $my_nft->email }})
-                        @else
-                        No owner
-                        @endif
-                    </p>
+                    <p class="mt-2 mb-1 text-muted small">Admin-managed notable drop</p>
+                    <p class="mb-0 small">Duration: {{ $my_nft->duration }} days</p>
 
                 </div>
                 <div class="card-footer">
@@ -75,7 +71,7 @@
 
                 <div class="card-footer">
                     <form action="{{ route('admin.nft-drops.destroy', $my_nft->id) }}" method="POST"
-                        onsubmit="return confirm('Are you sure you want to delete this NFT Drop?');">
+                        onsubmit="return confirm('Are you sure you want to delete this notable drop?');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn w-100">

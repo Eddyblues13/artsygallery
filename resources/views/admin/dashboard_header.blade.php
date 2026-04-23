@@ -61,7 +61,8 @@
                     </li>
                     <li class="sidebar-item active">
                         <a class="sidebar-link" href="{{ route('admin.dashboard') }}">
-                            <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
+                            <i class="align-middle" data-feather="sliders"></i> <span
+                                class="align-middle">Dashboard</span>
                         </a>
                     </li>
 
@@ -70,7 +71,8 @@
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('view.users') }}">
-                            <i class="align-middle" data-feather="users"></i> <span class="align-middle">All Users</span>
+                            <i class="align-middle" data-feather="users"></i> <span class="align-middle">All
+                                Users</span>
                         </a>
                     </li>
 
@@ -79,22 +81,32 @@
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.approve.nft') }}">
-                            <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Approve Artworks</span>
+                            <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Approve
+                                Artworks</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('users.uploaded.nft') }}">
-                            <i class="align-middle" data-feather="grid"></i> <span class="align-middle">All Artworks</span>
+                            <i class="align-middle" data-feather="grid"></i> <span class="align-middle">All
+                                Artworks</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.upload.nft') }}">
-                            <i class="align-middle" data-feather="upload"></i> <span class="align-middle">Upload Artwork</span>
+                            <i class="align-middle" data-feather="upload"></i> <span class="align-middle">Upload
+                                Artwork</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.buy.nft') }}">
-                            <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">Artwork Market</span>
+                            <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">Artwork
+                                Market</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('admin.nft-drops.index') }}">
+                            <i class="align-middle" data-feather="star"></i> <span class="align-middle">Manage Notable
+                                Drops</span>
                         </a>
                     </li>
 
@@ -103,7 +115,8 @@
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('user.transaction') }}">
-                            <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">All Transactions</span>
+                            <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">All
+                                Transactions</span>
                         </a>
                     </li>
 
@@ -112,37 +125,44 @@
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('update.wallet') }}">
-                            <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Wallet Settings</span>
+                            <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Wallet
+                                Settings</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('update.whatsapp') }}">
-                            <i class="align-middle" data-feather="phone"></i> <span class="align-middle">WhatsApp API</span>
+                            <i class="align-middle" data-feather="phone"></i> <span class="align-middle">WhatsApp
+                                API</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.change.password') }}">
-                            <i class="align-middle" data-feather="lock"></i> <span class="align-middle">Change Password</span>
+                            <i class="align-middle" data-feather="lock"></i> <span class="align-middle">Change
+                                Password</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('send.user.email') }}">
-                            <i class="align-middle" data-feather="mail"></i> <span class="align-middle">Send Email</span>
+                            <i class="align-middle" data-feather="mail"></i> <span class="align-middle">Send
+                                Email</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.popup.messages') }}">
-                            <i class="align-middle" data-feather="message-square"></i> <span class="align-middle">Popup Messages</span>
+                            <i class="align-middle" data-feather="message-square"></i> <span class="align-middle">Popup
+                                Messages</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.withdrawal.modal') }}">
-                            <i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Withdrawal Success Modal</span>
+                            <i class="align-middle" data-feather="credit-card"></i> <span
+                                class="align-middle">Withdrawal Success Modal</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('admin.currency.settings') }}">
-                            <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">Currency Settings</span>
+                            <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">Currency
+                                Settings</span>
                         </a>
                     </li>
 
@@ -176,7 +196,8 @@
                                     <span class="indicator">4</span>
                                 </div>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="alertsDropdown">
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+                                aria-labelledby="alertsDropdown">
                                 <div class="dropdown-menu-header">
                                     4 New Notifications
                                 </div>
@@ -188,7 +209,8 @@
                                             </div>
                                             <div class="col-10">
                                                 <div class="text-dark">Pending Approvals</div>
-                                                <div class="text-muted small mt-1">You have pending artwork approvals.</div>
+                                                <div class="text-muted small mt-1">You have pending artwork approvals.
+                                                </div>
                                                 <div class="text-muted small mt-1">30m ago</div>
                                             </div>
                                         </div>
@@ -200,11 +222,13 @@
                             </div>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
+                                data-bs-toggle="dropdown">
                                 <span class="text-dark">{{Auth::guard('admin')->user()->name}}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="{{route('admin.change.password')}}"><i class="align-middle me-1" data-feather="settings"></i> Settings</a>
+                                <a class="dropdown-item" href="{{route('admin.change.password')}}"><i
+                                        class="align-middle me-1" data-feather="settings"></i> Settings</a>
                                 <div class="dropdown-divider"></div>
                                 <form method="POST" action="{{ route('admin.logout') }}">
                                     @csrf

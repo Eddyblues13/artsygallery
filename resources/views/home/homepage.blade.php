@@ -93,7 +93,7 @@
 <section class="py-16 bg-white border-t border-slate-100">
     <div class="container mx-auto px-4 max-w-7xl">
         <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Trending in All Categories</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Top Collectors</h2>
             <div class="hidden sm:flex gap-2">
                 <button
                     class="px-4 py-2 rounded-lg bg-slate-100 text-slate-900 font-medium text-sm hover:bg-slate-200 transition">24h</button>
@@ -133,57 +133,60 @@
     </div>
 </section>
 
-<!-- Notable Drops / Featured NFTs (Using original $nfts variable) -->
+<!-- Notable Drops -->
 <section class="py-20 bg-slate-50" id="explore">
     <div class="container mx-auto px-4 max-w-7xl">
         <div class="flex items-center justify-between mb-10">
             <h2 class="text-2xl md:text-3xl font-bold text-slate-900 border-b-2 border-primary pb-2 inline-block">
                 Notable Drops</h2>
-            <a href="{{ route('explore') }}"
+            <a href="{{ route('drop') }}"
                 class="text-primary font-medium hover:text-primary-dark transition-colors flex items-center gap-1">
                 View All <i class="bi bi-chevron-right text-xs"></i>
             </a>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @forelse($nfts as $nft)
-            <!-- NFT Card OpenSea Style -->
-            <a href="{{ route('nft.public', $nft->id) }}"
+            @forelse($nftDrops as $drop)
+            <a href="{{ auth()->check() ? route('user.nft.drops') : route('drop') }}"
                 class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 flex flex-col h-full">
                 <div class="relative w-full aspect-square overflow-hidden bg-slate-100">
-                    @if(Str::startsWith($nft->ntf_image, ['http', 'https']))
-                    <img src="{{ $nft->ntf_image }}" alt="{{ $nft->ntf_name }}"
+                    @if(Illuminate\Support\Str::startsWith($drop->image_url, ['http', 'https']))
+                    <img src="{{ $drop->image_url }}" alt="{{ $drop->name }}"
                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     @else
-                    <img src="{{ asset($nft->ntf_image) }}" alt="{{ $nft->ntf_name }}"
+                    <img src="{{ asset($drop->image_url) }}" alt="{{ $drop->name }}"
                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     @endif
-                    <!-- Likes -->
                     <div
                         class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                        <i class="bi bi-heart text-slate-400 text-xs"></i>
-                        <span class="text-xs font-medium text-slate-600">{{ rand(10, 999) }}</span>
+                        <i class="bi bi-lightning-charge text-slate-400 text-xs"></i>
+                        <span class="text-xs font-medium text-slate-600">{{ number_format($drop->eth_value, 2) }}
+                            ETH</span>
                     </div>
                 </div>
 
                 <div class="p-4 flex flex-col flex-1">
                     <div class="flex justify-between items-start mb-2">
                         <div class="w-full overflow-hidden">
-                            <p class="text-xs font-medium text-slate-500 mb-1 truncate">{{ $nft->ntf_owner }}</p>
-                            <h3 class="font-bold text-slate-900 text-sm truncate leading-tight w-full">{{ $nft->ntf_name
+                            <p class="text-xs font-medium text-slate-500 mb-1 truncate">Admin Curated</p>
+                            <h3 class="font-bold text-slate-900 text-sm truncate leading-tight w-full">{{ $drop->name
                                 }}</h3>
                         </div>
                     </div>
 
                     <div class="mt-auto pt-3 border-t border-slate-50 flex justify-between items-end">
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Price</span>
-                            <span class="font-bold text-slate-900 text-sm">${{ number_format($nft->nft_price, 2)
-                                }}</span>
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Floor</span>
+                            <span class="font-bold text-slate-900 text-sm">{{ number_format($drop->eth_value, 2) }}
+                                ETH</span>
                         </div>
                         <span
+                            class="text-xs font-semibold {{ $drop->is_positive ? 'text-emerald-600' : 'text-rose-600' }}">
+                            {{ $drop->is_positive ? '+' : '-' }}{{ number_format(abs($drop->change), 2) }}%
+                        </span>
+                        <span
                             class="text-primary text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
-                            Buy Now
+                            Buy Drop
                         </span>
                     </div>
                 </div>
@@ -193,7 +196,7 @@
                 <div class="inline-block p-6 bg-white rounded-full shadow-sm mb-4">
                     <i class="bi bi-image text-4xl text-slate-300"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 mb-2">No NFTs available</h3>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">No notable drops available</h3>
                 <p class="text-slate-500">Check back later for new drops and collections.</p>
             </div>
             @endforelse

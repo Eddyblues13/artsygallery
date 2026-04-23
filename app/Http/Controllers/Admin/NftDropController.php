@@ -28,8 +28,7 @@ class NftDropController extends Controller
      */
     public function create()
     {
-        $users = User::where('user_type', 0)->get();
-        return view('admin.nft_drops.create', compact('users'));
+        return view('admin.nft_drops.create');
     }
 
     /**
@@ -42,12 +41,13 @@ class NftDropController extends Controller
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg,avif,webp|max:2048',
             'eth_value' => 'required|numeric',
             'change' => 'required|numeric',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'nullable|exists:users,id',
             'duration' => 'required|integer',
             'is_positive' => 'required|boolean',
         ]);
 
         $uploadResult = $this->uploadToCloudinary($request->file('image_url'), 'nft_drops');
+        $fallbackUserId = $request->user_id ?: User::where('user_type', 0)->value('id');
 
         NftDrop::create([
             'name' => $request->name,
@@ -55,12 +55,12 @@ class NftDropController extends Controller
             'cloudinary_public_id' => $uploadResult['public_id'],
             'eth_value' => $request->eth_value,
             'change' => $request->change,
-            'user_id' => $request->user_id,
+            'user_id' => $fallbackUserId,
             'duration' => $request->duration,
             'is_positive' => $request->is_positive,
         ]);
 
-        return redirect()->route('admin.nft-drops.index')->with('success', 'NFT Drop created successfully.');
+        return redirect()->route('admin.nft-drops.index')->with('success', 'Notable drop created successfully.');
     }
 
     /**
@@ -69,8 +69,7 @@ class NftDropController extends Controller
     public function edit($id)
     {
         $nftDrop = NftDrop::findOrFail($id);
-        $users = User::where('user_type', 0)->get();
-        return view('admin.nft_drops.edit', compact('nftDrop', 'users'));
+        return view('admin.nft_drops.edit', compact('nftDrop'));
     }
 
     /**
@@ -85,16 +84,18 @@ class NftDropController extends Controller
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,avif,webp|max:2048',
             'eth_value' => 'required|numeric|min:0',
             'change' => 'required|numeric|min:0',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'nullable|exists:users,id',
             'duration' => 'required|integer',
             'is_positive' => 'required|boolean',
         ]);
+
+        $fallbackUserId = $validated['user_id'] ?? $nftDrop->user_id ?? User::where('user_type', 0)->value('id');
 
         $updateData = [
             'name' => $validated['name'],
             'eth_value' => $validated['eth_value'],
             'change' => $validated['change'],
-            'user_id' => $validated['user_id'],
+            'user_id' => $fallbackUserId,
             'duration' => $validated['duration'],
             'is_positive' => $validated['is_positive'],
         ];
@@ -106,9 +107,9 @@ class NftDropController extends Controller
             $updateData['cloudinary_public_id'] = $uploadResult['public_id'];
         }
 
-        $nftDrop->update($updateData); 
+        $nftDrop->update($updateData);
 
-        return redirect()->route('admin.nft-drops.index')->with('success', 'NFT Drop updated successfully.');
+        return redirect()->route('admin.nft-drops.index')->with('success', 'Notable drop updated successfully.');
     }
 
     /**
@@ -126,7 +127,7 @@ class NftDropController extends Controller
         $nftDrop->delete();
 
         return redirect()->route('admin.nft-drops.index')
-            ->with('success', 'NFT Drop deleted successfully');
+            ->with('success', 'Notable drop deleted successfully');
     }
 
     /**

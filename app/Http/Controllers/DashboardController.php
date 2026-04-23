@@ -1845,8 +1845,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
         $data['phone'] = DB::table('admins')->first();
 
-        // Fetch all NFT Drops, you can add pagination if needed
-        $data['nftDrops'] = NftDrop::orderBy('created_at', 'desc')->where('user_id', Auth::user()->id)->get();
+        $data['nftDrops'] = NftDrop::orderBy('created_at', 'desc')->paginate(12);
 
 
         return view('dashboard.drops', $data);
@@ -1918,8 +1917,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
         Mail::to($user->email)->send(new Continuation($emailData));
 
-        // Placeholder for any additional logic if needed.
-        return redirect()->back()->with('message', 'Continuing with the NFT drop.');
+        return redirect()->back()->with('message', 'Your request for this notable drop has been submitted successfully.');
     }
 
 

@@ -15,6 +15,7 @@ class HomePageController extends Controller
     {
         $data['phone'] = DB::table('admins')->first();
         $data['nfts'] = Nft::where('status', 1)->latest()->take(6)->get();
+        $data['nftDrops'] = NftDrop::orderBy('created_at', 'desc')->take(8)->get();
         return view('home.homepage', $data);
     }
 
