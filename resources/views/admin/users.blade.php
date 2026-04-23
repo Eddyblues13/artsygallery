@@ -432,15 +432,7 @@
 
 				<!-- Horizontal Pagination -->
 				<div class="card-footer bg-white py-3 border-top">
-					<div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-						<div class="text-muted small text-center text-md-start">
-							Showing <strong>{{ $users->firstItem() ?? 0 }}</strong> to <strong>{{ $users->lastItem() ??
-								0 }}</strong> of <strong>{{ $users->total() }}</strong> users
-						</div>
-						<div class="pagination-container">
-							{{ $users->links('pagination::bootstrap-4') }}
-						</div>
-					</div>
+					@include('admin.partials.pagination', ['paginator' => $users, 'label' => 'users'])
 				</div>
 			</div>
 		</div>

@@ -261,9 +261,7 @@
                 <!-- Footer / Pagination -->
                 @if($nfts->hasPages())
                 <div class="card-footer bg-white border-top py-3">
-                    <div class="d-flex justify-content-center">
-                        {{ $nfts->links('pagination::bootstrap-4') }}
-                    </div>
+                    @include('admin.partials.pagination', ['paginator' => $nfts, 'label' => 'artworks'])
                 </div>
                 @endif
             </div>

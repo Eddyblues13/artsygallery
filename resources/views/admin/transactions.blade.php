@@ -727,16 +727,9 @@
 						</div>
 
 						<!-- Pagination -->
-						<div
-							class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-							<div class="text-muted text-center text-md-start">
-								Showing <strong>{{ $transactions->firstItem() ?? 0 }}</strong> to <strong>{{
-									$transactions->lastItem() ?? 0 }}</strong> of <strong>{{ $transactions->total()
-									}}</strong> transactions
-							</div>
-							<div class="pagination-wrapper">
-								{{ $transactions->links('pagination::bootstrap-4') }}
-							</div>
+						<div class="mt-4">
+							@include('admin.partials.pagination', ['paginator' => $transactions, 'label' =>
+							'transactions'])
 						</div>
 					</div>
 				</div>

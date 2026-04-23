@@ -91,16 +91,17 @@
 						<label for="type" class="form-label">Type</label>
 						<select class="form-select" id="type" name="type">
 							<option value="">All Types</option>
-							<option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General</option>
-							<option value="user_specific" {{ request('type') == 'user_specific' ? 'selected' : '' }}>User Specific</option>
+							<option value="general" {{ request('type')=='general' ? 'selected' : '' }}>General</option>
+							<option value="user_specific" {{ request('type')=='user_specific' ? 'selected' : '' }}>User
+								Specific</option>
 						</select>
 					</div>
 					<div class="col-md-4">
 						<label for="status" class="form-label">Status</label>
 						<select class="form-select" id="status" name="status">
 							<option value="">All Status</option>
-							<option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
-							<option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+							<option value="1" {{ request('status')=='1' ? 'selected' : '' }}>Active</option>
+							<option value="0" {{ request('status')=='0' ? 'selected' : '' }}>Inactive</option>
 						</select>
 					</div>
 					<div class="col-md-4 d-flex align-items-end">
@@ -186,14 +187,17 @@
 								</td>
 								<td>
 									<div class="btn-group" role="group">
-										<a href="{{ route('admin.popup.edit', $popup->id) }}" class="btn btn-primary" title="Edit">
+										<a href="{{ route('admin.popup.edit', $popup->id) }}" class="btn btn-primary"
+											title="Edit">
 											<i class="align-middle" data-feather="edit"></i>
 										</a>
-										<a href="{{ route('admin.popup.toggle', $popup->id) }}" class="btn btn-{{ $popup->is_active ? 'warning' : 'success' }}" title="{{ $popup->is_active ? 'Deactivate' : 'Activate' }}">
-											<i class="align-middle" data-feather="{{ $popup->is_active ? 'eye-off' : 'eye' }}"></i>
+										<a href="{{ route('admin.popup.toggle', $popup->id) }}"
+											class="btn btn-{{ $popup->is_active ? 'warning' : 'success' }}"
+											title="{{ $popup->is_active ? 'Deactivate' : 'Activate' }}">
+											<i class="align-middle"
+												data-feather="{{ $popup->is_active ? 'eye-off' : 'eye' }}"></i>
 										</a>
-										<a href="{{ route('admin.popup.delete', $popup->id) }}" 
-											class="btn btn-danger" 
+										<a href="{{ route('admin.popup.delete', $popup->id) }}" class="btn btn-danger"
 											title="Delete"
 											onclick="return confirm('Are you sure you want to delete this popup message?')">
 											<i class="align-middle" data-feather="trash-2"></i>
@@ -204,7 +208,8 @@
 							@empty
 							<tr>
 								<td colspan="9" class="text-center py-5">
-									<i class="align-middle" data-feather="message-square" style="width: 48px; height: 48px; opacity: 0.3;"></i>
+									<i class="align-middle" data-feather="message-square"
+										style="width: 48px; height: 48px; opacity: 0.3;"></i>
 									<p class="mt-3 text-muted">No popup messages found</p>
 									<a href="{{ route('admin.popup.create') }}" class="btn btn-primary mt-2">
 										Create First Popup Message
@@ -217,13 +222,8 @@
 				</div>
 
 				<!-- Pagination -->
-				<div class="d-flex justify-content-between align-items-center mt-3">
-					<div class="text-muted">
-						Showing {{ $popups->firstItem() ?? 0 }} to {{ $popups->lastItem() ?? 0 }} of {{ $popups->total() }} popups
-					</div>
-					<div>
-						{{ $popups->links('pagination::bootstrap-4') }}
-					</div>
+				<div class="mt-3">
+					@include('admin.partials.pagination', ['paginator' => $popups, 'label' => 'popups'])
 				</div>
 			</div>
 		</div>

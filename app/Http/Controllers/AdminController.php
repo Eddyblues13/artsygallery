@@ -433,7 +433,10 @@ class AdminController extends Controller
             ->sum('transaction_amount');
 
         $balance = $deposit + ($addProfit - $debitProfit) - $withdrawal;
-        if ($balance < $nft->nft_price) {
+        $isAdminBuyer = $buyer && $admin && strcasecmp((string) $buyer->email, (string) $admin->email) === 0;
+
+        // Admin can buy regardless of available balance.
+        if (!$isAdminBuyer && $balance < $nft->nft_price) {
             return back()->with('error', 'Insufficient balance! Your balance: ' . \App\Helpers\CurrencyHelper::format($balance, 2) . ', NFT Price: ' . \App\Helpers\CurrencyHelper::format($nft->nft_price, 2));
         }
 

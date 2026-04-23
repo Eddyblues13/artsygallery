@@ -335,7 +335,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $buy_nft->links('pagination::bootstrap-4') }}
+            @include('admin.partials.pagination', ['paginator' => $buy_nft, 'label' => 'artworks'])
         </div>
         @else
         <div class="text-center py-5">

@@ -212,8 +212,8 @@
                             @endforeach
                         </div>
 
-                        <div class="d-flex justify-content-center mt-3">
-                            {{ $users_nfts->links('pagination::bootstrap-4') }}
+                        <div class="mt-3">
+                            @include('admin.partials.pagination', ['paginator' => $users_nfts, 'label' => 'artworks'])
                         </div>
                     </div>
                 </div>
