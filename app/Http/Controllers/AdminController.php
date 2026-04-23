@@ -398,7 +398,14 @@ class AdminController extends Controller
         }
 
         if (!$buyer) {
-            return back()->with('error', 'No buyer user account found. Select a buyer user from marketplace filter or create a matching user account for this admin email.');
+            // If admin does not select a buyer, auto-create a buyer user for admin.
+            $buyer = User::create([
+                'name' => $admin->name ?: 'Admin Buyer',
+                'email' => $admin->email,
+                'password' => Hash::make(\Illuminate\Support\Str::random(32)),
+                'is_activated' => 1,
+                'user_type' => '1',
+            ]);
         }
 
         if ($nft->user_id == $buyer->id) {

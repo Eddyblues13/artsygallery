@@ -247,7 +247,7 @@
                     <div class="col-md-8 col-lg-6">
                         <label for="buyer_user_id" class="form-label">Buy As User Account</label>
                         <select id="buyer_user_id" name="buyer_user_id" class="form-select">
-                            <option value="">Auto (match admin email)</option>
+                            <option value="">Auto (use admin account)</option>
                             @foreach(($buyerUsers ?? collect()) as $buyerUser)
                             <option value="{{ $buyerUser->id }}" {{ (string)($selectedBuyerUserId ?? ''
                                 )===(string)$buyerUser->id ? 'selected' : '' }}>
