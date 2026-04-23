@@ -128,45 +128,21 @@
 									exceeds your available balance!</div>
 							</div>
 
-							<!-- Method Selection (vertical, simple radios) -->
+							<!-- Method Selection (ETH only) -->
 							<div class="mb-4">
 								<label class="form-label fw-bold mb-3">
-									<i class="align-middle" data-feather="credit-card"></i> Select Withdrawal Method
+									<i class="align-middle" data-feather="activity"></i> Withdrawal Method
 									<span class="text-danger">*</span>
 								</label>
 
 								<div class="border rounded-3 p-3 bg-light">
 									<div class="form-check mb-2">
 										<input class="form-check-input" type="radio" name="withdrawal_method"
-											id="withdraw_bank" value="bank" {{ old('withdrawal_method')=='bank'
-											? 'checked' : '' }} required>
-										<label class="form-check-label" for="withdraw_bank">
-											<strong>Bank Transfer</strong>
-											<span class="text-muted d-block small">Send funds directly to your bank
-												account</span>
-										</label>
-									</div>
-
-									<div class="form-check mb-2">
-
-										<input class="form-check-input" type="radio" name="withdrawal_method"
-											id="withdraw_paypal" value="paypal" {{ old('withdrawal_method')=='paypal'
-											? 'checked' : '' }} required>
-										<label class="form-check-label" for="withdraw_paypal">
-											<strong>PayPal</strong>
-											<span class="text-muted d-block small">Withdraw to your PayPal
-												account</span>
-										</label>
-									</div>
-
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="withdrawal_method"
-											id="withdraw_other" value="other" {{ old('withdrawal_method')=='other'
-											? 'checked' : '' }} required>
-										<label class="form-check-label" for="withdraw_other">
-											<strong>Other Method</strong>
-											<span class="text-muted d-block small">Specify a custom withdrawal
-												method</span>
+											id="withdraw_crypto" value="crypto" checked required>
+										<label class="form-check-label" for="withdraw_crypto">
+											<strong>ETH (Crypto Wallet)</strong>
+											<span class="text-muted d-block small">Withdrawals are processed only to
+												linked ETH/crypto wallet addresses.</span>
 										</label>
 									</div>
 								</div>
@@ -174,10 +150,9 @@
 								<div class="mt-2">
 									<small class="text-muted">
 										@if(count($linkedMethodTypes ?? []) > 0)
-										You have {{ count($linkedMethodTypes) }} withdrawal method(s) linked. Select a
-										method above.
+										ETH withdrawal method is linked and ready to use.
 										@else
-										Please link a withdrawal method before you can withdraw.
+										Please link your ETH wallet before you can withdraw.
 										@endif
 									</small>
 								</div>

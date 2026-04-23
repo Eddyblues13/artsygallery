@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DepositApproved extends Mailable
+class WithdrawalDeclinedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -22,14 +22,14 @@ class DepositApproved extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Deposit Approved — Funds Available',
+            subject: 'Withdrawal Declined - Update Needed',
         );
     }
 
     public function content()
     {
         return new Content(
-            view: 'emails.deposit_approved',
+            view: 'emails.withdrawal_declined',
             with: ['data' => $this->data],
         );
     }

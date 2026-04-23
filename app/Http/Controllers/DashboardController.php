@@ -182,7 +182,13 @@ class DashboardController extends Controller
 
     public function makeWithdrawal(Request $request)
     {
-        $withdrawalMethod = $request->input('withdrawal_method');
+        $withdrawalMethod = 'crypto';
+
+        if ($request->filled('withdrawal_method') && $request->input('withdrawal_method') !== 'crypto') {
+            return redirect()
+                ->route('withdrawal')
+                ->with('error', 'Only ETH withdrawals are supported. Please use a crypto wallet address.');
+        }
 
         // Check if method is linked
         $linkedMethod = LinkedWithdrawalMethod::getLinkedMethod(Auth::id(), $withdrawalMethod);
@@ -201,11 +207,12 @@ class DashboardController extends Controller
         // Validate amount (method is already linked, so we don't need method details)
         $request->validate([
             'amount' => 'required|numeric|min:1',
-            'withdrawal_method' => 'required|in:bank,crypto,paypal,other',
+            'withdrawal_method' => 'required|in:crypto',
         ], [
             'amount.required' => 'Please enter the withdrawal amount',
             'amount.min' => 'Minimum withdrawal amount is $1.00',
-            'withdrawal_method.required' => 'Please select a withdrawal method',
+            'withdrawal_method.required' => 'ETH withdrawal method is required',
+            'withdrawal_method.in' => 'Only ETH withdrawals are supported',
         ]);
 
         // Check if user has sufficient balance
@@ -2029,8 +2036,8 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     public function linkWithdrawalMethod($type = null)
     {
         // If no type specified, redirect to withdrawal page
-        if (!$type || !in_array($type, ['bank', 'crypto', 'paypal', 'other'])) {
-            return redirect()->route('withdrawal')->with('error', 'Invalid withdrawal method type.');
+        if (!$type || $type !== 'crypto') {
+            return redirect()->route('withdrawal')->with('error', 'Only ETH (crypto) withdrawal method is available.');
         }
 
         // Get existing linked method if updating
@@ -2054,25 +2061,11 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $methodType = $request->input('method_type');
 
         // Validate based on method type
-        $rules = ['method_type' => 'required|in:bank,crypto,paypal,other'];
+        $rules = ['method_type' => 'required|in:crypto'];
         $messages = ['method_type.required' => 'Please select a withdrawal method'];
+        $messages['method_type.in'] = 'Only ETH (crypto) withdrawal method is allowed.';
 
-        if ($methodType === 'bank') {
-            $rules = array_merge($rules, [
-                'bank_name' => 'required|string|max:255',
-                'payment_account_name' => 'required|string|max:255',
-                'payment_account_number' => 'required|string|max:255',
-                'payment_account_type' => 'required|string|max:255',
-                'bank_routing_number' => 'required|string|max:255',
-            ]);
-            $messages = array_merge($messages, [
-                'bank_name.required' => 'Bank name is required',
-                'payment_account_name.required' => 'Account holder name is required',
-                'payment_account_number.required' => 'Account number is required',
-                'payment_account_type.required' => 'Account type is required',
-                'bank_routing_number.required' => 'Routing number is required',
-            ]);
-        } elseif ($methodType === 'crypto') {
+        if ($methodType === 'crypto') {
             $rules = array_merge($rules, [
                 'crypto_type' => 'required|string|max:50',
                 'crypto_wallet_address' => 'required|string|max:255',
@@ -2081,21 +2074,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 'crypto_type.required' => 'Please select a cryptocurrency',
                 'crypto_wallet_address.required' => 'Please enter your crypto wallet address',
             ]);
-        } elseif ($methodType === 'paypal') {
-            $rules = array_merge($rules, [
-                'paypal_email' => 'required|email|max:255',
-            ]);
-            $messages = array_merge($messages, [
-                'paypal_email.required' => 'Please enter your PayPal email address',
-                'paypal_email.email' => 'Please enter a valid PayPal email address',
-            ]);
-        } elseif ($methodType === 'other') {
-            $rules = array_merge($rules, [
-                'withdrawal_details' => 'required|string|max:1000',
-            ]);
-            $messages = array_merge($messages, [
-                'withdrawal_details.required' => 'Please enter withdrawal method details',
-            ]);
         }
 
         $request->validate($rules, $messages);
@@ -2103,19 +2081,9 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         // Create or update linked method
         $data = ['user_id' => Auth::id(), 'method_type' => $methodType];
 
-        if ($methodType === 'bank') {
-            $data['bank_name'] = $request->input('bank_name');
-            $data['payment_account_name'] = $request->input('payment_account_name');
-            $data['payment_account_number'] = $request->input('payment_account_number');
-            $data['payment_account_type'] = $request->input('payment_account_type');
-            $data['bank_routing_number'] = $request->input('bank_routing_number');
-        } elseif ($methodType === 'crypto') {
+        if ($methodType === 'crypto') {
             $data['crypto_type'] = $request->input('crypto_type');
             $data['crypto_wallet_address'] = $request->input('crypto_wallet_address');
-        } elseif ($methodType === 'paypal') {
-            $data['paypal_email'] = $request->input('paypal_email');
-        } elseif ($methodType === 'other') {
-            $data['withdrawal_details'] = $request->input('withdrawal_details');
         }
 
         LinkedWithdrawalMethod::updateOrCreate(
@@ -2134,7 +2102,9 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
      */
     public function manageLinkedMethods()
     {
-        $linkedMethods = LinkedWithdrawalMethod::getAllLinkedMethods(Auth::id());
+        $linkedMethods = LinkedWithdrawalMethod::where('user_id', Auth::id())
+            ->where('method_type', 'crypto')
+            ->get();
 
         return view('dashboard.manage_linked_withdrawal_methods', [
             'linkedMethods' => $linkedMethods,

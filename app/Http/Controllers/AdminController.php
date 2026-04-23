@@ -17,7 +17,9 @@ use App\Mail\ApproveKyc;
 use App\Mail\PurchaseNft;
 use App\Mail\ArtworkPurchasedEmail;
 use App\Mail\DepositApproved;
+use App\Mail\DepositDeclined;
 use App\Mail\WithdrawalApprovedMail;
+use App\Mail\WithdrawalDeclinedMail;
 use App\Mail\profitEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +35,31 @@ class AdminController extends Controller
     protected function admin()
     {
         return Auth::guard('admin')->user();
+    }
+
+    private function computeUserBalance($userId)
+    {
+        $depTotal = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'Deposit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $wdTotal = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'Withdrawal')
+            ->whereIn('status', ['0', '1'])
+            ->sum('transaction_amount');
+
+        $profitTotal = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'Profit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        $debitTotal = Transaction::where('user_id', $userId)
+            ->where('transaction_type', 'DebitProfit')
+            ->where('status', '1')
+            ->sum('transaction_amount');
+
+        return $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
     }
 
     public function home()
@@ -574,30 +601,26 @@ class AdminController extends Controller
 
     public function approveDeposit(Request $request, $id)
     {
-        $deposit = array();
-        $deposit['status'] = 1;
-        $update = DB::table('transactions')->where('id', $id)->update($deposit);
+        $transaction = Transaction::find($id);
+
+        if (!$transaction || $transaction->transaction_type !== 'Deposit') {
+            return redirect()->back()->with('error', 'Invalid deposit transaction.');
+        }
+
+        $transaction->status = 1;
+        $transaction->save();
 
         // Send deposit approved email
         try {
-            $transaction = Transaction::find($id);
-            if ($transaction) {
-                $user = User::find($transaction->user_id);
-                if ($user) {
-                    $userId = $user->id;
-                    $depTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
-                    $wdTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
-                    $profitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
-                    $debitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
-                    $balance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
-
-                    $emailData = array_merge(
-                        ['name' => $user->name, 'date' => now()->format('M d, Y h:i A')],
-                        \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
-                        \App\Helpers\CurrencyHelper::emailBalanceData($balance)
-                    );
-                    Mail::to($user->email)->send(new DepositApproved($emailData));
-                }
+            $user = User::find($transaction->user_id);
+            if ($user) {
+                $balance = $this->computeUserBalance($user->id);
+                $emailData = array_merge(
+                    ['name' => $user->name, 'date' => now()->format('M d, Y h:i A')],
+                    \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
+                    \App\Helpers\CurrencyHelper::emailBalanceData($balance)
+                );
+                Mail::to($user->email)->send(new DepositApproved($emailData));
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Deposit approved email failed: ' . $e->getMessage());
@@ -608,43 +631,61 @@ class AdminController extends Controller
 
     public function declineDeposit(Request $request, $id)
     {
-        $deposit = array();
-        $deposit['status'] = 2;
-        $update = DB::table('transactions')->where('id', $id)->update($deposit);
+        $transaction = Transaction::find($id);
+
+        if (!$transaction || $transaction->transaction_type !== 'Deposit') {
+            return redirect()->back()->with('error', 'Invalid deposit transaction.');
+        }
+
+        $transaction->status = 2;
+        $transaction->save();
+
+        try {
+            $user = User::find($transaction->user_id);
+            if ($user) {
+                $balance = $this->computeUserBalance($user->id);
+                $emailData = array_merge(
+                    ['name' => $user->name, 'date' => now()->format('M d, Y h:i A')],
+                    \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
+                    \App\Helpers\CurrencyHelper::emailBalanceData($balance)
+                );
+                Mail::to($user->email)->send(new DepositDeclined($emailData));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Deposit declined email failed: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('message', 'Deposit Declined');
     }
 
     public function approveWithdrawal(Request $request, $id)
     {
-        $deposit = array();
-        $deposit['status'] = $request->status;
-        $update = DB::table('transactions')->where('id', $id)->update($deposit);
+        $transaction = Transaction::find($id);
+
+        if (!$transaction || $transaction->transaction_type !== 'Withdrawal') {
+            return redirect()->back()->with('error', 'Invalid withdrawal transaction.');
+        }
+
+        $transaction->status = 1;
+        $transaction->save();
 
         // Send withdrawal approved email
         try {
-            $transaction = Transaction::find($id);
-            if ($transaction && $request->status == 1) {
-                $user = User::find($transaction->user_id);
-                if ($user) {
-                    $userId = $user->id;
-                    $depTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Deposit')->where('status', '1')->sum('transaction_amount');
-                    $wdTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Withdrawal')->whereIn('status', ['0', '1'])->sum('transaction_amount');
-                    $profitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'Profit')->where('status', '1')->sum('transaction_amount');
-                    $debitTotal = Transaction::where('user_id', $userId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
-                    $balance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
+            $user = User::find($transaction->user_id);
+            if ($user) {
+                $balance = $this->computeUserBalance($user->id);
 
-                    $emailData = array_merge(
-                        [
-                            'name' => $user->name,
-                            'method' => $transaction->withdrawal_method ?? 'crypto',
-                            'reference' => $transaction->transaction_id ?? 'N/A',
-                            'date' => now()->format('M d, Y h:i A'),
-                        ],
-                        \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
-                        \App\Helpers\CurrencyHelper::emailBalanceData(max(0, $balance))
-                    );
-                    Mail::to($user->email)->send(new WithdrawalApprovedMail($emailData));
-                }
+                $emailData = array_merge(
+                    [
+                        'name' => $user->name,
+                        'method' => $transaction->withdrawal_method ?? 'crypto',
+                        'reference' => $transaction->transaction_id ?? 'N/A',
+                        'date' => now()->format('M d, Y h:i A'),
+                    ],
+                    \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
+                    \App\Helpers\CurrencyHelper::emailBalanceData(max(0, $balance))
+                );
+                Mail::to($user->email)->send(new WithdrawalApprovedMail($emailData));
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Withdrawal approved email failed: ' . $e->getMessage());
@@ -655,9 +696,36 @@ class AdminController extends Controller
 
     public function declineWithdrawal(Request $request, $id)
     {
-        $deposit = array();
-        $deposit['status'] = $request->status;
-        $update = DB::table('transactions')->where('id', $id)->update($deposit);
+        $transaction = Transaction::find($id);
+
+        if (!$transaction || $transaction->transaction_type !== 'Withdrawal') {
+            return redirect()->back()->with('error', 'Invalid withdrawal transaction.');
+        }
+
+        $transaction->status = 2;
+        $transaction->save();
+
+        try {
+            $user = User::find($transaction->user_id);
+            if ($user) {
+                $balance = $this->computeUserBalance($user->id);
+
+                $emailData = array_merge(
+                    [
+                        'name' => $user->name,
+                        'method' => $transaction->withdrawal_method ?? 'crypto',
+                        'reference' => $transaction->transaction_id ?? 'N/A',
+                        'date' => now()->format('M d, Y h:i A'),
+                    ],
+                    \App\Helpers\CurrencyHelper::emailAmountData($transaction->transaction_amount),
+                    \App\Helpers\CurrencyHelper::emailBalanceData(max(0, $balance))
+                );
+                Mail::to($user->email)->send(new WithdrawalDeclinedMail($emailData));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Withdrawal declined email failed: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('message', 'Withdrawal Declined');
     }
 

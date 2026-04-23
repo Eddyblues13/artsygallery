@@ -198,7 +198,7 @@
 											@if($transaction->user)
 											<div class="d-flex align-items-center">
 												<div>
-													<a href="{{ url('profile/' . $transaction->user->id) }}"
+													<a href="{{ url('admin/profile/' . $transaction->user->id) }}"
 														class="text-decoration-none">
 														<strong>{{ $transaction->user->name }}</strong>
 													</a>
@@ -605,7 +605,7 @@
 									<div class="mb-2">
 										<small class="text-muted d-block">User:</small>
 										@if($transaction->user)
-										<a href="{{ url('profile/' . $transaction->user->id) }}"
+										<a href="{{ url('admin/profile/' . $transaction->user->id) }}"
 											class="text-decoration-none">
 											{{ $transaction->user->name }}
 										</a>

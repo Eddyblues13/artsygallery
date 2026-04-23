@@ -319,12 +319,12 @@
 								</td>
 								<td class="px-4 py-3 text-end">
 									<div class="btn-group shadow-sm rounded-pill" role="group">
-										<a href="{{ url('profile/' . $user->id) }}" class="btn btn-sm btn-primary"
+										<a href="{{ url('admin/profile/' . $user->id) }}" class="btn btn-sm btn-primary"
 											title="View Profile">
 											<i class="align-middle" data-feather="eye" width="16"></i> <span
 												class="d-none d-lg-inline-block small ms-1">View</span>
 										</a>
-										<a href="{{ url('delete/' . $user->id) }}" class="btn btn-sm btn-danger"
+										<a href="{{ url('admin/delete/' . $user->id) }}" class="btn btn-sm btn-danger"
 											title="Delete User"
 											onclick="return confirm('Are you sure? This action is permanent.')">
 											<i class="align-middle" data-feather="trash-2" width="16"></i>
@@ -427,11 +427,11 @@
 									</div>
 
 									<div class="d-grid gap-2 d-flex">
-										<a href="{{ url('profile/' . $user->id) }}"
+										<a href="{{ url('admin/profile/' . $user->id) }}"
 											class="btn btn-primary btn-sm rounded-pill fw-bold">
 											<i class="align-middle me-1" data-feather="eye"></i> View Profile
 										</a>
-										<a href="{{ url('delete/' . $user->id) }}"
+										<a href="{{ url('admin/delete/' . $user->id) }}"
 											class="btn btn-danger btn-sm rounded-pill fw-bold"
 											onclick="return confirm('Are you sure?')">
 											<i class="align-middle me-1" data-feather="trash-2"></i> Delete
