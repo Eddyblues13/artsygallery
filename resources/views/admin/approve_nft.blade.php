@@ -58,7 +58,8 @@
                     <div
                         class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                         <div class="card-title mb-0">NFT List</div>
-                        <form method="GET" action="{{ url('search-nft') }}" class="d-flex w-100 w-md-auto" data-ajax-filter="#admin-approve-nft-results">
+                        <form method="GET" action="{{ url('search-nft') }}" class="d-flex w-100 w-md-auto"
+                            data-ajax-filter="#admin-approve-nft-results">
                             <input type="text" name="search" class="form-control me-2" placeholder="Search..."
                                 value="{{ request()->get('search') }}">
                             <button type="submit" class="btn btn-primary">Search</button>

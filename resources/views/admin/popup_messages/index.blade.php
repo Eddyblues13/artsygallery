@@ -86,7 +86,8 @@
 		<!-- Filters -->
 		<div class="card mb-4">
 			<div class="card-body">
-				<form method="GET" action="{{ route('admin.popup.messages') }}" class="row g-3" data-ajax-filter="#admin-popups-results">
+				<form method="GET" action="{{ route('admin.popup.messages') }}" class="row g-3"
+					data-ajax-filter="#admin-popups-results">
 					<div class="col-md-4">
 						<label for="type" class="form-label">Type</label>
 						<select class="form-select" id="type" name="type">

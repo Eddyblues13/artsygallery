@@ -128,7 +128,8 @@
 					<h5 class="card-title mb-0 text-primary fw-bold">Advanced Filtering</h5>
 				</div>
 				<div class="card-body">
-					<form method="GET" action="{{ route('view.users') }}" class="row g-3" data-ajax-filter="#admin-users-results">
+					<form method="GET" action="{{ route('view.users') }}" class="row g-3"
+						data-ajax-filter="#admin-users-results">
 						<div class="col-12 col-md-6 col-lg-3">
 							<label for="search" class="form-label small text-uppercase fw-bold text-muted">Global
 								Search</label>
@@ -182,7 +183,8 @@
 						<div class="col-12 d-flex justify-content-end gap-2 mt-4">
 							@if(request()->hasAny(['search', 'status', 'wallet_verify', 'kyc_status', 'date_from',
 							'date_to']))
-							<a href="{{ route('view.users') }}" class="btn btn-light text-muted" data-ajax-filter-link="#admin-users-results">
+							<a href="{{ route('view.users') }}" class="btn btn-light text-muted"
+								data-ajax-filter-link="#admin-users-results">
 								<i class="align-middle me-1" data-feather="x"></i> Clear
 							</a>
 							@endif

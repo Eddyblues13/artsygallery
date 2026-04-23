@@ -1,5 +1,5 @@
 @php
-    $labelText = $label ?? 'items';
+$labelText = $label ?? 'items';
 @endphp
 
 @once

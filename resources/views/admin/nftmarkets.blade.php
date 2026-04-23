@@ -242,109 +242,110 @@
         </div>
 
         <div id="admin-market-results" data-ajax-container>
-        <div class="card mb-4">
-            <div class="card-body">
-            <form method="GET" action="{{ route('admin.buy.nft') }}" class="row g-3 align-items-end" data-ajax-filter="#admin-market-results">
-                    <div class="col-md-8 col-lg-6">
-                        <label for="buyer_user_id" class="form-label">Buy As User Account</label>
-                        <select id="buyer_user_id" name="buyer_user_id" class="form-select">
-                            <option value="">Auto (use admin account)</option>
-                            @foreach(($buyerUsers ?? collect()) as $buyerUser)
-                            <option value="{{ $buyerUser->id }}" {{ (string)($selectedBuyerUserId ?? ''
-                                )===(string)$buyerUser->id ? 'selected' : '' }}>
-                                {{ $buyerUser->name }} ({{ $buyerUser->email }})
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-4 col-lg-3 d-grid">
-                        <button type="submit" class="btn btn-primary">Apply Buyer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        @if($buy_nft->count() > 0)
-        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-sm-4">
-            @foreach($buy_nft as $nft)
-            <div class="col">
-                <div class="nft-card">
-                    <div class="nft-image-wrapper">
-                        <img class="nft-image" src="{{ $nft->ntf_image }}" alt="{{ $nft->ntf_name }}" loading="lazy"
-                            onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
-                    </div>
-
-                    <div class="nft-card-header">
-                        <h5 class="nft-card-title">{{ $nft->ntf_name }}</h5>
-                    </div>
-
-                    <div class="nft-card-body">
-                        <div class="nft-price-section">
-                            <div class="price-item">
-                                <img src="https://img.icons8.com/ios-filled/24/000000/us-dollar.png" alt="USD"
-                                    class="price-icon">
-                                <span class="price-label">Price</span>
-                                <span class="price-value"
-                                    style="font-weight: 400; color: #6c757d; font-size: 0.85rem;">{{
-                                    \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
-                                    }}</span>
-                            </div>
-                            <div class="price-item" style="background: #f3f0ff;">
-                                <img src="https://img.icons8.com/ios-filled/24/764ba2/ethereum.png" alt="ETH"
-                                    class="price-icon">
-                                <span class="price-label" style="font-weight: 600;">ETH</span>
-                                <span class="price-value eth-conversion" style="font-size: 1.1rem; color: #6f42c1;"
-                                    data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
-                                    \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
-                            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('admin.buy.nft') }}" class="row g-3 align-items-end"
+                        data-ajax-filter="#admin-market-results">
+                        <div class="col-md-8 col-lg-6">
+                            <label for="buyer_user_id" class="form-label">Buy As User Account</label>
+                            <select id="buyer_user_id" name="buyer_user_id" class="form-select">
+                                <option value="">Auto (use admin account)</option>
+                                @foreach(($buyerUsers ?? collect()) as $buyerUser)
+                                <option value="{{ $buyerUser->id }}" {{ (string)($selectedBuyerUserId ?? ''
+                                    )===(string)$buyerUser->id ? 'selected' : '' }}>
+                                    {{ $buyerUser->name }} ({{ $buyerUser->email }})
+                                </option>
+                                @endforeach
+                            </select>
                         </div>
-
-                        <div class="nft-meta">
-                            <div class="seller-info">
-                                @if($nft->user && $nft->user->profile_picture)
-                                <img src="{{ $nft->user->profile_picture }}" alt="{{ $nft->user->name }}"
-                                    style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
-                                @else
-                                <i class="align-middle" data-feather="user" style="width: 16px; height: 16px;"></i>
-                                @endif
-                                @if($nft->user)
-                                <a href="{{ url('profile/' . $nft->user->id) }}"
-                                    style="text-decoration: none; color: #495057; font-weight: 500;"
-                                    title="View seller profile">
-                                    {{ $nft->user->name ?? $nft->ntf_owner ?? 'Unknown' }}
-                                </a>
-                                @else
-                                <span style="color: #495057; font-weight: 500;">{{ $nft->ntf_owner ?? 'Unknown'
-                                    }}</span>
-                                @endif
-                            </div>
-                            <div class="views-count">
-                                <i class="align-middle" data-feather="eye" style="width: 16px; height: 16px;"></i>
-                                <span>{{ number_format(100 + ($loop->index * 20)) }}</span>
-                            </div>
+                        <div class="col-md-4 col-lg-3 d-grid">
+                            <button type="submit" class="btn btn-primary">Apply Buyer</button>
                         </div>
-
-                        <a href="{{ route('admin.purchase.nft', ['id' => $nft->id, 'buyer_user_id' => $selectedBuyerUserId]) }}"
-                            class="buy-btn"
-                            onclick="return confirm('Are you sure you want to purchase {{ $nft->ntf_name }} for {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }} (≈ {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }})?')">
-                            <i class="align-middle" data-feather="shopping-cart"></i> Buy Now
-                        </a>
-                    </div>
+                    </form>
                 </div>
             </div>
-            @endforeach
-        </div>
 
-        <div class="pagination-wrapper">
-            @include('admin.partials.pagination', ['paginator' => $buy_nft, 'label' => 'artworks'])
-        </div>
-        @else
-        <div class="text-center py-5">
-            <i class="align-middle" data-feather="inbox" style="width: 64px; height: 64px; color: #ccc;"></i>
-            <h3 class="mt-3 text-muted">No NFTs Available</h3>
-            <p class="text-muted">Check back later for new listings</p>
-        </div>
-        @endif
+            @if($buy_nft->count() > 0)
+            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-sm-4">
+                @foreach($buy_nft as $nft)
+                <div class="col">
+                    <div class="nft-card">
+                        <div class="nft-image-wrapper">
+                            <img class="nft-image" src="{{ $nft->ntf_image }}" alt="{{ $nft->ntf_name }}" loading="lazy"
+                                onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
+                        </div>
+
+                        <div class="nft-card-header">
+                            <h5 class="nft-card-title">{{ $nft->ntf_name }}</h5>
+                        </div>
+
+                        <div class="nft-card-body">
+                            <div class="nft-price-section">
+                                <div class="price-item">
+                                    <img src="https://img.icons8.com/ios-filled/24/000000/us-dollar.png" alt="USD"
+                                        class="price-icon">
+                                    <span class="price-label">Price</span>
+                                    <span class="price-value"
+                                        style="font-weight: 400; color: #6c757d; font-size: 0.85rem;">{{
+                                        \App\Helpers\CurrencyHelper::format($nft->nft_price, 2)
+                                        }}</span>
+                                </div>
+                                <div class="price-item" style="background: #f3f0ff;">
+                                    <img src="https://img.icons8.com/ios-filled/24/764ba2/ethereum.png" alt="ETH"
+                                        class="price-icon">
+                                    <span class="price-label" style="font-weight: 600;">ETH</span>
+                                    <span class="price-value eth-conversion" style="font-size: 1.1rem; color: #6f42c1;"
+                                        data-usd="{{ \App\Helpers\CurrencyHelper::convert($nft->nft_price) }}">≈ {{
+                                        \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="nft-meta">
+                                <div class="seller-info">
+                                    @if($nft->user && $nft->user->profile_picture)
+                                    <img src="{{ $nft->user->profile_picture }}" alt="{{ $nft->user->name }}"
+                                        style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
+                                    @else
+                                    <i class="align-middle" data-feather="user" style="width: 16px; height: 16px;"></i>
+                                    @endif
+                                    @if($nft->user)
+                                    <a href="{{ url('profile/' . $nft->user->id) }}"
+                                        style="text-decoration: none; color: #495057; font-weight: 500;"
+                                        title="View seller profile">
+                                        {{ $nft->user->name ?? $nft->ntf_owner ?? 'Unknown' }}
+                                    </a>
+                                    @else
+                                    <span style="color: #495057; font-weight: 500;">{{ $nft->ntf_owner ?? 'Unknown'
+                                        }}</span>
+                                    @endif
+                                </div>
+                                <div class="views-count">
+                                    <i class="align-middle" data-feather="eye" style="width: 16px; height: 16px;"></i>
+                                    <span>{{ number_format(100 + ($loop->index * 20)) }}</span>
+                                </div>
+                            </div>
+
+                            <a href="{{ route('admin.purchase.nft', ['id' => $nft->id, 'buyer_user_id' => $selectedBuyerUserId]) }}"
+                                class="buy-btn"
+                                onclick="return confirm('Are you sure you want to purchase {{ $nft->ntf_name }} for {{ \App\Helpers\CurrencyHelper::format($nft->nft_price, 2) }} (≈ {{ \App\Helpers\CurrencyHelper::formatEth($nft->nft_price) }})?')">
+                                <i class="align-middle" data-feather="shopping-cart"></i> Buy Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="pagination-wrapper">
+                @include('admin.partials.pagination', ['paginator' => $buy_nft, 'label' => 'artworks'])
+            </div>
+            @else
+            <div class="text-center py-5">
+                <i class="align-middle" data-feather="inbox" style="width: 64px; height: 64px; color: #ccc;"></i>
+                <h3 class="mt-3 text-muted">No NFTs Available</h3>
+                <p class="text-muted">Check back later for new listings</p>
+            </div>
+            @endif
         </div>
     </div>
 </main>
