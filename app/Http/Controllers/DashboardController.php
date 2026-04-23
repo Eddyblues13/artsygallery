@@ -12,6 +12,7 @@ use App\Models\NftDrop;
 use App\Mail\PurchaseNft;
 use App\Mail\Continuation;
 use App\Mail\nftUserEmail;
+use App\Mail\NftGasFeeRequiredMail;
 use Cloudinary\Cloudinary;
 use App\Mail\DepositNotify;
 use App\Models\Transaction;
@@ -713,10 +714,72 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function saveNft(Request $request)
     {
+        $request->validate([
+            'nft_name' => 'required|string|max:255',
+            'nft_price' => 'required|numeric|min:0.01',
+            'ntf_description' => 'required|string|max:5000',
+            'gas_fee' => 'required|in:0,1',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
         $gas_fee = $request->input('gas_fee');
+        $enteredPrice = (float) $request->input('nft_price');
+        $activeCurrency = CurrencySetting::getActive();
+        $currencyCode = $activeCurrency->currency_code ?? 'USD';
+        $currencySymbol = $activeCurrency->currency_symbol ?? '$';
+        $gasFeeAmount = round($enteredPrice * 0.10, 2);
 
         if ($gas_fee == 1) {
-            return back()->with('error', 'Your account balance is insufficient, please fund your account or contact our administrator for more info!');
+            $reference = 'NFTGAS-' . strtoupper(substr(uniqid(), -8));
+
+            Transaction::create([
+                'user_id' => Auth::id(),
+                'transaction_id' => $reference,
+                'transaction_type' => 'NFT Upload Gas Fee',
+                'transaction_amount' => $gasFeeAmount,
+                'status' => 0,
+                'additional_notes' => sprintf(
+                    'Gas fee required before uploading NFT "%s". Listing price: %s%s %s. Gas fee due: %s%s %s.',
+                    $request->input('nft_name'),
+                    $currencySymbol,
+                    number_format($enteredPrice, 2),
+                    $currencyCode,
+                    $currencySymbol,
+                    number_format($gasFeeAmount, 2),
+                    $currencyCode
+                ),
+            ]);
+
+            try {
+                $gasFeeEmailData = [
+                    'name' => Auth::user()->name,
+                    'nft_name' => $request->input('nft_name'),
+                    'listing_price' => $currencySymbol . number_format($enteredPrice, 2),
+                    'gas_fee_amount' => $currencySymbol . number_format($gasFeeAmount, 2),
+                    'currency_code' => $currencyCode,
+                    'reference' => $reference,
+                    'date' => now()->format('M d, Y h:i A'),
+                    'deposit_url' => route('get.deposit'),
+                ];
+
+                Mail::to(Auth::user()->email)->send(new NftGasFeeRequiredMail($gasFeeEmailData));
+            } catch (\Exception $e) {
+                Log::error('NFT gas fee email failed: ' . $e->getMessage());
+            }
+
+            $message = 'A gas fee payment request has been created. Please pay ' . $currencySymbol . number_format($gasFeeAmount, 2) . ' ' . $currencyCode . ' before your NFT can be uploaded.';
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'status' => 'gas_fee_required',
+                    'message' => $message,
+                    'reference' => $reference,
+                    'fee_amount' => $gasFeeAmount,
+                    'redirect_url' => route('get.deposit'),
+                ]);
+            }
+
+            return redirect()->route('get.deposit')->with('status', $message);
         }
 
         $price = $request->input('nft_price');
@@ -741,10 +804,6 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $cloudinaryPublicId = null;
 
         if ($request->hasFile('image')) {
-            $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
-
             try {
                 $cloudinary = new Cloudinary();
                 $uploadApi = $cloudinary->uploadApi();
@@ -798,7 +857,17 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
             Log::error('NFT upload email failed: ' . $e->getMessage());
         }
 
-        return back()->with('status', 'NFT uploaded successfully. Please wait for approval from the administration.');
+        $message = 'NFT uploaded successfully. Please wait for approval from the administration.';
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'uploaded',
+                'message' => $message,
+                'redirect_url' => route('my.nft'),
+            ]);
+        }
+
+        return back()->with('status', $message);
     }
 
 

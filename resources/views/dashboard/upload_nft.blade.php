@@ -186,6 +186,32 @@
         box-shadow: none;
     }
 
+    .fee-option-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 1rem;
+        background: #fff;
+        transition: all 0.2s ease;
+        height: 100%;
+    }
+
+    .fee-option-card.active {
+        border-color: #3b7ddd;
+        box-shadow: 0 0 0 3px rgba(59, 125, 221, 0.12);
+        background: #f7fbff;
+    }
+
+    .fee-summary {
+        border: 1px solid #dbeafe;
+        background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+        border-radius: 14px;
+        padding: 1rem 1.1rem;
+    }
+
+    .fee-summary strong {
+        color: #1d4ed8;
+    }
+
     @media (max-width: 575.98px) {
         .upload-card .card-body {
             padding: 1.25rem;
@@ -269,8 +295,8 @@
                                     class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">{{ $activeCurrency->currency_symbol ?? '$' }}</span>
-                                <input type="number" class="form-control" name="nft_price" placeholder="0.00"
-                                    step="0.01" min="0" required>
+                                <input type="number" class="form-control" name="nft_price" id="nftPriceInput"
+                                    placeholder="0.00" step="0.01" min="0" required>
                             </div>
                         </div>
 
@@ -283,15 +309,35 @@
                         <!-- Gas Fee Option -->
                         <div class="mb-4">
                             <label class="form-label-styled">Gas Fee <span class="text-danger">*</span></label>
-                            <div class="d-flex gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="gas_fee" id="gasFeeNo" value="0" checked>
-                                    <label class="form-check-label" for="gasFeeNo">Without Gas Fee</label>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="fee-option-card active d-block" for="gasFeeNo" data-fee-card="0">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="gas_fee" id="gasFeeNo"
+                                                value="0" checked>
+                                            <span class="form-check-label fw-semibold">Without Gas Fee</span>
+                                        </div>
+                                        <p class="small text-muted mb-0">Upload immediately and send your artwork
+                                            directly for admin review.</p>
+                                    </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="gas_fee" id="gasFeeYes" value="1">
-                                    <label class="form-check-label" for="gasFeeYes">With Gas Fee</label>
+                                <div class="col-md-6">
+                                    <label class="fee-option-card d-block" for="gasFeeYes" data-fee-card="1">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="gas_fee" id="gasFeeYes"
+                                                value="1">
+                                            <span class="form-check-label fw-semibold">With Gas Fee</span>
+                                        </div>
+                                        <p class="small text-muted mb-0">A gas fee equal to 10% of your listing price
+                                            must be paid before the upload can be processed.</p>
+                                    </label>
                                 </div>
+                            </div>
+
+                            <div class="fee-summary" id="feeSummary">
+                                <div class="small text-muted mb-1">Upload summary</div>
+                                <div id="feeSummaryText">Choose an upload option. If you select <strong>With Gas
+                                        Fee</strong>, your required payment will be calculated instantly.</div>
                             </div>
                         </div>
 
@@ -307,13 +353,15 @@
                         </div>
 
                         <button type="submit" class="btn btn-upload mt-3" id="submitBtn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                            Publish NFT
+                            <span id="submitBtnIcon" class="me-2 d-inline-flex align-items-center">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </span>
+                            <span id="submitBtnLabel">Submit NFT</span>
                         </button>
                     </form>
                 </div>
@@ -333,6 +381,15 @@
     const removeBtn = document.getElementById('removeImage');
     const fileNameEl = document.getElementById('fileName');
     const fileSizeEl = document.getElementById('fileSize');
+    const priceInput = document.getElementById('nftPriceInput');
+    const feeSummaryText = document.getElementById('feeSummaryText');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnIcon = document.getElementById('submitBtnIcon');
+    const submitBtnLabel = document.getElementById('submitBtnLabel');
+    const feeOptions = document.querySelectorAll('input[name="gas_fee"]');
+    const currencySymbol = @json($activeCurrency->currency_symbol ?? '$');
+    const currencyCode = @json($activeCurrency->currency_code ?? 'USD');
+    const defaultSubmitIcon = submitBtnIcon.innerHTML;
 
     // Click to browse
     dropZone.addEventListener('click', () => imageInput.click());
@@ -376,6 +433,37 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
 
+    function updateFeeSummary() {
+        const selectedOption = document.querySelector('input[name="gas_fee"]:checked')?.value || '0';
+        const price = parseFloat(priceInput.value || '0');
+        const gasFee = price > 0 ? (price * 0.10).toFixed(2) : '0.00';
+
+        document.querySelectorAll('[data-fee-card]').forEach(card => {
+            card.classList.toggle('active', card.dataset.feeCard === selectedOption);
+        });
+
+        if (selectedOption === '1') {
+            feeSummaryText.innerHTML = 'To continue with <strong>With Gas Fee</strong>, you will first need to pay <strong>' + currencySymbol + gasFee + ' ' + currencyCode + '</strong>, which is 10% of your listing price.';
+            submitBtnLabel.textContent = 'Request Gas Fee Payment';
+        } else {
+            feeSummaryText.innerHTML = 'Your NFT will be submitted immediately for review with no upfront gas fee request.';
+            submitBtnLabel.textContent = 'Submit NFT';
+        }
+    }
+
+    function setSubmitButtonBusy(isBusy) {
+        submitBtn.disabled = isBusy;
+        submitBtnIcon.innerHTML = isBusy
+            ? '<span class="spinner-border spinner-border-sm"></span>'
+            : defaultSubmitIcon;
+
+        if (isBusy) {
+            submitBtnLabel.textContent = 'Processing...';
+        } else {
+            updateFeeSummary();
+        }
+    }
+
     // Remove image
     removeBtn.addEventListener('click', function() {
         imageInput.value = '';
@@ -383,6 +471,12 @@
         dropZone.style.display = '';
         previewImage.src = '';
     });
+
+    priceInput.addEventListener('input', updateFeeSummary);
+    feeOptions.forEach(function(option) {
+        option.addEventListener('change', updateFeeSummary);
+    });
+    updateFeeSummary();
 
     // Form submit with two-phase progress (upload + server processing)
     $('#uploadForm').on('submit', function(e) {
@@ -393,10 +487,7 @@
         const progressFill = document.getElementById('progressFill');
         const progressPercent = document.getElementById('progressPercent');
         const progressText = document.getElementById('progressText');
-        const submitBtn = document.getElementById('submitBtn');
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Publishing...';
+        setSubmitButtonBusy(true);
         progressEl.style.display = 'block';
         progressFill.style.width = '0%';
         progressFill.style.transition = 'width 0.15s linear';
@@ -428,6 +519,7 @@
         }
 
         $.ajax({
+            dataType: 'json',
             xhr: function() {
                 var xhr = new window.XMLHttpRequest();
                 xhr.upload.addEventListener('progress', function(evt) {
@@ -450,26 +542,42 @@
             processData: false,
             success: function(response) {
                 clearInterval(processingTimer);
+
+                if (response.status === 'gas_fee_required') {
+                    progressFill.style.transition = 'width 0.3s ease';
+                    setProgress(100, 'Payment request created');
+                    progressFill.style.background = 'linear-gradient(90deg, #3b7ddd, #5a9cf5)';
+                    Swal.fire({
+                        title: 'Gas Fee Payment Required',
+                        text: response.message,
+                        icon: 'info',
+                        confirmButtonText: 'Proceed to Deposit',
+                        confirmButtonColor: '#3b7ddd'
+                    }).then(function() {
+                        location.href = response.redirect_url;
+                    });
+                    return;
+                }
+
                 progressFill.style.transition = 'width 0.3s ease';
                 setProgress(100, 'Complete!');
                 progressFill.style.background = 'linear-gradient(90deg, #28a745, #34d058)';
 
                 Swal.fire({
-                    title: 'Published!',
-                    text: 'Your NFT has been uploaded successfully.',
+                    title: 'NFT Submitted',
+                    text: response.message || 'Your NFT has been uploaded successfully.',
                     icon: 'success',
                     confirmButtonText: 'View My NFTs',
                     confirmButtonColor: '#3b7ddd'
                 }).then(function() {
-                    location.href = "{{ route('my.nft') }}";
+                    location.href = response.redirect_url || "{{ route('my.nft') }}";
                 });
             },
             error: function(response) {
                 clearInterval(processingTimer);
                 progressFill.style.background = '#dc3545';
                 progressText.textContent = 'Upload failed';
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Publish NFT';
+                setSubmitButtonBusy(false);
 
                 let msg = 'There was an error uploading your NFT.';
                 if (response.responseJSON && response.responseJSON.message) {
