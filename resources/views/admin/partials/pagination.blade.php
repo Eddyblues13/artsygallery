@@ -80,15 +80,17 @@ $labelText = $label ?? 'items';
 </style>
 @endonce
 
-@if(isset($paginator) && $paginator->hasPages())
+@if(isset($paginator))
 <div class="admin-pagination-wrap">
     <div class="admin-pagination-count">
         Showing <strong>{{ number_format($paginator->firstItem() ?? 0) }}</strong>
         to <strong>{{ number_format($paginator->lastItem() ?? 0) }}</strong>
         of <strong>{{ number_format($paginator->total()) }}</strong> {{ $labelText }}
     </div>
+    @if($paginator->hasPages())
     <div class="admin-pagination-nav">
         {{ $paginator->onEachSide(1)->links('pagination::bootstrap-4') }}
     </div>
+    @endif
 </div>
 @endif

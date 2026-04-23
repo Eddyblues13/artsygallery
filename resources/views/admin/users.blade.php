@@ -15,8 +15,9 @@
 					</ol>
 				</nav>
 			</div>
-			<div class="d-flex gap-2 w-100 w-md-auto">
-				<a href="{{ route('view.users') }}" class="btn btn-outline-secondary" title="Refresh">
+			<div class="d-flex gap-2 w-100 w-md-auto page-actions">
+				<a href="{{ route('view.users') }}" class="btn btn-outline-secondary" title="Refresh"
+					data-ajax-filter-link="#admin-users-results">
 					<i class="align-middle" data-feather="refresh-cw"></i>
 				</a>
 				<button class="btn btn-primary shadow-sm" type="button" data-bs-toggle="collapse"
@@ -205,8 +206,8 @@
 				<h5 class="card-title mb-0 fw-bold">Users List</h5>
 
 				<!-- Instant JS Search -->
-				<div class="position-relative w-100" style="min-width: 250px; max-width: 320px;">
-					<input type="text" id="instantSearch" class="form-control ps-5 rounded-pill bg-light border-0"
+				<div class="position-relative quick-search-wrap w-100">
+					<input type="text" id="instantSearch" class="form-control ps-5 rounded-pill bg-light border"
 						placeholder="Quick find on this page...">
 					<div class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
 						<i class="align-middle" data-feather="search" width="16" height="16"></i>
@@ -216,7 +217,7 @@
 
 			<div class="card-body p-0">
 				<!-- Desktop Table View -->
-				<div class="table-responsive d-none d-md-block">
+				<div class="table-responsive d-none d-xl-block">
 					<table class="table table-hover table-striped align-middle mb-0" id="usersTable">
 						<thead class="bg-light">
 							<tr>
@@ -339,94 +340,98 @@
 					</table>
 				</div>
 
-				<!-- Mobile Card View -->
-				<div class="d-md-none bg-light p-3">
-					<div id="mobileUserList">
+				<!-- Mobile/Laptop Card View -->
+				<div class="d-xl-none bg-light p-3">
+					<div id="mobileUserList" class="row g-3">
 						@forelse($users as $user)
-						<div class="card mb-3 shadow-sm border-0 user-item">
-							<div class="card-body p-3">
-								<div class="d-flex justify-content-between align-items-start mb-3">
-									<div class="d-flex align-items-center">
-										@if($user->profile_picture)
-										<img src="{{ $user->profile_picture }}" alt="{{ $user->name }}"
-											class="rounded-circle me-3 shadow-sm"
-											style="width: 40px; height: 40px; object-fit: cover;">
+						<div class="col-12 col-lg-6 user-item">
+							<div class="card h-100 shadow-sm border-0">
+								<div class="card-body p-3">
+									<div class="d-flex justify-content-between align-items-start mb-3">
+										<div class="d-flex align-items-center">
+											@if($user->profile_picture)
+											<img src="{{ $user->profile_picture }}" alt="{{ $user->name }}"
+												class="rounded-circle me-3 shadow-sm"
+												style="width: 40px; height: 40px; object-fit: cover;">
+											@else
+											<div class="avatar-initial rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
+												style="width: 40px; height: 40px; font-weight: bold; font-size: 14px;">
+												{{
+												strtoupper(substr($user->name, 0, 1)) }}</div>
+											@endif
+											<div>
+												<h6 class="mb-0 fw-bold text-dark search-name">{{ $user->name }}</h6>
+												<small class="text-muted">#{{ $user->id }}</small>
+											</div>
+										</div>
+										@if($user->is_activated == '1')
+										<span class="badge bg-soft-success text-success rounded-pill">Active</span>
 										@else
-										<div class="avatar-initial rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
-											style="width: 40px; height: 40px; font-weight: bold; font-size: 14px;">{{
-											strtoupper(substr($user->name, 0, 1)) }}</div>
+										<span class="badge bg-soft-warning text-warning rounded-pill">Inactive</span>
 										@endif
-										<div>
-											<h6 class="mb-0 fw-bold text-dark search-name">{{ $user->name }}</h6>
-											<small class="text-muted">#{{ $user->id }}</small>
+									</div>
+
+									<div class="mb-3">
+										<div class="d-flex align-items-center mb-1">
+											<i class="text-muted me-2" data-feather="mail" width="14"></i>
+											<a href="mailto:{{ $user->email }}"
+												class="text-decoration-none text-dark small search-email">{{
+												$user->email
+												}}</a>
+										</div>
+										@if($user->phone)
+										<div class="d-flex align-items-center">
+											<i class="text-muted me-2" data-feather="phone" width="14"></i>
+											<span class="text-dark small search-phone">{{ $user->phone }}</span>
+										</div>
+										@endif
+									</div>
+
+									<div class="row g-2 mb-3">
+										<div class="col-6">
+											<div class="p-2 bg-light rounded text-center">
+												<small class="d-block text-uppercase text-muted fw-bold"
+													style="font-size: 10px;">Wallet</small>
+												@if($user->wallet_verify)
+												<span class="text-success small fw-bold"><i class="me-1"
+														data-feather="check"></i> Verified</span>
+												@else
+												<span class="text-danger small fw-bold"><i class="me-1"
+														data-feather="x"></i> Unverified</span>
+												@endif
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="p-2 bg-light rounded text-center">
+												<small class="d-block text-uppercase text-muted fw-bold"
+													style="font-size: 10px;">KYC</small>
+												@if($user->id_card_status == '1')
+												<span class="text-success small fw-bold">Approved</span>
+												@elseif($user->id_card_status == '0')
+												<span class="text-warning small fw-bold">Pending</span>
+												@else
+												<span class="text-muted small fw-bold">-</span>
+												@endif
+											</div>
 										</div>
 									</div>
-									@if($user->is_activated == '1')
-									<span class="badge bg-soft-success text-success rounded-pill">Active</span>
-									@else
-									<span class="badge bg-soft-warning text-warning rounded-pill">Inactive</span>
-									@endif
-								</div>
 
-								<div class="mb-3">
-									<div class="d-flex align-items-center mb-1">
-										<i class="text-muted me-2" data-feather="mail" width="14"></i>
-										<a href="mailto:{{ $user->email }}"
-											class="text-decoration-none text-dark small search-email">{{ $user->email
-											}}</a>
+									<div class="d-grid gap-2 d-flex">
+										<a href="{{ url('profile/' . $user->id) }}"
+											class="btn btn-primary btn-sm flex-fill rounded-pill">
+											View Profile
+										</a>
+										<a href="{{ url('delete/' . $user->id) }}"
+											class="btn btn-outline-danger btn-sm flex-fill rounded-pill"
+											onclick="return confirm('Are you sure?')">
+											Delete
+										</a>
 									</div>
-									@if($user->phone)
-									<div class="d-flex align-items-center">
-										<i class="text-muted me-2" data-feather="phone" width="14"></i>
-										<span class="text-dark small search-phone">{{ $user->phone }}</span>
-									</div>
-									@endif
-								</div>
-
-								<div class="row g-2 mb-3">
-									<div class="col-6">
-										<div class="p-2 bg-light rounded text-center">
-											<small class="d-block text-uppercase text-muted fw-bold"
-												style="font-size: 10px;">Wallet</small>
-											@if($user->wallet_verify)
-											<span class="text-success small fw-bold"><i class="me-1"
-													data-feather="check"></i> Verified</span>
-											@else
-											<span class="text-danger small fw-bold"><i class="me-1"
-													data-feather="x"></i> Unverified</span>
-											@endif
-										</div>
-									</div>
-									<div class="col-6">
-										<div class="p-2 bg-light rounded text-center">
-											<small class="d-block text-uppercase text-muted fw-bold"
-												style="font-size: 10px;">KYC</small>
-											@if($user->id_card_status == '1')
-											<span class="text-success small fw-bold">Approved</span>
-											@elseif($user->id_card_status == '0')
-											<span class="text-warning small fw-bold">Pending</span>
-											@else
-											<span class="text-muted small fw-bold">-</span>
-											@endif
-										</div>
-									</div>
-								</div>
-
-								<div class="d-grid gap-2 d-flex">
-									<a href="{{ url('profile/' . $user->id) }}"
-										class="btn btn-primary btn-sm flex-fill rounded-pill">
-										View Profile
-									</a>
-									<a href="{{ url('delete/' . $user->id) }}"
-										class="btn btn-outline-danger btn-sm flex-fill rounded-pill"
-										onclick="return confirm('Are you sure?')">
-										Delete
-									</a>
 								</div>
 							</div>
 						</div>
 						@empty
-						<div class="text-center py-5">
+						<div class="col-12 text-center py-5">
 							<p class="text-muted">No users found</p>
 						</div>
 						@endforelse
@@ -486,10 +491,34 @@
 		justify-content: center;
 	}
 
-	/* Mobile Adjustments */
+	.quick-search-wrap {
+		min-width: 240px;
+		max-width: 360px;
+	}
+
+	@media (min-width: 992px) {
+		#filtersCollapse {
+			display: block !important;
+			height: auto !important;
+			visibility: visible !important;
+		}
+	}
+
+	/* Laptop & Mobile Adjustments */
+	@media (max-width: 1199.98px) {
+		.page-actions .btn {
+			flex: 1 1 auto;
+		}
+	}
+
 	@media (max-width: 768px) {
 		#instantSearch {
 			font-size: 0.9rem;
+		}
+
+		.quick-search-wrap {
+			max-width: 100%;
+			min-width: 0;
 		}
 
 		.btn[title="Refresh"] {
@@ -500,57 +529,69 @@
 
 <script>
 	(function () {
-	function bindInstantSearch() {
-		// Initialize Feather Icons
-		if (typeof feather !== 'undefined') {
-			feather.replace();
-		}
+		function bindInstantSearch() {
+			if (typeof feather !== 'undefined') {
+				feather.replace();
+			}
 
-		// Instant JS Filter (Enhanced to search EVERYTHING)
-		const searchInput = document.getElementById('instantSearch');
-		if (!searchInput || searchInput.dataset.bound === '1') {
-			return;
-		}
+			const searchInput = document.getElementById('instantSearch');
+			if (!searchInput || searchInput.dataset.bound === '1') {
+				return;
+			}
 
-		searchInput.dataset.bound = '1';
-
-		searchInput.addEventListener('input', function() {
+			searchInput.dataset.bound = '1';
+			searchInput.addEventListener('input', function () {
 				const query = this.value.toLowerCase().trim();
 				const tableRows = document.querySelectorAll('#usersTable tbody tr.user-row');
 				const mobileItems = document.querySelectorAll('#mobileUserList .user-item');
-				
-				// Filter Table Rows
-				if(tableRows.length > 0) {
-					tableRows.forEach(row => {
-						// Search the entire text content of the row
-						const rowText = row.innerText.toLowerCase();
-						
-						if(rowText.includes(query)) {
-							row.style.display = '';
-						} else {
-							row.style.display = 'none';
-						}
-					});
-				}
 
-				// Filter Mobile Cards
-				if(mobileItems.length > 0) {
-					mobileItems.forEach(item => {
-						// Search the entire text content of the card
-						const itemText = item.innerText.toLowerCase();
-						
-						if(itemText.includes(query)) {
-							item.style.display = '';
-						} else {
-							item.style.display = 'none';
-						}
-					});
-				}
+				tableRows.forEach(function (row) {
+					const rowText = (row.innerText || '').toLowerCase();
+					row.style.display = rowText.includes(query) ? '' : 'none';
+				});
+
+				mobileItems.forEach(function (item) {
+					const itemText = (item.innerText || '').toLowerCase();
+					item.style.display = itemText.includes(query) ? '' : 'none';
+				});
 			});
-	}
+		}
 
-	document.addEventListener('DOMContentLoaded', bindInstantSearch);
-	document.addEventListener('ajax:content-updated', bindInstantSearch);
+		function bindLiveAjaxFilter() {
+			const form = document.querySelector('form[data-ajax-filter="#admin-users-results"]');
+			if (!form || form.dataset.liveBound === '1') {
+				return;
+			}
+
+			form.dataset.liveBound = '1';
+			let timer = null;
+
+			const textInput = form.querySelector('input[name="search"]');
+			if (textInput) {
+				textInput.addEventListener('input', function () {
+					clearTimeout(timer);
+					timer = setTimeout(function () {
+						form.requestSubmit();
+					}, 350);
+				});
+			}
+
+			form.querySelectorAll('select, input[type="date"]').forEach(function (el) {
+				el.addEventListener('change', function () {
+					form.requestSubmit();
+				});
+			});
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
+			bindInstantSearch();
+			bindLiveAjaxFilter();
+		});
+
+		document.addEventListener('ajax:content-updated', function () {
+			bindInstantSearch();
+			bindLiveAjaxFilter();
+		});
 	})();
 </script>
 
