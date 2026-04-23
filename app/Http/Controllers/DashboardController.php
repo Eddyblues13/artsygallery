@@ -1029,7 +1029,55 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $nft->ntf_owner = $buyer->name;
         $nft->save();
 
+        $updatedBuyerBalance = $balance - $nft->nft_price;
+        $this->sendNftPurchaseNotifications($buyer, $seller, $nft, $updatedBuyerBalance);
+
         return redirect()->route('my.nft')->with('status', 'NFT purchased successfully! It has been added to your collection.');
+    }
+
+    private function sendNftPurchaseNotifications($buyer, $seller, $nft, $buyerBalance = null)
+    {
+        if (!$buyer || !$nft) {
+            return;
+        }
+
+        $data = [
+            'name' => $buyer->name,
+            'nft_name' => $nft->ntf_name,
+            'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+            'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+            'seller' => $seller->name ?? 'Unknown Seller',
+            'balance_formatted' => $buyerBalance !== null
+                ? \App\Helpers\CurrencyHelper::format($buyerBalance, 2)
+                : null,
+            'balance_eth' => $buyerBalance !== null
+                ? \App\Helpers\CurrencyHelper::formatEth($buyerBalance)
+                : null,
+            'date' => now()->format('M d, Y h:i A'),
+        ];
+
+        try {
+            Mail::to($buyer->email)->send(new PurchaseNft($data));
+        } catch (\Exception $e) {
+            Log::error('NFT purchase buyer email failed: ' . $e->getMessage());
+        }
+
+        if ($seller && $seller->email) {
+            try {
+                $sellerData = [
+                    'name' => $seller->name,
+                    'nft_name' => $nft->ntf_name,
+                    'price_formatted' => \App\Helpers\CurrencyHelper::format($nft->nft_price, 2),
+                    'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft->nft_price),
+                    'buyer' => $buyer->name,
+                    'date' => now()->format('M d, Y h:i A'),
+                ];
+
+                Mail::to($seller->email)->send(new \App\Mail\ArtworkPurchasedEmail($sellerData));
+            } catch (\Exception $e) {
+                Log::error('NFT purchase seller notification email failed: ' . $e->getMessage());
+            }
+        }
     }
 
 
@@ -1787,41 +1835,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
         $debitTotal = Transaction::where('user_id', $buyerId)->where('transaction_type', 'DebitProfit')->where('status', '1')->sum('transaction_amount');
         $buyerBalance = $depTotal + ($profitTotal - $debitTotal) - $wdTotal;
 
-        // Prepare the data for the email
-        $data = [
-            'name' => $currentUser->name,
-            'nft_name' => $nft_details->ntf_name,
-            'price_formatted' => \App\Helpers\CurrencyHelper::format($nft_details->nft_price, 2),
-            'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft_details->nft_price),
-            'seller' => $user->name,
-            'balance_formatted' => \App\Helpers\CurrencyHelper::format($buyerBalance, 2),
-            'balance_eth' => \App\Helpers\CurrencyHelper::formatEth($buyerBalance),
-            'date' => now()->format('M d, Y h:i A'),
-        ];
-
-        // Send the email to the buyer
-        try {
-            Mail::to($currentUser->email)->send(new PurchaseNft($data));
-        } catch (\Exception $e) {
-            Log::error('NFT purchase email failed: ' . $e->getMessage());
-        }
-
-        // Send email notification to the seller
-        if ($user) {
-            try {
-                $sellerData = [
-                    'name' => $user->name,
-                    'nft_name' => $nft_details->ntf_name,
-                    'price_formatted' => \App\Helpers\CurrencyHelper::format($nft_details->nft_price, 2),
-                    'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($nft_details->nft_price),
-                    'buyer' => $currentUser->name,
-                    'date' => now()->format('M d, Y h:i A'),
-                ];
-                Mail::to($user->email)->send(new \App\Mail\ArtworkPurchasedEmail($sellerData));
-            } catch (\Exception $e) {
-                Log::error('NFT purchase seller notification email failed: ' . $e->getMessage());
-            }
-        }
+        $this->sendNftPurchaseNotifications($currentUser, $user, $nft_details, $buyerBalance);
 
         return back()->with('status', 'NFT has been purchased successfully');
     }
