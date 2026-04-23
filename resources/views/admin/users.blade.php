@@ -2,29 +2,32 @@
 
 <main class="content">
 	<div class="container-fluid p-0">
-		<div
-			class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-			<div>
-				<h1 class="h3 mb-1 text-gray-800">
-					<strong>All Users</strong>
-				</h1>
-				<nav aria-label="breadcrumb">
-					<ol class="breadcrumb mb-0">
-						<li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-						<li class="breadcrumb-item active" aria-current="page">Users</li>
-					</ol>
-				</nav>
-			</div>
-			<div class="d-flex gap-2 w-100 w-md-auto page-actions">
-				<a href="{{ route('view.users') }}" class="btn btn-outline-secondary" title="Refresh"
-					data-ajax-filter-link="#admin-users-results">
-					<i class="align-middle" data-feather="refresh-cw"></i>
-				</a>
-				<button class="btn btn-primary shadow-sm" type="button" data-bs-toggle="collapse"
-					data-bs-target="#filtersCollapse"
-					aria-expanded="{{ request()->hasAny(['search', 'status', 'wallet_verify', 'kyc_status', 'date_from', 'date_to']) ? 'true' : 'false' }}">
-					<i class="align-middle" data-feather="filter"></i> Filters
-				</button>
+		<div class="page-header mb-4">
+			<div
+				class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+				<div>
+					<h1 class="h3 mb-1 text-dark fw-bold">
+						<i class="align-middle me-2 text-primary" data-feather="users"></i>All Users
+					</h1>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb mb-0 small">
+							<li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"
+									class="text-decoration-none">Dashboard</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Users</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="d-flex gap-2 w-100 w-md-auto page-actions">
+					<a href="{{ route('view.users') }}" class="btn btn-light border border-light-subtle shadow-sm"
+						title="Refresh" data-ajax-filter-link="#admin-users-results">
+						<i class="align-middle" data-feather="refresh-cw"></i>
+					</a>
+					<button class="btn btn-primary shadow-sm rounded-pill px-4" type="button" data-bs-toggle="collapse"
+						data-bs-target="#filtersCollapse"
+						aria-expanded="{{ request()->hasAny(['search', 'status', 'wallet_verify', 'kyc_status', 'date_from', 'date_to']) ? 'true' : 'false' }}">
+						<i class="align-middle me-2" data-feather="filter"></i> Filters
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -49,75 +52,71 @@
 		@endif
 
 		<!-- Statistics Cards -->
-		<div class="row mb-4">
-			<div class="col-sm-6 col-xl-3 mb-3 mb-xl-0">
-				<div class="card shadow-sm border-0 h-100 stat-card">
-					<div class="card-body">
-						<div class="row">
-							<div class="col mt-0">
-								<h5 class="card-title text-muted text-uppercase fw-bold small">Total Users</h5>
+		<div class="row mb-4 g-3">
+			<div class="col-sm-6 col-xl-3">
+				<div class="card stat-card h-100 border-0 shadow-sm overflow-hidden">
+					<div class="card-body p-4">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<h6 class="text-muted text-uppercase fw-bold small mb-2">Total Users</h6>
+								<h3 class="fw-bold text-dark mb-0">{{ number_format($stats['total']) }}</h3>
 							</div>
-							<div class="col-auto">
-								<div class="icon-shape bg-soft-primary text-primary rounded-circle">
-									<i class="align-middle" data-feather="users"></i>
-								</div>
-							</div>
-						</div>
-						<h3 class="mt-1 mb-0 fw-bold">{{ number_format($stats['total']) }}</h3>
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-xl-3 mb-3 mb-xl-0">
-				<div class="card shadow-sm border-0 h-100 stat-card">
-					<div class="card-body">
-						<div class="row">
-							<div class="col mt-0">
-								<h5 class="card-title text-muted text-uppercase fw-bold small">Active</h5>
-							</div>
-							<div class="col-auto">
-								<div class="icon-shape bg-soft-success text-success rounded-circle">
-									<i class="align-middle" data-feather="user-check"></i>
-								</div>
+							<div class="icon-shape bg-primary text-white">
+								<i class="align-middle" data-feather="users"></i>
 							</div>
 						</div>
-						<h3 class="mt-1 mb-0 fw-bold">{{ number_format($stats['active']) }}</h3>
-						<small class="text-muted">{{ number_format($stats['inactive']) }} Inactive</small>
 					</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-xl-3 mb-3 mb-xl-0">
-				<div class="card shadow-sm border-0 h-100 stat-card">
-					<div class="card-body">
-						<div class="row">
-							<div class="col mt-0">
-								<h5 class="card-title text-muted text-uppercase fw-bold small">Wallet Verified</h5>
-							</div>
-							<div class="col-auto">
-								<div class="icon-shape bg-soft-info text-info rounded-circle">
-									<i class="align-middle" data-feather="shield"></i>
-								</div>
-							</div>
-						</div>
-						<h3 class="mt-1 mb-0 fw-bold">{{ number_format($stats['wallet_verified']) }}</h3>
-					</div>
+					<div class="stat-card-bar bg-primary"></div>
 				</div>
 			</div>
 			<div class="col-sm-6 col-xl-3">
-				<div class="card shadow-sm border-0 h-100 stat-card">
-					<div class="card-body">
-						<div class="row">
-							<div class="col mt-0">
-								<h5 class="card-title text-muted text-uppercase fw-bold small">KYC Approved</h5>
+				<div class="card stat-card h-100 border-0 shadow-sm overflow-hidden">
+					<div class="card-body p-4">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<h6 class="text-muted text-uppercase fw-bold small mb-2">Active Users</h6>
+								<h3 class="fw-bold text-dark mb-0">{{ number_format($stats['active']) }}</h3>
+								<small class="text-muted">{{ number_format($stats['inactive']) }} Inactive</small>
 							</div>
-							<div class="col-auto">
-								<div class="icon-shape bg-soft-warning text-warning rounded-circle">
-									<i class="align-middle" data-feather="file-check"></i>
-								</div>
+							<div class="icon-shape bg-success text-white">
+								<i class="align-middle" data-feather="user-check"></i>
 							</div>
 						</div>
-						<h3 class="mt-1 mb-0 fw-bold">{{ number_format($stats['kyc_approved']) }}</h3>
-						<small class="text-muted">{{ number_format($stats['kyc_pending']) }} Pending</small>
 					</div>
+					<div class="stat-card-bar bg-success"></div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-xl-3">
+				<div class="card stat-card h-100 border-0 shadow-sm overflow-hidden">
+					<div class="card-body p-4">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<h6 class="text-muted text-uppercase fw-bold small mb-2">Wallet Verified</h6>
+								<h3 class="fw-bold text-dark mb-0">{{ number_format($stats['wallet_verified']) }}</h3>
+							</div>
+							<div class="icon-shape bg-info text-white">
+								<i class="align-middle" data-feather="shield"></i>
+							</div>
+						</div>
+					</div>
+					<div class="stat-card-bar bg-info"></div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-xl-3">
+				<div class="card stat-card h-100 border-0 shadow-sm overflow-hidden">
+					<div class="card-body p-4">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<h6 class="text-muted text-uppercase fw-bold small mb-2">KYC Approved</h6>
+								<h3 class="fw-bold text-dark mb-0">{{ number_format($stats['kyc_approved']) }}</h3>
+								<small class="text-muted">{{ number_format($stats['kyc_pending']) }} Pending</small>
+							</div>
+							<div class="icon-shape bg-warning text-white">
+								<i class="align-middle" data-feather="file-check"></i>
+							</div>
+						</div>
+					</div>
+					<div class="stat-card-bar bg-warning"></div>
 				</div>
 			</div>
 		</div>
@@ -125,27 +124,29 @@
 		<!-- Advanced Filters (Server-side) -->
 		<div class="collapse mb-4 {{ request()->hasAny(['search', 'status', 'wallet_verify', 'kyc_status', 'date_from', 'date_to']) ? 'show' : '' }}"
 			id="filtersCollapse">
-			<div class="card shadow-sm border-0">
-				<div class="card-header bg-white border-bottom-0 pb-0">
-					<h5 class="card-title mb-0 text-primary fw-bold">Advanced Filtering</h5>
+			<div class="card border-0 shadow-sm">
+				<div class="card-header bg-gradient border-0 py-4">
+					<h5 class="card-title mb-0 text-white fw-bold d-flex align-items-center gap-2">
+						<i class="align-middle" data-feather="sliders"></i> Advanced Filtering
+					</h5>
 				</div>
-				<div class="card-body">
-					<form method="GET" action="{{ route('view.users') }}" class="row g-3"
+				<div class="card-body p-4">
+					<form method="GET" action="{{ route('view.users') }}" class="row g-4"
 						data-ajax-filter="#admin-users-results">
 						<div class="col-12 col-md-6 col-lg-3">
 							<label for="search" class="form-label small text-uppercase fw-bold text-muted">Global
 								Search</label>
-							<div class="input-group">
-								<span class="input-group-text bg-light border-end-0"><i class="align-middle"
+							<div class="input-group input-group-lg">
+								<span class="input-group-text bg-light border-0"><i class="align-middle text-muted"
 										data-feather="search"></i></span>
-								<input type="text" class="form-control border-start-0 bg-light" id="search"
-									name="search" value="{{ request('search') }}" placeholder="Name, email, details...">
+								<input type="text" class="form-control border-0 bg-light" id="search" name="search"
+									value="{{ request('search') }}" placeholder="Name, email...">
 							</div>
 						</div>
 						<div class="col-12 col-md-6 col-lg-2">
 							<label for="status"
 								class="form-label small text-uppercase fw-bold text-muted">Status</label>
-							<select class="form-select bg-light" id="status" name="status">
+							<select class="form-select form-select-lg bg-light border-0" id="status" name="status">
 								<option value="">All Status</option>
 								<option value="1" {{ request('status')=='1' ? 'selected' : '' }}>Active</option>
 								<option value="0" {{ request('status')=='0' ? 'selected' : '' }}>Inactive</option>
@@ -154,7 +155,8 @@
 						<div class="col-12 col-md-6 col-lg-2">
 							<label for="wallet_verify"
 								class="form-label small text-uppercase fw-bold text-muted">Wallet</label>
-							<select class="form-select bg-light" id="wallet_verify" name="wallet_verify">
+							<select class="form-select form-select-lg bg-light border-0" id="wallet_verify"
+								name="wallet_verify">
 								<option value="">All</option>
 								<option value="1" {{ request('wallet_verify')=='1' ? 'selected' : '' }}>Verified
 								</option>
@@ -165,7 +167,8 @@
 						<div class="col-12 col-md-6 col-lg-2">
 							<label for="kyc_status"
 								class="form-label small text-uppercase fw-bold text-muted">KYC</label>
-							<select class="form-select bg-light" id="kyc_status" name="kyc_status">
+							<select class="form-select form-select-lg bg-light border-0" id="kyc_status"
+								name="kyc_status">
 								<option value="">All</option>
 								<option value="0" {{ request('kyc_status')=='0' ? 'selected' : '' }}>Pending</option>
 								<option value="1" {{ request('kyc_status')=='1' ? 'selected' : '' }}>Approved</option>
@@ -174,24 +177,24 @@
 						</div>
 						<div class="col-12 col-md-6 col-lg-3">
 							<label class="form-label small text-uppercase fw-bold text-muted">Date Range</label>
-							<div class="input-group">
-								<input type="date" class="form-control bg-light" name="date_from"
+							<div class="input-group input-group-lg">
+								<input type="date" class="form-control bg-light border-0" name="date_from"
 									value="{{ request('date_from') }}" title="From">
-								<span class="input-group-text border-start-0 border-end-0 bg-light text-muted">to</span>
-								<input type="date" class="form-control bg-light" name="date_to"
+								<span class="input-group-text border-0 bg-light text-muted">to</span>
+								<input type="date" class="form-control bg-light border-0" name="date_to"
 									value="{{ request('date_to') }}" title="To">
 							</div>
 						</div>
-						<div class="col-12 d-flex justify-content-end gap-2 mt-4">
+						<div class="col-12 d-flex justify-content-end gap-3 mt-3">
 							@if(request()->hasAny(['search', 'status', 'wallet_verify', 'kyc_status', 'date_from',
 							'date_to']))
-							<a href="{{ route('view.users') }}" class="btn btn-light text-muted"
+							<a href="{{ route('view.users') }}" class="btn btn-light text-muted border"
 								data-ajax-filter-link="#admin-users-results">
-								<i class="align-middle me-1" data-feather="x"></i> Clear
+								<i class="align-middle me-2" data-feather="x"></i> Clear Filters
 							</a>
 							@endif
-							<button type="submit" class="btn btn-primary px-4 rounded-pill">
-								<i class="align-middle me-1" data-feather="search"></i> Apply Filters
+							<button type="submit" class="btn btn-primary px-5 rounded-pill">
+								<i class="align-middle me-2" data-feather="search"></i> Apply Filters
 							</button>
 						</div>
 					</form>
@@ -200,16 +203,19 @@
 		</div>
 
 		<!-- Users List Card -->
-		<div class="card shadow-sm border-0" id="admin-users-results" data-ajax-container>
+		<div class="card border-0 shadow-sm" id="admin-users-results" data-ajax-container>
 			<div
-				class="card-header bg-white py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-				<h5 class="card-title mb-0 fw-bold">Users List</h5>
+				class="card-header bg-gradient border-0 py-4 px-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+				<h5 class="card-title mb-0 fw-bold text-white d-flex align-items-center gap-2">
+					<i class="align-middle" data-feather="list"></i> Users Directory
+				</h5>
 
 				<!-- Instant JS Search -->
-				<div class="position-relative quick-search-wrap w-100">
-					<input type="text" id="instantSearch" class="form-control ps-5 rounded-pill bg-light border"
-						placeholder="Quick find on this page...">
-					<div class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+				<div class="position-relative quick-search-wrap w-lg-auto">
+					<input type="text" id="instantSearch"
+						class="form-control rounded-pill ps-5 bg-white border-0 shadow-sm"
+						placeholder="Quick search...">
+					<div class="position-absolute top-50 start-0 translate-middle-y ps-4 text-muted">
 						<i class="align-middle" data-feather="search" width="16" height="16"></i>
 					</div>
 				</div>
@@ -218,8 +224,8 @@
 			<div class="card-body p-0">
 				<!-- Desktop Table View -->
 				<div class="table-responsive d-none d-xl-block">
-					<table class="table table-hover table-striped align-middle mb-0" id="usersTable">
-						<thead class="bg-light">
+					<table class="table table-hover align-middle mb-0 modern-table" id="usersTable">
+						<thead class="bg-light-subtle">
 							<tr>
 								<th class="border-0 px-4 py-3 fw-bold text-muted text-uppercase small">User</th>
 								<th class="border-0 px-4 py-3 fw-bold text-muted text-uppercase small">Contact</th>
@@ -233,12 +239,12 @@
 						</thead>
 						<tbody>
 							@forelse($users as $user)
-							<tr class="user-row">
+							<tr class="user-row border-bottom">
 								<td class="px-4 py-3">
 									<div class="d-flex align-items-center">
 										@if($user->profile_picture)
 										<img src="{{ $user->profile_picture }}" alt="{{ $user->name }}"
-											class="rounded-circle me-3 shadow-sm"
+											class="rounded-circle me-3 shadow-sm border border-light"
 											style="width: 40px; height: 40px; object-fit: cover;">
 										@else
 										<div class="avatar-initial rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
@@ -263,21 +269,23 @@
 								</td>
 								<td class="px-4 py-3">
 									@if($user->is_activated == '1')
-									<span class="badge bg-soft-success text-success rounded-pill px-3">Active</span>
+									<span class="badge bg-success rounded-pill px-3 py-2"><i class="align-middle me-1"
+											data-feather="check" width="12"></i> Active</span>
 									@else
-									<span class="badge bg-soft-warning text-warning rounded-pill px-3">Inactive</span>
+									<span class="badge bg-warning rounded-pill px-3 py-2"><i class="align-middle me-1"
+											data-feather="alert-circle" width="12"></i> Inactive</span>
 									@endif
 								</td>
 								<td class="px-4 py-3">
 									<div class="d-flex flex-column gap-1">
 										@if($user->wallet_verify)
 										<span
-											class="badge bg-soft-success text-success rounded-pill w-auto align-self-start"><i
+											class="badge bg-success bg-opacity-10 text-success rounded-pill w-auto align-self-start"><i
 												class="align-middle me-1" data-feather="shield" width="12"></i>
 											Verified</span>
 										@else
 										<span
-											class="badge bg-soft-danger text-danger rounded-pill w-auto align-self-start"><i
+											class="badge bg-danger bg-opacity-10 text-danger rounded-pill w-auto align-self-start"><i
 												class="align-middle me-1" data-feather="shield-off" width="12"></i>
 											Unverified</span>
 										@endif
@@ -295,11 +303,13 @@
 								</td>
 								<td class="px-4 py-3">
 									@if($user->id_card_status == '0')
-									<span class="badge bg-soft-warning text-warning rounded-pill">Pending</span>
+									<span
+										class="badge bg-warning bg-opacity-10 text-warning rounded-pill">Pending</span>
 									@elseif($user->id_card_status == '1')
-									<span class="badge bg-soft-success text-success rounded-pill">Approved</span>
+									<span
+										class="badge bg-success bg-opacity-10 text-success rounded-pill">Approved</span>
 									@elseif($user->id_card_status == '2')
-									<span class="badge bg-soft-danger text-danger rounded-pill">Declined</span>
+									<span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">Declined</span>
 									@else
 									<span class="badge bg-light text-muted border rounded-pill">None</span>
 									@endif
@@ -309,12 +319,12 @@
 								</td>
 								<td class="px-4 py-3 text-end">
 									<div class="btn-group shadow-sm rounded-pill" role="group">
-										<a href="{{ url('profile/' . $user->id) }}"
-											class="btn btn-sm btn-outline-primary" title="View Profile">
+										<a href="{{ url('profile/' . $user->id) }}" class="btn btn-sm btn-primary"
+											title="View Profile">
 											<i class="align-middle" data-feather="eye" width="16"></i> <span
 												class="d-none d-lg-inline-block small ms-1">View</span>
 										</a>
-										<a href="{{ url('delete/' . $user->id) }}" class="btn btn-sm btn-outline-danger"
+										<a href="{{ url('delete/' . $user->id) }}" class="btn btn-sm btn-danger"
 											title="Delete User"
 											onclick="return confirm('Are you sure? This action is permanent.')">
 											<i class="align-middle" data-feather="trash-2" width="16"></i>
@@ -326,12 +336,12 @@
 							<tr>
 								<td colspan="10" class="text-center py-5">
 									<div class="d-flex flex-column align-items-center">
-										<div class="bg-light rounded-circle p-3 mb-3">
-											<i class="align-middle text-muted" data-feather="users" width="32"
-												height="32"></i>
+										<div class="bg-light rounded-circle p-4 mb-3">
+											<i class="align-middle text-muted" data-feather="inbox" width="40"
+												height="40"></i>
 										</div>
 										<h5 class="text-muted fw-bold">No users found</h5>
-										<p class="text-muted small mb-0">Try adjusting your search filters</p>
+										<p class="text-muted small mb-0">Try adjusting your search or filters</p>
 									</div>
 								</td>
 							</tr>
@@ -341,21 +351,21 @@
 				</div>
 
 				<!-- Mobile/Laptop Card View -->
-				<div class="d-xl-none bg-light p-3">
+				<div class="d-xl-none p-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
 					<div id="mobileUserList" class="row g-3">
 						@forelse($users as $user)
 						<div class="col-12 col-lg-6 user-item">
-							<div class="card h-100 shadow-sm border-0">
-								<div class="card-body p-3">
+							<div class="card h-100 border-0 shadow-sm overflow-hidden modern-card">
+								<div class="card-body p-4">
 									<div class="d-flex justify-content-between align-items-start mb-3">
-										<div class="d-flex align-items-center">
+										<div class="d-flex align-items-center flex-1">
 											@if($user->profile_picture)
 											<img src="{{ $user->profile_picture }}" alt="{{ $user->name }}"
-												class="rounded-circle me-3 shadow-sm"
-												style="width: 40px; height: 40px; object-fit: cover;">
+												class="rounded-circle me-3 shadow-sm border border-light"
+												style="width: 45px; height: 45px; object-fit: cover;">
 											@else
 											<div class="avatar-initial rounded-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
-												style="width: 40px; height: 40px; font-weight: bold; font-size: 14px;">
+												style="width: 45px; height: 45px; font-weight: bold; font-size: 16px;">
 												{{
 												strtoupper(substr($user->name, 0, 1)) }}</div>
 											@endif
@@ -365,14 +375,14 @@
 											</div>
 										</div>
 										@if($user->is_activated == '1')
-										<span class="badge bg-soft-success text-success rounded-pill">Active</span>
+										<span class="badge bg-success rounded-pill py-2">Active</span>
 										@else
-										<span class="badge bg-soft-warning text-warning rounded-pill">Inactive</span>
+										<span class="badge bg-warning rounded-pill py-2">Inactive</span>
 										@endif
 									</div>
 
-									<div class="mb-3">
-										<div class="d-flex align-items-center mb-1">
+									<div class="mb-3 pb-3 border-bottom">
+										<div class="d-flex align-items-center mb-2">
 											<i class="text-muted me-2" data-feather="mail" width="14"></i>
 											<a href="mailto:{{ $user->email }}"
 												class="text-decoration-none text-dark small search-email">{{
@@ -389,7 +399,7 @@
 
 									<div class="row g-2 mb-3">
 										<div class="col-6">
-											<div class="p-2 bg-light rounded text-center">
+											<div class="p-3 bg-light rounded-3 text-center">
 												<small class="d-block text-uppercase text-muted fw-bold"
 													style="font-size: 10px;">Wallet</small>
 												@if($user->wallet_verify)
@@ -402,7 +412,7 @@
 											</div>
 										</div>
 										<div class="col-6">
-											<div class="p-2 bg-light rounded text-center">
+											<div class="p-3 bg-light rounded-3 text-center">
 												<small class="d-block text-uppercase text-muted fw-bold"
 													style="font-size: 10px;">KYC</small>
 												@if($user->id_card_status == '1')
@@ -418,15 +428,19 @@
 
 									<div class="d-grid gap-2 d-flex">
 										<a href="{{ url('profile/' . $user->id) }}"
-											class="btn btn-primary btn-sm flex-fill rounded-pill">
-											View Profile
+											class="btn btn-primary btn-sm rounded-pill fw-bold">
+											<i class="align-middle me-1" data-feather="eye"></i> View Profile
 										</a>
 										<a href="{{ url('delete/' . $user->id) }}"
-											class="btn btn-outline-danger btn-sm flex-fill rounded-pill"
+											class="btn btn-danger btn-sm rounded-pill fw-bold"
 											onclick="return confirm('Are you sure?')">
-											Delete
+											<i class="align-middle me-1" data-feather="trash-2"></i> Delete
 										</a>
 									</div>
+								</div>
+								<div class="card-footer bg-light border-0 p-2 text-center">
+									<small class="text-muted">Registered {{ $user->created_at->format('M d, Y')
+										}}</small>
 								</div>
 							</div>
 						</div>
@@ -439,7 +453,7 @@
 				</div>
 
 				<!-- Horizontal Pagination -->
-				<div class="card-footer bg-white py-3 border-top">
+				<div class="card-footer bg-light border-top p-4">
 					@include('admin.partials.pagination', ['paginator' => $users, 'label' => 'users'])
 				</div>
 			</div>
@@ -448,66 +462,224 @@
 </main>
 
 <style>
-	/* Custom Styles for Modern Look */
+	/* Modern Color Palette */
+	:root {
+		--primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		--success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+		--info-gradient: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+		--warning-gradient: linear-gradient(135deg, #FA709A 0%, #FEE140 100%);
+	}
+
+	/* Page Header */
+	.page-header {
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		padding-bottom: 1.5rem;
+	}
+
+	/* Gradient Background for Headers */
+	.bg-gradient {
+		background: var(--primary-gradient) !important;
+		color: white;
+	}
+
+	.card-header.bg-gradient {
+		border-radius: 0.5rem 0.5rem 0 0 !important;
+	}
+
+	/* Modern Gradients */
 	.bg-gradient-primary {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: var(--primary-gradient) !important;
 	}
 
-	.bg-soft-primary {
-		background-color: rgba(102, 126, 234, 0.1);
+	.bg-gradient-success {
+		background: var(--success-gradient) !important;
 	}
 
-	.bg-soft-success {
-		background-color: rgba(40, 167, 69, 0.1);
+	.bg-gradient-info {
+		background: var(--info-gradient) !important;
 	}
 
-	.bg-soft-warning {
-		background-color: rgba(255, 193, 7, 0.1);
+	.bg-gradient-warning {
+		background: var(--warning-gradient) !important;
 	}
 
-	.bg-soft-danger {
-		background-color: rgba(220, 53, 69, 0.1);
-	}
-
-	.bg-soft-info {
-		background-color: rgba(23, 162, 184, 0.1);
-	}
-
-	/* Card & Stats Improvements */
+	/* Stats Cards */
 	.stat-card {
-		transition: all 0.3s ease;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		position: relative;
+		overflow: hidden;
 	}
 
 	.stat-card:hover {
-		transform: translateY(-5px);
-		box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
+		transform: translateY(-8px);
+		box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+	}
+
+	.stat-card-bar {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 4px;
+		width: 100%;
 	}
 
 	.icon-shape {
-		width: 48px;
-		height: 48px;
+		width: 56px;
+		height: 56px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		border-radius: 12px;
+		font-size: 24px;
 	}
 
+	/* Modern Card Styles */
+	.card {
+		transition: all 0.3s ease;
+	}
+
+	.modern-card {
+		transition: all 0.3s ease;
+	}
+
+	.modern-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+	}
+
+	/* Table Styling */
+	.modern-table {
+		border-collapse: collapse;
+	}
+
+	.modern-table tbody tr {
+		transition: all 0.2s ease;
+	}
+
+	.modern-table tbody tr:hover {
+		background-color: rgba(102, 126, 234, 0.05) !important;
+	}
+
+	.modern-table thead {
+		background-color: #f8f9fa !important;
+	}
+
+	.modern-table thead th {
+		border-top: none !important;
+		border-bottom: 2px solid #e9ecef !important;
+	}
+
+	/* Badge Styles */
+	.badge {
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		padding: 0.4rem 0.8rem !important;
+		transition: all 0.2s ease;
+	}
+
+	.badge:hover {
+		transform: translateY(-2px);
+	}
+
+	/* Button Styles */
+	.btn {
+		transition: all 0.3s ease;
+		font-weight: 500;
+	}
+
+	.btn-primary {
+		background: var(--primary-gradient) !important;
+		border: none;
+	}
+
+	.btn-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4) !important;
+	}
+
+	.btn-success {
+		background: var(--success-gradient) !important;
+		border: none;
+	}
+
+	.btn-danger {
+		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+		border: none;
+	}
+
+	.btn-danger:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4) !important;
+	}
+
+	/* Quick Search Wrap */
 	.quick-search-wrap {
 		min-width: 240px;
-		max-width: 360px;
+		max-width: 380px;
+		transition: all 0.3s ease;
 	}
 
+	.quick-search-wrap input {
+		transition: all 0.3s ease;
+		font-weight: 500;
+	}
+
+	.quick-search-wrap input:focus {
+		box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+		transform: translateY(-2px);
+	}
+
+	/* Filter Section */
+	.card-header.bg-gradient~.card-body {
+		padding: 2rem 2rem;
+	}
+
+	/* Input Groups */
+	.input-group-lg .form-control,
+	.input-group-lg .form-select {
+		padding: 0.75rem 1rem;
+		font-size: 0.95rem;
+		border-radius: 0.5rem;
+	}
+
+	.form-control:focus,
+	.form-select:focus {
+		border-color: #667eea;
+		box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+	}
+
+	/* Light Subtle Background */
+	.bg-light-subtle {
+		background-color: #f8f9fa !important;
+	}
+
+	/* Responsive Design */
 	@media (min-width: 992px) {
 		#filtersCollapse {
 			display: block !important;
 			height: auto !important;
 			visibility: visible !important;
 		}
+
+		.quick-search-wrap {
+			max-width: 320px;
+		}
+
+		.w-lg-auto {
+			width: auto !important;
+		}
 	}
 
-	/* Laptop & Mobile Adjustments */
 	@media (max-width: 1199.98px) {
 		.page-actions .btn {
 			flex: 1 1 auto;
+		}
+
+		.quick-search-wrap {
+			max-width: 100%;
 		}
 	}
 
@@ -524,6 +696,50 @@
 		.btn[title="Refresh"] {
 			min-width: 44px;
 		}
+
+		.icon-shape {
+			width: 48px;
+			height: 48px;
+			font-size: 20px;
+		}
+
+		.stat-card:hover {
+			transform: translateY(-4px);
+		}
+
+		.modern-card:hover {
+			transform: translateY(-2px);
+		}
+
+		.btn-group {
+			width: 100%;
+		}
+
+		.btn-group .btn {
+			flex: 1;
+		}
+	}
+
+	/* Animation */
+	@keyframes slideInUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.card {
+		animation: slideInUp 0.5s ease-out;
+	}
+
+	/* Card Footer */
+	.card-footer {
+		border-top: 1px solid rgba(0, 0, 0, 0.05);
 	}
 </style>
 
