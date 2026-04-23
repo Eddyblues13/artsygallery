@@ -215,7 +215,7 @@
             </div>
         </div>
 
-        <div class="card transaction-card">
+        <div class="card transaction-card" id="user-transactions-results" data-ajax-container>
 
             @if($transaction->isEmpty())
             <div class="text-center py-5">
@@ -333,7 +333,7 @@
 
             <!-- Pagination -->
             <div class="p-3 border-top">
-                {{ $transaction->links('pagination::bootstrap-4') }}
+                @include('dashboard.partials.pagination', ['paginator' => $transaction, 'label' => 'transactions'])
             </div>
             @endif
         </div>

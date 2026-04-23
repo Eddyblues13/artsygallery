@@ -241,9 +241,10 @@
             </div>
         </div>
 
+        <div id="admin-market-results" data-ajax-container>
         <div class="card mb-4">
             <div class="card-body">
-                <form method="GET" action="{{ route('admin.buy.nft') }}" class="row g-3 align-items-end">
+            <form method="GET" action="{{ route('admin.buy.nft') }}" class="row g-3 align-items-end" data-ajax-filter="#admin-market-results">
                     <div class="col-md-8 col-lg-6">
                         <label for="buyer_user_id" class="form-label">Buy As User Account</label>
                         <select id="buyer_user_id" name="buyer_user_id" class="form-select">
@@ -344,6 +345,7 @@
             <p class="text-muted">Check back later for new listings</p>
         </div>
         @endif
+        </div>
     </div>
 </main>
 

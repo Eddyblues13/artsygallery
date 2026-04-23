@@ -58,13 +58,13 @@
                     <div
                         class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                         <div class="card-title mb-0">NFT List</div>
-                        <form method="GET" action="{{ url('search-nft') }}" class="d-flex w-100 w-md-auto">
+                        <form method="GET" action="{{ url('search-nft') }}" class="d-flex w-100 w-md-auto" data-ajax-filter="#admin-approve-nft-results">
                             <input type="text" name="search" class="form-control me-2" placeholder="Search..."
                                 value="{{ request()->get('search') }}">
                             <button type="submit" class="btn btn-primary">Search</button>
                         </form>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" id="admin-approve-nft-results" data-ajax-container>
                         <!-- Desktop Table View -->
                         <div class="table-responsive d-none d-md-block">
                             <table class="table table-bordered table-hover align-middle">
@@ -233,7 +233,7 @@
 
 <script>
     $(document).ready(function() {
-    $('.approve-nft-form').on('submit', function(e) {
+    $(document).on('submit', '.approve-nft-form', function(e) {
         e.preventDefault();
         var form = $(this);
         var url = form.data('url');

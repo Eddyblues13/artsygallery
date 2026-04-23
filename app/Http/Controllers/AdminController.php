@@ -266,12 +266,14 @@ class AdminController extends Controller
             ->select('users.email', 'users.name as user_name', 'nfts.*');
 
         // Apply search filters if provided
-        if ($request->has('search')) {
-            $search = $request->input('search');
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
             $query->where(function ($q) use ($search) {
-                $q->where('nfts.name', 'like', '%' . $search . '%')
+                $q->where('nfts.ntf_name', 'like', '%' . $search . '%')
                     ->orWhere('nfts.ntf_owner', 'like', '%' . $search . '%')
                     ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
+                    ->orWhere('users.name', 'like', '%' . $search . '%')
+                    ->orWhere('users.email', 'like', '%' . $search . '%')
                     ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
             });
         }
@@ -290,12 +292,14 @@ class AdminController extends Controller
             ->select('users.email', 'users.name as user_name', 'nfts.*');
 
         // Apply search filters if provided
-        if ($request->has('search')) {
-            $search = $request->input('search');
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->where('nfts.ntf_name', 'like', '%' . $search . '%')
                     ->orWhere('nfts.ntf_owner', 'like', '%' . $search . '%')
                     ->orWhere('nfts.ntf_description', 'like', '%' . $search . '%')
+                    ->orWhere('users.name', 'like', '%' . $search . '%')
+                    ->orWhere('users.email', 'like', '%' . $search . '%')
                     ->orWhere('nfts.created_at', 'like', '%' . $search . '%');
             });
         }

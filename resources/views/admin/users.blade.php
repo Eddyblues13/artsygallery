@@ -128,7 +128,7 @@
 					<h5 class="card-title mb-0 text-primary fw-bold">Advanced Filtering</h5>
 				</div>
 				<div class="card-body">
-					<form method="GET" action="{{ route('view.users') }}" class="row g-3">
+					<form method="GET" action="{{ route('view.users') }}" class="row g-3" data-ajax-filter="#admin-users-results">
 						<div class="col-12 col-md-6 col-lg-3">
 							<label for="search" class="form-label small text-uppercase fw-bold text-muted">Global
 								Search</label>
@@ -182,7 +182,7 @@
 						<div class="col-12 d-flex justify-content-end gap-2 mt-4">
 							@if(request()->hasAny(['search', 'status', 'wallet_verify', 'kyc_status', 'date_from',
 							'date_to']))
-							<a href="{{ route('view.users') }}" class="btn btn-light text-muted">
+							<a href="{{ route('view.users') }}" class="btn btn-light text-muted" data-ajax-filter-link="#admin-users-results">
 								<i class="align-middle me-1" data-feather="x"></i> Clear
 							</a>
 							@endif
@@ -196,7 +196,7 @@
 		</div>
 
 		<!-- Users List Card -->
-		<div class="card shadow-sm border-0">
+		<div class="card shadow-sm border-0" id="admin-users-results" data-ajax-container>
 			<div
 				class="card-header bg-white py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
 				<h5 class="card-title mb-0 fw-bold">Users List</h5>
@@ -537,12 +537,12 @@
 
 		// Instant JS Filter (Enhanced to search EVERYTHING)
 		const searchInput = document.getElementById('instantSearch');
-		const tableRows = document.querySelectorAll('#usersTable tbody tr.user-row');
-		const mobileItems = document.querySelectorAll('#mobileUserList .user-item');
 
 		if(searchInput) {
 			searchInput.addEventListener('keyup', function() {
 				const query = this.value.toLowerCase().trim();
+					const tableRows = document.querySelectorAll('#usersTable tbody tr.user-row');
+					const mobileItems = document.querySelectorAll('#mobileUserList .user-item');
 				
 				// Filter Table Rows
 				if(tableRows.length > 0) {

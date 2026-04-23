@@ -63,7 +63,7 @@
         <div class="collapse d-md-block mb-4" id="filtersCollapse">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('users.uploaded.nft') }}" class="row g-3">
+                    <form method="GET" action="{{ route('users.uploaded.nft') }}" class="row g-3" data-ajax-filter="#admin-all-nft-results">
                         <div class="col-md-4">
                             <label class="form-label small text-muted">Search / Key Words</label>
                             <div class="input-group">
@@ -95,7 +95,7 @@
                         <div class="col-md-2 d-flex align-items-end gap-2">
                             <button type="submit" class="btn btn-primary w-100">Filter</button>
                             @if(request()->hasAny(['search', 'status', 'price_min', 'price_max']))
-                            <a href="{{ route('users.uploaded.nft') }}" class="btn btn-light w-100" title="Clear">
+                            <a href="{{ route('users.uploaded.nft') }}" class="btn btn-light w-100" title="Clear" data-ajax-filter-link="#admin-all-nft-results">
                                 <i data-feather="x"></i>
                             </a>
                             @endif
@@ -106,7 +106,7 @@
         </div>
 
         <!-- Main Content Card -->
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm" id="admin-all-nft-results" data-ajax-container>
             <div class="card-header bg-white py-3">
                 <h5 class="card-title mb-0">Artwork List</h5>
             </div>

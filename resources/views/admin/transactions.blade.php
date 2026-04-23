@@ -110,7 +110,7 @@
 		<div class="collapse mb-4" id="filtersCollapse">
 			<div class="card">
 				<div class="card-body">
-					<form method="GET" action="{{ route('user.transaction') }}" class="row g-3">
+					<form method="GET" action="{{ route('user.transaction') }}" class="row g-3" data-ajax-filter="#admin-transactions-results">
 						<div class="col-md-3">
 							<label for="search" class="form-label">Search</label>
 							<input type="text" class="form-control" id="search" name="search"
@@ -155,7 +155,7 @@
 						</div>
 						@if(request()->hasAny(['search', 'type', 'status', 'date_from', 'date_to']))
 						<div class="col-12">
-							<a href="{{ route('user.transaction') }}" class="btn btn-outline-secondary btn-sm">
+							<a href="{{ route('user.transaction') }}" class="btn btn-outline-secondary btn-sm" data-ajax-filter-link="#admin-transactions-results">
 								<i class="align-middle" data-feather="x"></i> Clear Filters
 							</a>
 						</div>
@@ -166,7 +166,7 @@
 		</div>
 
 		<!-- Transactions Table -->
-		<div class="row">
+		<div class="row" id="admin-transactions-results" data-ajax-container>
 			<div class="col-12">
 				<div class="card">
 					<div class="card-header">

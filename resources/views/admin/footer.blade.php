@@ -58,6 +58,7 @@
 
     <!-- Main Js Required -->
     <script src="{{asset('admin/assets/js/main.js')}}"></script>
+    <script src="{{ asset('js/ajax-filters.js') }}"></script>
   </body>
 
 </html>

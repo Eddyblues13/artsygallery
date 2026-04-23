@@ -332,6 +332,7 @@
             </div>
         </div>
 
+        <div id="user-market-results" data-ajax-container>
         @if($buy_nft->count() > 0)
         <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-sm-4">
             @foreach($buy_nft as $nft)
@@ -401,7 +402,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $buy_nft->links('pagination::bootstrap-4') }}
+            @include('dashboard.partials.pagination', ['paginator' => $buy_nft, 'label' => 'artworks'])
         </div>
         @else
         <div class="text-center py-5">
@@ -410,6 +411,7 @@
             <p class="text-muted">Check back later for new listings</p>
         </div>
         @endif
+        </div>
     </div>
 </main>
 

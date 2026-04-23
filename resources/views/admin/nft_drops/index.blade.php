@@ -22,6 +22,7 @@
 <!-- Main header ends -->
 
 <!-- Row start -->
+<div id="admin-nft-drops-results" data-ajax-container>
 <div class="row gx-3">
     @foreach($buy_nft as $my_nft)
 
@@ -91,6 +92,7 @@
 <!-- Pagination -->
 <div class="mt-3">
     @include('admin.partials.pagination', ['paginator' => $buy_nft, 'label' => 'drops'])
+</div>
 </div>
 @endsection
 
