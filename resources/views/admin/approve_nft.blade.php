@@ -17,6 +17,39 @@
     .btn-processing {
         cursor: not-allowed;
     }
+
+    /* Smart Live Search Styles */
+    #admin-approve-nft-results.searching {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    #admin-approve-nft-results.searching::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        z-index: 1000;
+    }
+
+    @keyframes spin {
+        to {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
+
+    /* Search input glow */
+    form[data-ajax-filter] input[name="search"]:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 0.3rem rgba(102, 126, 234, 0.25) !important;
+    }
 </style>
 
 <!-- Content wrapper scroll start -->

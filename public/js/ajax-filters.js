@@ -15,8 +15,13 @@
 
     function setLoading(target, isLoading) {
         if (!target) return;
-        target.style.opacity = isLoading ? '0.55' : '1';
+        target.style.opacity = isLoading ? '0.7' : '1';
         target.style.pointerEvents = isLoading ? 'none' : 'auto';
+        if (isLoading) {
+            target.classList.add('searching');
+        } else {
+            target.classList.remove('searching');
+        }
     }
 
     function loadIntoTarget(url, targetSelector, pushState) {
@@ -70,6 +75,46 @@
     function formTargetSelector(form) {
         return form.getAttribute('data-ajax-filter');
     }
+
+    // Live search on text input with debounce
+    function setupLiveSearch() {
+        var forms = document.querySelectorAll('form[data-ajax-filter]');
+        forms.forEach(function (form) {
+            if (form.dataset.liveSearchBound === '1') return;
+            form.dataset.liveSearchBound = '1';
+
+            var searchInput = form.querySelector('input[name="search"]');
+            if (!searchInput) return;
+
+            var debounceTimer = null;
+            var submitOnChange = function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function () {
+                    if (searchInput.value.trim() || form.querySelector('select').value || form.querySelector('input[type="date"]')) {
+                        form.requestSubmit();
+                    }
+                }, 150); // Very responsive - 150ms
+            };
+
+            searchInput.addEventListener('input', submitOnChange);
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    clearTimeout(debounceTimer);
+                    form.requestSubmit();
+                }
+            });
+
+            // Also auto-submit on select/date changes
+            form.querySelectorAll('select, input[type="date"], input[type="number"]').forEach(function (el) {
+                el.addEventListener('change', function () {
+                    form.requestSubmit();
+                });
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', setupLiveSearch);
+    document.addEventListener('ajax:content-updated', setupLiveSearch);
 
     document.addEventListener('submit', function (event) {
         var form = event.target.closest('form[data-ajax-filter]');

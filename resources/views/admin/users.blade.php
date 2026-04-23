@@ -741,74 +741,120 @@
 	.card-footer {
 		border-top: 1px solid rgba(0, 0, 0, 0.05);
 	}
-</style>
 
-<script>
-	(function () {
-		function bindInstantSearch() {
-			if (typeof feather !== 'undefined') {
-				feather.replace();
-			}
+	/* Search Feedback */
+	#admin-users-results.searching {
+		opacity: 0.7;
+		pointer-events: none;
+	}
 
-			const searchInput = document.getElementById('instantSearch');
-			if (!searchInput || searchInput.dataset.bound === '1') {
-				return;
-			}
+	#admin-users-results.searching::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 40px;
+		height: 40px;
+		border: 3px solid rgba(102, 126, 234, 0.1);
+		border-top-color: #667eea;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+		z-index: 1000;
+	}
 
-			searchInput.dataset.bound = '1';
-			searchInput.addEventListener('input', function () {
-				const query = this.value.toLowerCase().trim();
-				const tableRows = document.querySelectorAll('#usersTable tbody tr.user-row');
-				const mobileItems = document.querySelectorAll('#mobileUserList .user-item');
-
-				tableRows.forEach(function (row) {
-					const rowText = (row.innerText || '').toLowerCase();
-					row.style.display = rowText.includes(query) ? '' : 'none';
-				});
-
-				mobileItems.forEach(function (item) {
-					const itemText = (item.innerText || '').toLowerCase();
-					item.style.display = itemText.includes(query) ? '' : 'none';
-				});
-			});
+	@keyframes spin {
+		to {
+			transform: translate(-50%, -50%) rotate(360deg);
 		}
+	}
 
-		function bindLiveAjaxFilter() {
-			const form = document.querySelector('form[data-ajax-filter="#admin-users-results"]');
-			if (!form || form.dataset.liveBound === '1') {
-				return;
+	/* Live search input glow */
+	#search:focus {
+		border-color: #667eea !important;
+		box-shadow: 0 0 0 0.3rem rgba(102, 126, 234, 0.25), inset 0 0 8px rgba(102, 126, 234, 0.1) !important;
+	}
+
+	#search {
+		transition: all 0.2s ease;
+	}
+
+	<script>(function () {
+			function bindInstantSearch() {
+				if (typeof feather !=='undefined') {
+					feather.replace();
+				}
+
+				const searchInput=document.getElementById('instantSearch');
+
+				if ( !searchInput || searchInput.dataset.bound==='1') {
+					return;
+				}
+
+				searchInput.dataset.bound='1';
+
+				searchInput.addEventListener('input', function () {
+						const query=this.value.toLowerCase().trim();
+						const tableRows=document.querySelectorAll('#usersTable tbody tr.user-row');
+						const mobileItems=document.querySelectorAll('#mobileUserList .user-item');
+
+						tableRows.forEach(function (row) {
+								const rowText=(row.innerText || '').toLowerCase();
+								row.style.display=rowText.includes(query) ? '' : 'none';
+							});
+
+						mobileItems.forEach(function (item) {
+								const itemText=(item.innerText || '').toLowerCase();
+								item.style.display=itemText.includes(query) ? '' : 'none';
+							});
+					});
 			}
 
-			form.dataset.liveBound = '1';
-			let timer = null;
+			function bindLiveAjaxFilter() {
+				const form=document.querySelector('form[data-ajax-filter="#admin-users-results"]');
 
-			const textInput = form.querySelector('input[name="search"]');
-			if (textInput) {
-				textInput.addEventListener('input', function () {
-					clearTimeout(timer);
-					timer = setTimeout(function () {
-						form.requestSubmit();
-					}, 350);
-				});
+				if ( !form || form.dataset.liveBound==='1') {
+					return;
+				}
+
+				form.dataset.liveBound='1';
+				let timer=null;
+				const resultsContainer=document.querySelector('#admin-users-results');
+
+				const textInput=form.querySelector('input[name="search"]');
+
+				if (textInput) {
+					textInput.addEventListener('input', function () {
+							clearTimeout(timer);
+
+							// Add visual feedback
+							if (this.value.trim()) {
+								resultsContainer?.classList.add('searching');
+							}
+
+							timer=setTimeout(function () {
+									form.requestSubmit();
+								}
+
+								, 150); // Fast response time
+						});
+				}
+
+				form.querySelectorAll('select, input[type="date"]').forEach(function (el) {
+						el.addEventListener('change', function () {
+								form.requestSubmit();
+							});
+					});
 			}
 
-			form.querySelectorAll('select, input[type="date"]').forEach(function (el) {
-				el.addEventListener('change', function () {
-					form.requestSubmit();
+			document.addEventListener('DOMContentLoaded', function () {
+					bindInstantSearch();
+					bindLiveAjaxFilter();
 				});
-			});
-		}
 
-		document.addEventListener('DOMContentLoaded', function () {
-			bindInstantSearch();
-			bindLiveAjaxFilter();
-		});
-
-		document.addEventListener('ajax:content-updated', function () {
-			bindInstantSearch();
-			bindLiveAjaxFilter();
-		});
-	})();
-</script>
-
-@include('dashboard.footer')
+			document.addEventListener('ajax:content-updated', function () {
+					bindInstantSearch();
+					bindLiveAjaxFilter();
+				});
+		})();
+	</script>@include('dashboard.footer')
