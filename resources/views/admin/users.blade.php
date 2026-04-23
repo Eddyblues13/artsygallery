@@ -2,7 +2,8 @@
 
 <main class="content">
 	<div class="container-fluid p-0">
-		<div class="d-flex justify-content-between align-items-center mb-4">
+		<div
+			class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
 			<div>
 				<h1 class="h3 mb-1 text-gray-800">
 					<strong>All Users</strong>
@@ -14,7 +15,7 @@
 					</ol>
 				</nav>
 			</div>
-			<div class="d-flex gap-2">
+			<div class="d-flex gap-2 w-100 w-md-auto">
 				<a href="{{ route('view.users') }}" class="btn btn-outline-secondary" title="Refresh">
 					<i class="align-middle" data-feather="refresh-cw"></i>
 				</a>
@@ -204,7 +205,7 @@
 				<h5 class="card-title mb-0 fw-bold">Users List</h5>
 
 				<!-- Instant JS Search -->
-				<div class="position-relative" style="min-width: 250px;">
+				<div class="position-relative w-100" style="min-width: 250px; max-width: 320px;">
 					<input type="text" id="instantSearch" class="form-control ps-5 rounded-pill bg-light border-0"
 						placeholder="Quick find on this page...">
 					<div class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
@@ -485,53 +486,21 @@
 		justify-content: center;
 	}
 
-	/* Horizontal Pagination Styling */
-	.pagination-container .pagination {
-		margin-bottom: 0;
-		display: flex;
-		flex-direction: row;
-		/* Force horizontal */
-		justify-content: center;
-		gap: 5px;
-	}
-
-	.pagination-container .page-item .page-link {
-		border-radius: 50%;
-		/* Circular buttons */
-		width: 36px;
-		height: 36px;
-		padding: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #6c757d;
-		border: 1px solid #dee2e6;
-		margin: 0;
-		transition: all 0.2s;
-	}
-
-	.pagination-container .page-item.active .page-link {
-		background-color: #667eea;
-		border-color: #667eea;
-		color: white;
-		box-shadow: 0 2px 5px rgba(102, 126, 234, 0.4);
-	}
-
-	.pagination-container .page-item .page-link:hover:not(.active) {
-		background-color: #e9ecef;
-		color: #495057;
-	}
-
 	/* Mobile Adjustments */
 	@media (max-width: 768px) {
-		.pagination-container .pagination {
-			flex-wrap: wrap;
+		#instantSearch {
+			font-size: 0.9rem;
+		}
+
+		.btn[title="Refresh"] {
+			min-width: 44px;
 		}
 	}
 </style>
 
 <script>
-	document.addEventListener('DOMContentLoaded', function() {
+	(function () {
+	function bindInstantSearch() {
 		// Initialize Feather Icons
 		if (typeof feather !== 'undefined') {
 			feather.replace();
@@ -539,12 +508,16 @@
 
 		// Instant JS Filter (Enhanced to search EVERYTHING)
 		const searchInput = document.getElementById('instantSearch');
+		if (!searchInput || searchInput.dataset.bound === '1') {
+			return;
+		}
 
-		if(searchInput) {
-			searchInput.addEventListener('keyup', function() {
+		searchInput.dataset.bound = '1';
+
+		searchInput.addEventListener('input', function() {
 				const query = this.value.toLowerCase().trim();
-					const tableRows = document.querySelectorAll('#usersTable tbody tr.user-row');
-					const mobileItems = document.querySelectorAll('#mobileUserList .user-item');
+				const tableRows = document.querySelectorAll('#usersTable tbody tr.user-row');
+				const mobileItems = document.querySelectorAll('#mobileUserList .user-item');
 				
 				// Filter Table Rows
 				if(tableRows.length > 0) {
@@ -574,8 +547,11 @@
 					});
 				}
 			});
-		}
-	});
+	}
+
+	document.addEventListener('DOMContentLoaded', bindInstantSearch);
+	document.addEventListener('ajax:content-updated', bindInstantSearch);
+	})();
 </script>
 
 @include('dashboard.footer')
