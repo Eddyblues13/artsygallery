@@ -334,7 +334,7 @@
 
         <div id="user-market-results" data-ajax-container>
             @if($buy_nft->count() > 0)
-            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-sm-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-sm-4">
                 @foreach($buy_nft as $nft)
                 <div class="col">
                     <div class="nft-card">
@@ -370,24 +370,11 @@
 
                             <div class="nft-meta">
                                 <div class="seller-info">
-                                    @if($nft->user && $nft->user->profile_picture)
-                                    <img src="{{ $nft->user->profile_picture }}" alt="{{ $nft->user->name }}"
-                                        style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
-                                    @else
-                                    <i class="align-middle" data-feather="user" style="width: 16px; height: 16px;"></i>
-                                    @endif
-                                    <a href="{{ route('seller.profile', $nft->user_id) }}"
-                                        style="text-decoration: none; color: #495057; font-weight: 500;"
-                                        title="View seller profile">
-                                        {{ $nft->user->name ?? $nft->ntf_owner ?? 'Unknown' }}
-                                    </a>
-                                    @if($nft->user && $nft->user->country)
-                                    <span class="badge bg-secondary ms-2">{{ $nft->user->country }}</span>
-                                    @endif
-                                </div>
-                                <div class="views-count">
-                                    <i class="align-middle" data-feather="eye" style="width: 16px; height: 16px;"></i>
-                                    <span>{{ number_format(100 + ($loop->index * 20)) }}</span>
+                                    <div class="views-count">
+                                        <i class="align-middle" data-feather="eye"
+                                            style="width: 16px; height: 16px;"></i>
+                                        <span>{{ number_format(100 + ($loop->index * 20)) }}</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -397,22 +384,21 @@
                             </a>
                         </div>
                     </div>
+                    @endforeach
                 </div>
-                @endforeach
-            </div>
 
-            <div class="pagination-wrapper">
-                @include('dashboard.partials.pagination', ['paginator' => $buy_nft, 'label' => 'artworks'])
+                <div class="pagination-wrapper">
+                    @include('dashboard.partials.pagination', ['paginator' => $buy_nft, 'label' => 'artworks'])
+                </div>
+                @else
+                <div class="text-center py-5">
+                    <i class="align-middle" data-feather="inbox" style="width: 64px; height: 64px; color: #ccc;"></i>
+                    <h3 class="mt-3 text-muted">No NFTs Available</h3>
+                    <p class="text-muted">Check back later for new listings</p>
+                </div>
+                @endif
             </div>
-            @else
-            <div class="text-center py-5">
-                <i class="align-middle" data-feather="inbox" style="width: 64px; height: 64px; color: #ccc;"></i>
-                <h3 class="mt-3 text-muted">No NFTs Available</h3>
-                <p class="text-muted">Check back later for new listings</p>
-            </div>
-            @endif
         </div>
-    </div>
 </main>
 
 @include('dashboard.footer')
