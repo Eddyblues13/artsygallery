@@ -100,7 +100,7 @@
 
     .nft-meta {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         padding: 0.75rem 0;
         border-top: 1px solid #f0f0f0;
@@ -308,10 +308,6 @@
                                 onerror="this.src='https://via.placeholder.com/400?text=NFT+Image'">
                         </div>
 
-                        <div class="nft-card-header">
-                            <h5 class="nft-card-title">{{ $nft->ntf_name }}</h5>
-                        </div>
-
                         <div class="nft-card-body">
                             <div class="nft-price-section">
                                 <div class="price-item">
@@ -334,24 +330,6 @@
                             </div>
 
                             <div class="nft-meta">
-                                <div class="seller-info">
-                                    @if($nft->user && $nft->user->profile_picture)
-                                    <img src="{{ $nft->user->profile_picture }}" alt="{{ $nft->user->name }}"
-                                        style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
-                                    @else
-                                    <i class="align-middle" data-feather="user" style="width: 16px; height: 16px;"></i>
-                                    @endif
-                                    @if($nft->user)
-                                    <a href="{{ url('profile/' . $nft->user->id) }}"
-                                        style="text-decoration: none; color: #495057; font-weight: 500;"
-                                        title="View seller profile">
-                                        {{ $nft->user->name ?? $nft->ntf_owner ?? 'Unknown' }}
-                                    </a>
-                                    @else
-                                    <span style="color: #495057; font-weight: 500;">{{ $nft->ntf_owner ?? 'Unknown'
-                                        }}</span>
-                                    @endif
-                                </div>
                                 <div class="views-count">
                                     <i class="align-middle" data-feather="eye" style="width: 16px; height: 16px;"></i>
                                     <span>{{ number_format(100 + ($loop->index * 20)) }}</span>
