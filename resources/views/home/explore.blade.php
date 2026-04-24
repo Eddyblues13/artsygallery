@@ -109,6 +109,11 @@
                 </div>
 
                 <div class="p-4 flex flex-col flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-purple-500 flex-shrink-0">
+                        </div>
+                        <p class="text-xs font-medium text-slate-500 truncate">{{ $nft->ntf_owner }}</p>
+                    </div>
                     <h3 class="font-bold text-slate-900 text-sm truncate leading-tight mb-1">{{ $nft->ntf_name }}</h3>
                     @if($nft->ntf_description)
                     <p class="text-xs text-slate-400 truncate mb-2">{{ Str::limit($nft->ntf_description, 60) }}</p>

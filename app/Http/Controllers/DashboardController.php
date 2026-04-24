@@ -269,25 +269,6 @@ class DashboardController extends Controller
 
         $withdrawal->save();
 
-        try {
-            $user = Auth::user();
-            $newBalance = max(0, $balance - $request->input('amount'));
-            $emailData = [
-                'name' => $user->name,
-                'amount_formatted' => \App\Helpers\CurrencyHelper::format($request->input('amount'), 2),
-                'eth_amount' => \App\Helpers\CurrencyHelper::formatEth($request->input('amount')),
-                'method' => strtoupper($linkedMethod->crypto_type ?? 'ETH'),
-                'reference' => $reference,
-                'balance_formatted' => \App\Helpers\CurrencyHelper::format($newBalance, 2),
-                'balance_eth' => \App\Helpers\CurrencyHelper::formatEth($newBalance),
-                'date' => now()->format('M d, Y h:i A'),
-            ];
-
-            Mail::to($user->email)->send(new WithdrawalPendingMail($emailData));
-        } catch (\Exception $e) {
-            Log::error('Withdrawal pending email failed: ' . $e->getMessage());
-        }
-
         return redirect()
             ->route('withdrawal')
             ->with('success', 'Your withdrawal request has been submitted and is pending review.');
