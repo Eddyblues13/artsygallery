@@ -136,8 +136,10 @@ Route::middleware('admin.auth')->group(function () {
     Route::post('admin_update_whatsapp', [AdminController::class, 'updateWhatsapp'])->name('admin.save.whatsapp');
     Route::post('transfer', [AdminController::class, 'transferFunds'])->name('transfer-fund');
     Route::post('reflection-pin', [AdminController::class, 'reflectionPin'])->name('reflection');
+    Route::get('admin/profile/{id}/', [AdminController::class, 'userProfile'])->name('admin.user.profile');
     Route::get('/profile/{id}/', [AdminController::class, 'userProfile']);
     Route::post('/admin-upload-profile-picture/{id}', [AdminController::class, 'adminUpdateProfilePicture'])->name('admin.upload.profile.picture');
+    Route::get('admin/delete/{id}', [AdminController::class, 'deleteUser'])->name('admin.user.delete');
     Route::get('/delete/{id}', [AdminController::class, 'deleteUser']);
     Route::get('admin-change-password', [AdminController::class, 'adminChangePassword'])->name('admin.change.password');
     Route::post('admin-change-password', [AdminController::class, 'adminUpdatePassword'])->name('admin.update.password');
