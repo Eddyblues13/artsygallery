@@ -622,7 +622,7 @@ class AdminController extends Controller
                 );
                 Mail::to($user->email)->send(new DepositApproved($emailData));
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Deposit approved email failed: ' . $e->getMessage());
         }
 
@@ -651,7 +651,7 @@ class AdminController extends Controller
                 );
                 Mail::to($user->email)->send(new DepositDeclined($emailData));
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Deposit declined email failed: ' . $e->getMessage());
         }
 
@@ -1143,7 +1143,7 @@ class AdminController extends Controller
                 );
                 Mail::to($user->email)->send(new profitEmail($emailData));
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Profit email failed: ' . $e->getMessage());
         }
 
@@ -1173,13 +1173,38 @@ class AdminController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        $transaction = new Transaction;
-        $transaction->user_id = $request->id;
-        $transaction->transaction_type = "DebitProfit";
-        $transaction->transaction_amount = $request->amount;
-        $transaction->transaction_id = 'DEBIT_' . time() . '_' . rand(1000, 9999);
-        $transaction->status = 1;
-        $transaction->save();
+        try {
+            $user = User::find($request->id);
+
+            if (!$user) {
+                return back()->with('error', 'User not found.');
+            }
+
+            $availableProfit = Transaction::where('user_id', $user->id)
+                ->where('transaction_type', 'Profit')
+                ->where('status', '1')
+                ->sum('transaction_amount')
+                - Transaction::where('user_id', $user->id)
+                ->where('transaction_type', 'DebitProfit')
+                ->where('status', '1')
+                ->sum('transaction_amount');
+
+            if ((float) $request->amount > max(0, (float) $availableProfit)) {
+                return back()->with('error', 'Debit amount exceeds the user\'s available profit balance.');
+            }
+
+            $transaction = new Transaction;
+            $transaction->user_id = $user->id;
+            $transaction->transaction_type = "DebitProfit";
+            $transaction->transaction_amount = $request->amount;
+            $transaction->transaction_id = 'DEBIT_' . time() . '_' . rand(1000, 9999);
+            $transaction->status = 1;
+            $transaction->save();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Debit profit failed: ' . $e->getMessage());
+
+            return back()->with('error', 'Unable to debit profit right now. Please try again.');
+        }
 
         return back()->with('status', 'Profit deducted successfully!');
     }
