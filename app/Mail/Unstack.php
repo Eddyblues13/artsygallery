@@ -28,7 +28,7 @@ class Unstack extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmation of Profit Release for “Neonlight” - Action Required',
+            subject: 'Royalty Earned — Your Drop Has Been Unstaked',
         );
     }
 

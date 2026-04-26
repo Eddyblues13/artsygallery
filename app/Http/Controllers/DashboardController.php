@@ -1852,8 +1852,9 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     {
         $data['phone'] = DB::table('admins')->first();
 
-        $data['nftDrops'] = NftDrop::orderBy('created_at', 'desc')->paginate(12);
-
+        $data['nftDrops'] = NftDrop::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
 
         return view('dashboard.drops', $data);
     }
@@ -1862,26 +1863,30 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
     public function unstack(Request $request, $id)
     {
         try {
-            // Find the NFT drop
             $nftDrop = NftDrop::findOrFail($id);
+            $user    = Auth::user();
 
-            // Get the authenticated user
-            $user = Auth::user();
+            // Only the assigned user may unstake
+            if ($nftDrop->user_id && $nftDrop->user_id !== $user->id) {
+                return redirect()->back()->withErrors(['error' => 'This drop is not assigned to your account.']);
+            }
 
-            // Generate a unique transaction reference
-            $reference = substr(md5(mt_rand()), 0, 31);
+            // Calculate the accumulated ETH value (same formula as the card display)
+            $currentDay  = \Carbon\Carbon::now()->day;
+            $totalDays   = \Carbon\Carbon::now()->daysInMonth;
+            $progress    = ($currentDay / $totalDays) * 100;
+            $accumulatedEth = $nftDrop->is_positive
+                ? $nftDrop->eth_value + ($nftDrop->eth_value * ($progress / 100))
+                : max(0, $nftDrop->eth_value - ($nftDrop->eth_value * ($progress / 100)));
 
-            // Use the ETH value from the NFT drop
-            $nftEthPrice = $nftDrop->eth_value;
-            $nftPriceInUsd = $nftEthPrice;
-
-            // Create a new transaction
+            // Create profit transaction for the accumulated amount
+            $reference = substr(md5(uniqid('', true)), 0, 31);
             $transaction = new Transaction();
-            $transaction->user_id = $user->id;
-            $transaction->transaction_amount = $nftPriceInUsd;
-            $transaction->transaction_type = 'Profit';
-            $transaction->transaction_id = $reference;
-            $transaction->status = 1;
+            $transaction->user_id            = $user->id;
+            $transaction->transaction_amount = $accumulatedEth;
+            $transaction->transaction_type   = 'Profit';
+            $transaction->transaction_id     = $reference;
+            $transaction->status             = 1;
 
             if (!$transaction->save()) {
                 throw new \Exception('Failed to save the transaction.');
@@ -1889,23 +1894,28 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
             // Prepare email data
             $emailData = [
-                'name' => $user->name,
-                'email' => $user->email,
-                'nftName' => $nftDrop->name, // Assuming the NFT drop has a 'name' field
-                'nftPrice' => $nftPriceInUsd,
-                'ethPrice' => $nftEthPrice,
+                'name'           => $user->name,
+                'email'          => $user->email,
+                'nftName'        => $nftDrop->name,
+                'accumulatedEth' => number_format($accumulatedEth, 4),
+                'baseEth'        => number_format($nftDrop->eth_value, 4),
+                'progress'       => number_format($progress, 1),
             ];
 
-            // Delete the NFT drop
+            // Remove the drop after unstaking
             $nftDrop->delete();
 
-            // Send email notification
-            Mail::to($user->email)->send(new Unstack($emailData));
+            // Send royalty earned email
+            try {
+                Mail::to($user->email)->send(new Unstack($emailData));
+            } catch (\Throwable $mailErr) {
+                \Illuminate\Support\Facades\Log::error('Unstake mail failed: ' . $mailErr->getMessage());
+            }
 
-            return redirect()->back()->with('message', 'NFT Drop unstacked successfully, and ETH value credited.');
-        } catch (\Exception $e) {
-            // Handle any errors gracefully
-            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+            return redirect()->back()->with('message', 'Drop unstaked successfully! ' . number_format($accumulatedEth, 4) . ' ETH has been credited to your account as royalty earnings.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Unstack failed: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Unable to unstake right now. Please try again.']);
         }
     }
 
