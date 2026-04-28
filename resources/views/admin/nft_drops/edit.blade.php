@@ -81,8 +81,17 @@
                         </div>
                     </div>
 
-                    {{-- ETH Value & Change --}}
+                    {{-- USD Price, ETH Value & Change --}}
                     <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="usd_value">Price (USD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="usd_value"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="form-text" id="ethRateHint">Fetching ETH rate...</div>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold" for="eth_value">ETH Value</label>
                             <div class="input-group">
@@ -93,13 +102,14 @@
                                             fill="#6366f1" />
                                         <path d="M6.99984 0L0 11.11L6.99984 15.198V0Z" fill="#8b5cf6" />
                                     </svg></span>
-                                <input type="number" step="0.0001" min="0"
+                                <input type="number" step="0.00000001" min="0"
                                     class="form-control @error('eth_value') is-invalid @enderror" id="eth_value"
-                                    name="eth_value" value="{{ old('eth_value', $nftDrop->eth_value) }}" required>
+                                    name="eth_value" value="{{ old('eth_value', $nftDrop->eth_value) }}" required
+                                    readonly>
                                 @error('eth_value')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label fw-semibold" for="change">Change %</label>
                             <div class="input-group">
                                 <span class="input-group-text">%</span>
@@ -332,6 +342,49 @@
     const submitBtn   = document.getElementById('submitBtn');
     const btnText     = document.getElementById('submitBtnText');
     const btnSpinner  = document.getElementById('submitBtnSpinner');
+    const usdValueInput = document.getElementById('usd_value');
+    const ethValueInput = document.getElementById('eth_value');
+    const ethRateHint   = document.getElementById('ethRateHint');
+    let ethPriceUsd = null;
+
+    function formatEth(v) {
+        return Number(v).toFixed(8).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
+    }
+
+    function updateEthFromUsd() {
+        const usd = parseFloat(usdValueInput.value);
+        if (!ethPriceUsd || Number.isNaN(usd)) {
+            return;
+        }
+
+        const eth = usd / ethPriceUsd;
+        ethValueInput.value = eth > 0 ? formatEth(eth) : '0';
+    }
+
+    fetch('{{ route('api.eth.price') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(data => {
+            const parsed = parseFloat(data.eth_price_usd);
+            if (Number.isNaN(parsed) || parsed <= 0) {
+                throw new Error('Invalid ETH rate');
+            }
+            ethPriceUsd = parsed;
+            ethRateHint.textContent = '1 ETH = $' + parsed.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+            if (ethValueInput.value) {
+                const existingEth = parseFloat(ethValueInput.value);
+                if (!Number.isNaN(existingEth)) {
+                    usdValueInput.value = (existingEth * ethPriceUsd).toFixed(2);
+                }
+            }
+
+            updateEthFromUsd();
+        })
+        .catch(() => {
+            ethRateHint.textContent = 'Unable to fetch ETH rate. Please refresh and try again.';
+        });
+
+    usdValueInput.addEventListener('input', updateEthFromUsd);
 
     form.addEventListener('submit', function (e) {
         // Only intercept if a new file was chosen
@@ -347,17 +400,21 @@
 
         xhr.upload.addEventListener('progress', ev => {
             if (ev.lengthComputable) {
-                const pct = Math.round((ev.loaded / ev.total) * 100);
+                const pct = Math.min(99, Math.round((ev.loaded / ev.total) * 100));
                 progressFill.style.width = pct + '%';
                 progressPct.textContent  = pct + '%';
-                if (pct === 100) {
-                    progressLbl.textContent = 'Processing on server…';
-                    progressFill.style.background = 'linear-gradient(90deg,#10b981,#34d399)';
+                if (pct >= 99) {
+                    progressLbl.textContent = 'Finalizing upload...';
                 }
             }
         });
 
         xhr.addEventListener('load', () => {
+            progressFill.style.width = '100%';
+            progressPct.textContent = '100%';
+            progressLbl.textContent = 'Upload complete';
+            progressFill.style.background = 'linear-gradient(90deg,#10b981,#34d399)';
+
             if (xhr.responseURL) window.location.href = xhr.responseURL;
             else window.location.reload();
         });
@@ -389,7 +446,7 @@
         const q = this.value.trim();
         if (q.length < 2) { resultsBox.classList.add('d-none'); return; }
         searchTimer = setTimeout(() => {
-            fetch('{{ route('user.search') }}?query=' + encodeURIComponent(q), {
+            fetch('{{ route('admin.user.search') }}?query=' + encodeURIComponent(q), {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(r => r.json())
