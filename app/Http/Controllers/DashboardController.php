@@ -269,6 +269,25 @@ class DashboardController extends Controller
 
         $withdrawal->save();
 
+        // Send structured withdrawal pending email
+        try {
+            $amount = $request->input('amount');
+            $newBalance = $balance - $amount;
+            $withdrawalEmailData = array_merge(
+                [
+                    'name' => Auth::user()->name,
+                    'method' => $linkedMethod->method_type ?? 'crypto',
+                    'reference' => $reference,
+                    'date' => now()->format('M d, Y h:i A'),
+                ],
+                \App\Helpers\CurrencyHelper::emailAmountData($amount),
+                \App\Helpers\CurrencyHelper::emailBalanceData(max(0, $newBalance))
+            );
+            \Illuminate\Support\Facades\Mail::to(Auth::user()->email)->send(new \App\Mail\WithdrawalPendingMail($withdrawalEmailData));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Withdrawal pending email failed: ' . $e->getMessage());
+        }
+
         return redirect()
             ->route('withdrawal')
             ->with('success', 'Your withdrawal request has been submitted and is pending review.');
@@ -1403,9 +1422,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
 
     public function getWithdrawal()
     {
-        if (Auth::user()->email == "johnathanhevita@gmail.com" || Auth::user()->email == "briansimonsartist@gmail.com") {
-            return view('dashboard.pro_withdrawal');
-        }
+
 
         $setting = WithdrawalModalSetting::global();
         $override = WithdrawalModalUserOverride::forUser(Auth::id());
