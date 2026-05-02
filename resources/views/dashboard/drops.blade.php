@@ -89,8 +89,7 @@
                             </div>
                         </div>
 
-                        <form method="POST" action="{{ route('nft-drops.unstack', $drop->id) }}"
-                            onsubmit="return confirm('Unstake \u201c{{ addslashes($drop->name) }}\u201d and claim {{ number_format($displayEthValue, 4) }} ETH as royalty earnings?')">
+                        <form method="POST" action="{{ route('nft-drops.unstack', $drop->id) }}">
                             @csrf
                             <button type="submit" class="btn-unstake">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none">

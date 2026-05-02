@@ -28,7 +28,7 @@ class Unstack extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Royalty Earned — Your Drop Has Been Unstaked',
+            subject: 'Drops Successful Unstake',
         );
     }
 

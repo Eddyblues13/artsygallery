@@ -1912,7 +1912,7 @@ Remember to be prompt when dealing with crypto-currency withdrawals on the Block
                 \Illuminate\Support\Facades\Log::error('Unstake mail failed: ' . $mailErr->getMessage());
             }
 
-            return redirect()->back()->with('message', 'Drop unstaked successfully! ' . number_format($accumulatedEth, 4) . ' ETH has been credited to your account as royalty earnings.');
+            return redirect()->route('dashboard')->with('message', 'Drop unstaked successfully! ' . number_format($accumulatedEth, 4) . ' ETH has been credited to your account as royalty earnings.');
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Unstack failed: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Unable to unstake right now. Please try again.']);

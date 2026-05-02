@@ -1,7 +1,7 @@
 @extends('emails.partials.layout')
 
 @section('content')
-<h1 style="font-size:22px; color:#1a1a2e;">&#127881; Royalty Earned!</h1>
+<h1 style="font-size:22px; color:#1a1a2e;">&#127881; Drops Successful Unstake</h1>
 <p>Dear {{ $data['name'] }},</p>
 <p>Great news — you have successfully unstaked your Notable Drop and your accumulated royalty earnings have been
     credited to your account.</p>
